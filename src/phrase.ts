@@ -1,14 +1,17 @@
-type Fonction = "sujet" | "verbe_principal" | "cod" | "verbe";
+import {compare} from "./util";
+type Fonction = "sujet" | "verbe_principal" | "cod" | "verbes";
 // Ce type est un array de nombres, chaque nombre correspondant à la position d'un mot dans une phrase.
 // Un mot est défini comme un ensemble de caractères séparés par une espace, un trait-d'union, un tiret ou une apostrophe.
-type MotsPos = number[];
+export type MotsPos = number[];
+// Un simple alias de type: une représentation d'une Phrase en JSON
+//type JsonPhrase = string;
 
 export class Phrase {
     protected verbes: MotsPos = [];
     private _phrase_cassee: string[] = [];
     // id ne peut être qu'une valeur de type Fonction, mais TS ne veut pas que je mette autre chose qu'une string...
     // Pour être sûr qu'il s'agisse bien du type Fonctions, des accesseurs sont en place.
-    private _fonctions: { [id: string] : MotsPos} = {};
+    protected _fonctions: { [id: string] : MotsPos} = {};
     private static _separateur = /[ ,;?!.\'-]/;
     
     constructor(protected phrase: string) {
@@ -19,26 +22,32 @@ export class Phrase {
     get contenu(): string {
         return this.phrase;
     }
+    set contenu(phrase: string) {
+        /* Met à jour le contenu de la phrase
+         */
+        this.phrase = phrase;
+    }
+
     
-    get phraseCassee(): string[] {
+    get phraseCassee(): string[] { // TEST
         return this._phrase_cassee;
     }
 
-    get longueur(): number {
+    get longueur(): number { // TEST
         /* Renvoie le nombre de mots,
          * pas le nombre de caractères.
          */
         return this._phrase_cassee.length;
     }
 
-    fonctionPos(f: Fonction): MotsPos {
+    fonctionPos(f: Fonction): MotsPos { // TEST
         /* Renvoie les index correspondant à la fonction
          * s'ils existent
          */
         return this._fonctions[f];
     }
     
-    fonctionMots(f: Fonction): string {
+    fonctionMots(f: Fonction): string { // TEST
         /* Similaire à fonctionPos
          * mais renvoie les mots correspondants
          */
@@ -47,11 +56,11 @@ export class Phrase {
             .join(" ");
     }
 
-    declareFonction(f: Fonction, mots: MotsPos): void {
+    declareFonction(f: Fonction, mots: MotsPos): void { // TEST
         this._fonctions[f] = mots.sort();
     }
 
-    private _cassePhrase() {
+    private _cassePhrase() { // TEST
         /* Casse la phrase en mots en utilisant _separateur
          * pour séparer les mots
          */
@@ -60,22 +69,45 @@ export class Phrase {
             .filter(n=>n); // retire chaines vides
     }
 
-
 }
 
 export class PhraseCorrigee extends Phrase {
     /* Cette classe est utilisée pour la correction
      * d'une phrase.
      */
+
     constructor(phrase: string) {
         super(phrase);
     }
 
-    estFonction(f:Fonction, mot:MotsPos): boolean {
-        /*Vrai si mot a cette fonction
-         */
-        return this.fonctionPos(f) === mot.sort();
+    // http://choly.ca/post/typescript-json/#comment-2579491209
+    toJSON(): PhraseJSON { // TEST
+        return Object.assign(this);
     }
+
+    static reviver(key: string, value: any): any {
+        return key === "" ? PhraseCorrigee.fromJSON(value) : value;
+    }
+
+    static fromJSON(json: PhraseJSON|string): PhraseCorrigee { // TEST
+        if (typeof json === 'string') {
+            return JSON.parse(json, PhraseCorrigee.reviver);
+        } else {
+            let phrase = Object.create(PhraseCorrigee.prototype);
+            return Object.assign(phrase, json);
+        }
+    }
+
+    estFonction(f:Fonction, mot:MotsPos): boolean { // TEST
+        /*Vrai si mot a cette fonction d'après le corrigé
+         */
+        const fonction_pos = this.fonctionPos(f);
+        if (typeof fonction_pos === "undefined") {
+            return false;
+        }
+        return compare(this.fonctionPos(f),mot.sort());
+    }
+
 }
 
 export class SousPhrase extends Phrase {
@@ -97,12 +129,14 @@ export class PhraseEleve extends Phrase {
         this.corrige = corrige;
     }
 
-    declare(f: Fonction, elt: MotsPos): boolean {
+    declare(f: Fonction, elt: MotsPos): boolean { // TEST
         /* Enregistre une fonction pour cette phrase.
          * Vrai si elt a bien cette fonction
          * d'après le corrigé
          */
-        if (f === "verbe") {
+        if (f === "verbes") {
+// 	TODO problème ici: seule PhraseEleve enregistre les verbes à part:
+//ni PhraseCorrigee ni Phrase ne le font
             this.verbes = elt;
         } else {
             this.declareFonction(f, elt);
@@ -111,3 +145,10 @@ export class PhraseEleve extends Phrase {
     }
 
 }
+
+interface PhraseJSON {
+    phrase: string;
+    _fonctions: { [id: string] : MotsPos};
+    verbes: MotsPos;
+}
+
