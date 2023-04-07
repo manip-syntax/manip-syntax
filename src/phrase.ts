@@ -57,7 +57,12 @@ export class Phrase {
     }
 
     declareFonction(f: Fonction, mots: MotsPos): void { // TEST
-        this._fonctions[f] = mots.sort();
+        if (f === "verbes") {
+            //  TODO partie à tester?
+            this.verbes = mots;
+        } else {
+            this._fonctions[f] = mots.sort();
+        }
     }
 
     private _cassePhrase() { // TEST
@@ -82,6 +87,7 @@ export class PhraseCorrigee extends Phrase {
 
     // http://choly.ca/post/typescript-json/#comment-2579491209
     toJSON(): PhraseJSON { // TEST
+        // TODO enlever le superflu
         return Object.assign(this);
     }
 
@@ -90,6 +96,7 @@ export class PhraseCorrigee extends Phrase {
     }
 
     static fromJSON(json: PhraseJSON|string): PhraseCorrigee { // TEST
+        // TODO vérifier la validité de la phrase
         if (typeof json === 'string') {
             return JSON.parse(json, PhraseCorrigee.reviver);
         } else {
@@ -134,13 +141,7 @@ export class PhraseEleve extends Phrase {
          * Vrai si elt a bien cette fonction
          * d'après le corrigé
          */
-        if (f === "verbes") {
-// 	TODO problème ici: seule PhraseEleve enregistre les verbes à part:
-//ni PhraseCorrigee ni Phrase ne le font
-            this.verbes = elt;
-        } else {
-            this.declareFonction(f, elt);
-        }
+        this.declareFonction(f, elt);
         return this.corrige.estFonction(f, elt);
     }
 

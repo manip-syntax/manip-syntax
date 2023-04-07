@@ -1,0 +1,59 @@
+* {
+    box-sizing: border-box;
+}
+
+/* Style the header */
+.header {
+  grid-area: header;
+  background-color: #f1f1f1;
+  padding: 30px;
+  text-align: center;
+  font-size: 35px;
+}
+
+/* The grid container */
+.grid-container {
+  display: grid;
+  grid-template-areas: 
+    'header header header header header header' 
+    'left consigne consigne consigne consigne right' 
+    'left phrase phrase phrase phrase right' 
+    'footer footer footer footer footer footer';
+} 
+
+.gauche {
+    grid-area: left;
+}
+
+.consigne {
+    grid-area: consigne;
+}
+
+.phrase {
+    grid-area: phrase;
+}
+
+.footer {
+    grid-area: footer;
+}
+
+.footer {
+  grid-area: footer;
+  background-color: #f1f1f1;
+  padding: 10px;
+  text-align: center;
+}
+
+/* Responsive
+ */
+@media (max-width: 600px) {
+  .grid-container  {
+    grid-template-areas: 
+      'header header header header header header' 
+      'left left left left left left' 
+      'consigne consigne consigne consigne consigne consigne'
+      'phrase phrase phrase phrase phrase phrase'
+      'right right right right right right' 
+      'footer footer footer footer footer footer';
+  }
+}
