@@ -52,6 +52,7 @@ describe('Phrase class tests', () => {
       p.declareFonction("sujet",[0,1]);
       p.declareFonction("cod",[3,4]);
       let p_json_copie = JSON.stringify(p);
+      console.log(p_json_copie);
       let p_copie = PhraseCorrigee.fromJSON(p_json_copie);
       expect(p_copie.estFonction("verbe_principal",[2])).toBe(true);
       expect(p_copie.estFonction("sujet",[0,1])).toBe(true);

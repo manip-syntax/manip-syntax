@@ -1,10 +1,17 @@
 import {compare} from "./util";
-type Fonction = "sujet" | "verbe_principal" | "cod" | "verbes";
+type Fonction =
+    "verbes" |
+    "verbe_principal" |
+    "sujet" |
+    "cod" | "coi" |
+    "attribut_du_sujet" | "attribut_du_cod" |
+    "complément_d_agent" |
+    "complément_circonstanciel"
+;
+
 // Ce type est un array de nombres, chaque nombre correspondant à la position d'un mot dans une phrase.
 // Un mot est défini comme un ensemble de caractères séparés par une espace, un trait-d'union, un tiret ou une apostrophe.
 export type MotsPos = number[];
-// Un simple alias de type: une représentation d'une Phrase en JSON
-//type JsonPhrase = string;
 
 export class Phrase {
     protected verbes: MotsPos = [];
@@ -149,7 +156,7 @@ export class PhraseEleve extends Phrase {
 
 interface PhraseJSON {
     phrase: string;
-    _fonctions: { [id: string] : MotsPos};
+    _fonctions: { [id: string] : MotsPos|undefined};
     verbes: MotsPos;
 }
 

@@ -1,0 +1,59 @@
+[
+    {
+        "phrase":"Le chat mange la souris.",
+        "verbes":[2],
+        "_fonctions":{
+            "verbe_principal":[2],
+            "sujet":[0,1],
+            "cod":[3,4]
+        }
+    },
+    {
+        "phrase":"Marie donne du lait au chat.",
+        "verbes":[1],
+        "_fonctions":{
+            "verbe_principal":[1],
+            "sujet":[0],
+            "cod":[2,3],
+            "coi":[4,5]
+        }
+    },
+    {
+        "phrase":"Un véritable amant ne connaît point d'amis.",
+        "verbes":[4],
+        "_fonctions":{
+            "verbe_principal":[4],
+            "sujet":[0,1,2],
+            "cod":[6,7]
+        }
+    },
+    {
+        "phrase":"L'amour rend tout permis.",
+        "verbes":[2],
+        "_fonctions":{
+            "verbe_principal":[2],
+            "sujet":[0,1],
+            "cod":[3],
+            "attribut_du_cod":[4]
+        }
+    },
+    {
+        "phrase":"Vous êtes son rival ?",
+        "verbes":[1],
+        "_fonctions":{
+            "verbe_principal":[1],
+            "sujet":[0],
+            "attribut_du_sujet":[2,3]
+        }
+    },
+    {
+        "phrase":"Il est adoré d'elle.",
+        "verbes":[1,2],
+        "_fonctions":{
+            "verbe_principal":[1,2],
+            "sujet":[0],
+            "complément_d_agent":[3,4]
+        }
+    }
+
+]
