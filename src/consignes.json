@@ -1,0 +1,9 @@
+{
+    "verbes" : "Clique sur les verbes.",
+    "verbe_principal" : "Clique sur le verbe principal",
+    "sujet" : "Surligne le sujet",
+    "cod":"Surligne le Complément d'objet direct (COD).",
+    "coi" : "Surligne le Complément d'objet indirect (COI).",
+    "attribut_du_sujet":"Surligne l'attribut du sujet.",
+    "attribut_du_cod":"Surligne l'attribut du COD."
+}
