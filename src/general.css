@@ -1,49 +1,126 @@
 * {
     box-sizing: border-box;
+    font-family: "Noto Sans", sans-serif;
 }
 
-/* Style the header */
+body {
+    margin: 0;
+}
+
 .header {
   grid-area: header;
-  background-color: #f1f1f1;
-  padding: 30px;
-  text-align: center;
-  font-size: 35px;
+  background-color: #333;
+  font-size: 16px;
+  overflow: hidden;
 }
 
-/* The grid container */
+
+.header h1 {
+  font-family: "Oswald", sans-serif;
+  font-size: 21px;
+  text-align: center;
+  float: left;
+  margin:0;
+  padding: 10px;
+  padding-left: 15px;
+  padding-right: 15px;
+  text-decoration: none;
+  color: #f2f2f2;
+  height: 100%;
+  transition: 0.5s;
+}
+
+.header h1:hover {
+    background-color: #ddd;
+    color: black;
+    cursor: pointer;
+}
+
 .grid-container {
   display: grid;
   grid-template-areas: 
     'header header header header header header' 
-    'left consigne consigne consigne consigne right' 
-    'left phrase phrase phrase phrase right' 
+    'left central central central central right'
     'footer footer footer footer footer footer';
+    grid-template-columns: 0.5fr 1fr 1fr 1fr 1fr 0.5fr;
 } 
 
 .gauche {
     grid-area: left;
 }
 
-.consigne {
-    grid-area: consigne;
+.central {
+    grid-area: central;
+    padding: 20px;
+    margin: 5% auto;
+    border: 1px solid #888;
+    width: 100%;
+    background-color: #fefefe;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    border-radius: 5px;
 }
 
-.phrase {
-    grid-area: phrase;
+.droite {
+    grid-area: right;
 }
 
-.footer {
-    grid-area: footer;
-}
 
 .footer {
   grid-area: footer;
-  background-color: #f1f1f1;
+    background-color: #9BB7D4;
   padding: 10px;
   text-align: center;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
 }
 
+/* Boutons 
+ */
+.bouton {
+  border: none; /* Remove borders */
+  color: white; /* Add a text color */
+  padding: 14px 28px; /* Add some padding */
+  cursor: pointer; /* Add a pointer cursor on mouse-over */
+}
+
+.boutons-analyse-valider {
+    background-color: #f44336;
+    border-radius: 5px;
+    font-size: 30px;
+    display: block;
+    width: 100%;
+    transition: 0.5s;
+}
+.boutons-analyse-valider:hover {
+    background-color: #da190b;
+}
+
+
+.consigne {
+    font-size: 30px;
+    margin: 0;
+    padding-left: 10px;
+    border: 1px solid #888;
+    text-align: center;
+    background-color: #888;
+    color: white;
+    border-radius: 5px;
+}
+.consigne::before {
+    content: "\2139 ";
+    display:block; 
+  color: white;
+  border: 4px solid white;
+  text-align: center;
+  border-radius:50%; 
+  font-size: 25px;
+  width: 30px;
+  height: 30px;
+  float: left;
+
+}
 /* Responsive
  */
 @media (max-width: 600px) {
@@ -51,8 +128,7 @@
     grid-template-areas: 
       'header header header header header header' 
       'left left left left left left' 
-      'consigne consigne consigne consigne consigne consigne'
-      'phrase phrase phrase phrase phrase phrase'
+      'central central central central central central'
       'right right right right right right' 
       'footer footer footer footer footer footer';
   }

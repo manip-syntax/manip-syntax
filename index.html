@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald|Noto+Sans">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Manip@Syntaxe</title>
   </head>
@@ -12,17 +13,30 @@
             <h1>Manip@Syntaxe<h2>
         </div>
         <div class="gauche">Gauche</div>
-        <div class="consigne">Consigne</div>
-        <div class="phrase" id="phrase-analyse">
+        <div class="central">
+            <div class="consigne" id="consigne-container">Consigne</div>
+            <div class="phrase" id="phrase-analyse">
+                <p class="phrase-analyse-paragraphe" id="phrase-analyse-paragraphe">
+                </p>
+            </div>
+            <div class="boutons" id="boutons-analyse">
+                <button id="bouton-valider" class="bouton boutons-analyse-valider" type="button">Valider</button>
+            </div>
         </div>
         <div class="droite">Droite</div>
         <div class="footer">Mentions légales...</div>
     </div>
-    <div class="modal-choix-phrase" id="modal-choix-phrase">
-        <div class="modal-choix-phrase-contenu">
-            <span class="close" id="modal-choix-phrase-ferme">&times;</span>
+    <div class=" modal modal-choix-phrase" id="modal-choix-phrase">
+        <div class="modal-contenu modal-choix-phrase-contenu" id="modal-choix-phrase-contenu">
+            <h2>Sélectionne une phrase dans la liste suivante</h2>
             <ul id="modal-choix-phrase-liste">
             </ul>
+        </div>
+    </div>
+    <div class="modal modal-message" id="modal-message">
+        <div class="modal-contenu modal-message-contenu" id="modal-message-contenu">
+            <p class="modal-message-contenu-texte" id="modal-message-contenu-texte"></p>
+            <button id="modal-message-bouton" type="button" class="bouton modal-message-bouton">Ok</button>
         </div>
     </div>
     <script type="module" src="/src/main.ts"></script>

@@ -1,5 +1,5 @@
 import {compare} from "./util";
-type Fonction =
+export type Fonction =
     "verbes" |
     "verbe_principal" |
     "sujet" |
@@ -12,6 +12,8 @@ type Fonction =
 // Ce type est un array de nombres, chaque nombre correspondant à la position d'un mot dans une phrase.
 // Un mot est défini comme un ensemble de caractères séparés par une espace, un trait-d'union, un tiret ou une apostrophe.
 export type MotsPos = number[];
+// voir la fonction fonction_detaillee pour le détail de cet type
+export type FonctionEnchassee = [ Fonction, number, number];
 
 export class Phrase {
     protected verbes: MotsPos = [];
@@ -19,7 +21,8 @@ export class Phrase {
     // id ne peut être qu'une valeur de type Fonction, mais TS ne veut pas que je mette autre chose qu'une string...
     // Pour être sûr qu'il s'agisse bien du type Fonctions, des accesseurs sont en place.
     protected _fonctions: { [id: string] : MotsPos} = {};
-    private static _separateur = /[ ,;?!.\'-]/;
+    public static Separateur = "[ ,;?!.'-]";
+    private static _separateur = new RegExp(Phrase.Separateur);
     
     constructor(protected phrase: string) {
         this.phrase = phrase;
@@ -29,6 +32,7 @@ export class Phrase {
     get contenu(): string {
         return this.phrase;
     }
+
     set contenu(phrase: string) {
         /* Met à jour le contenu de la phrase
          */
@@ -47,10 +51,51 @@ export class Phrase {
         return this._phrase_cassee.length;
     }
 
+    static get separateur(): RegExp {
+        return this._separateur;
+    }
+
+    fonction(i: number) : Fonction[] { // TEST
+        /* Renvoie la ou les fonctions déclarées pour tel mot.
+         */
+        let rv:Fonction[] = [];
+        if (i >= this.longueur) {
+            return rv;
+        }
+        if (this.verbes.includes(i)) {
+            rv.push("verbes");
+        }
+        for (const key in this._fonctions) {
+            if (this._fonctions[key].includes(i)) {
+                rv.push(key as Fonction);
+            }
+        }
+        return rv;
+    }
+
+    fonction_detaillee(i: number): FonctionEnchassee[] { // TEST
+        /* Cette fonction renvoie un array de fonctions valables
+         * pour le mot entré.
+         * Chaque élément contient le nom de la fonction,
+         * le début de la fonction et la fin de la fonction
+         * L'ordre correspond à l'ordre des enchassements:
+         * le contenant se trouve avant le contenu // TODO partie à tester
+         */
+        return this.fonction(i)
+            .map( x => {
+                const positions = this.fonctionPos(x);
+                return [x, positions[0], positions.slice(-1)[0]] as FonctionEnchassee;
+            })
+            .sort( (a, b) => (a[2] - a[1]) > (b[2] - b[1]) ? -1 : 1);
+    }
+
     fonctionPos(f: Fonction): MotsPos { // TEST
         /* Renvoie les index correspondant à la fonction
          * s'ils existent
          */
+        if (f == "verbes") { // TODO partie à tester
+            return this.verbes;
+        }
         return this._fonctions[f];
     }
     
@@ -68,7 +113,9 @@ export class Phrase {
             //  TODO partie à tester?
             this.verbes = mots;
         } else {
-            this._fonctions[f] = mots.sort();
+            this._fonctions[f] = mots.sort(
+                (a,b) => a -b
+            );
         }
     }
 
@@ -112,6 +159,17 @@ export class PhraseCorrigee extends Phrase {
         }
     }
 
+    aFonction(f: Fonction): boolean { // TEST
+        /* Vrai si cette phrase contient cette fonction
+         * d'après le corrigé.
+         */
+        const pos = this.fonctionPos(f);
+        if (typeof pos === "undefined") {
+            return false;
+        }
+        return !compare(pos,[]);
+    }
+
     estFonction(f:Fonction, mot:MotsPos): boolean { // TEST
         /*Vrai si mot a cette fonction d'après le corrigé
          */
@@ -138,9 +196,13 @@ export class PhraseEleve extends Phrase {
      * Elle contient en outre la correction.
      */
 
-    constructor(phrase: string, private corrige: PhraseCorrigee) {
+    constructor(phrase: string, private _corrige: PhraseCorrigee) {
         super(phrase);
-        this.corrige = corrige;
+        this._corrige = _corrige;
+    }
+
+    get corrige (): PhraseCorrigee {
+        return this._corrige;
     }
 
     declare(f: Fonction, elt: MotsPos): boolean { // TEST
@@ -149,7 +211,7 @@ export class PhraseEleve extends Phrase {
          * d'après le corrigé
          */
         this.declareFonction(f, elt);
-        return this.corrige.estFonction(f, elt);
+        return this._corrige.estFonction(f, elt);
     }
 
 }

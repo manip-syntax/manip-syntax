@@ -1,0 +1,32 @@
+#phrase-analyse {
+    font-size: 50px;
+    text-align: center;
+    line-height: 50px;
+    padding: 20px;
+}
+
+.phrase-cliquable:hover {
+    cursor: pointer;
+}
+
+.phrase-selectionne {
+    font-weight: bold;
+    font-size: 55px;
+}
+
+.phrase-sujet {
+    text-decoration: underline red;
+}
+
+.phrase-verbe_principal {
+    text-decoration: wavy underline green;
+}
+
+.phrase-cod {
+    text-decoration: dashed underline blue;
+}
+
+.phrase-verbes {
+    font-style: italic;
+}
+

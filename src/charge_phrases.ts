@@ -19,8 +19,6 @@ export function charge_phrases(max: number, debut: number = 0): PhraseCorrigee[]
     // TODO implémentation temporaire pour des raisons de test
     let rt = phrases
         .slice(debut,debut + max);
-        //.map( elt => PhraseCorrigee.fromJSON(elt));
-    console.log(phrases.slice(debut,3));
     return rt;
 
 }

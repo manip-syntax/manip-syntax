@@ -39,4 +39,19 @@ export function cree_html_element(
         );
     return elt;
 }
+
+export function anime_disparition_modal(elt: HTMLElement, parent: HTMLElement) : void {
+    /* Fait l'animation définie par CSS pour elt 
+     * et fait disparaître parent 
+     */
+    elt.classList.add("modal-contenu-animation-disparition");
+
+    const f = () => {
+        parent.style.display = "none";
+        elt.classList.remove("modal-contenu-animation-disparition");
+        elt.removeEventListener("animationend",f);
+    };
+    elt.addEventListener("animationend",f); 
+
+}
     

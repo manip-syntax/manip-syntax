@@ -12,26 +12,58 @@
   background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
 
+
 /* Modal Content/Box */
-.modal-choix-phrase-contenu {
+.modal-contenu {
+    position: relative;
   background-color: #fefefe;
   margin: 15% auto; /* 15% from the top and centered */
   padding: 20px;
   border: 1px solid #888;
   width: 80%; /* Could be more or less, depending on screen size */
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animate-modal-choix-phrase;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animate-modal-choix-phrase;
+    animation-duration: 0.9s
 }
 
-/* The Close Button */
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
+
+@-webkit-keyframes animate-modal-choix-phrase {
+  from {top:-300px; opacity:0}
+  to {top:0; opacity:1}
 }
 
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
+@keyframes animate-modal-choix-phrase{
+  from {top:-300px; opacity:0}
+  to {top:0; opacity:1}
+}
+
+.modal-choix-phrase-contenu h2 {
+    text-align: center;
+    font-size: 30px;
+}
+
+#modal-choix-phrase-liste {
+    list-style-type: none;
+    padding: 3px;
+    margin: 0;
+    border: 1px solid grey;
+    border-collapse: collapse;
+    border-spacing: 0;
+    border-radius: 2px;
+}
+
+#modal-choix-phrase-liste li {
+    padding: 16px;
+    text-align: left;
+}
+
+#modal-choix-phrase-liste li:hover {
+    opacity: 0.7;
+    cursor: pointer;
+
+}
+#modal-choix-phrase-liste li:nth-child(odd) {
+    background-color: #9BB7D4;
 }

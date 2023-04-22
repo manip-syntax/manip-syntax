@@ -52,7 +52,6 @@ describe('Phrase class tests', () => {
       p.declareFonction("sujet",[0,1]);
       p.declareFonction("cod",[3,4]);
       let p_json_copie = JSON.stringify(p);
-      console.log(p_json_copie);
       let p_copie = PhraseCorrigee.fromJSON(p_json_copie);
       expect(p_copie.estFonction("verbe_principal",[2])).toBe(true);
       expect(p_copie.estFonction("sujet",[0,1])).toBe(true);
@@ -71,6 +70,48 @@ describe('Phrase class tests', () => {
       expect(phrase_eleve.declare("verbe_principal",[0])).toBe(false);
       expect(phrase_eleve.fonctionMots("verbe_principal")).toBe("Mon");
       expect(phrase_eleve.declare("verbe_principal",[3])).toBe(true);
+  });
+
+  test("Phrase trouve la bonne fonction pour un numéro donné.", () => {
+      const phrase = "Les sanglots longs des violons de l'automne blessent mon coeur d'une langueur motone";
+      let p = new Phrase(phrase);
+      // l'index doit être inférieur à la longueur de la phrase
+      expect(p.fonction(phrase.length)).toEqual([]);
+      p.declareFonction("verbes",[8]);
+      p.declareFonction("verbe_principal",[8]);
+      p.declareFonction("sujet",[0,1,2,3,4,5,6,7]);
+      p.declareFonction("cod",[9,10]);
+      p.declareFonction("coi",[11,12,13,14]);
+
+      expect(p.fonction(8).sort()).toEqual(["verbe_principal","verbes"].sort());
+      expect(p.fonction(1).sort()).toEqual(["sujet"]);
+      expect(p.fonction(10)).toEqual(["cod"]);
+  });
+
+  test("Phrase trouve la bonne fonction détaillée pour une position donnée", () => {
+      const phrase = "Les sanglots longs des violons de l'automne blessent mon coeur d'une langueur motone";
+      let p = new Phrase(phrase);
+      // l'index doit être inférieur à la longueur de la phrase
+      expect(p.fonction(phrase.length)).toEqual([]);
+      p.declareFonction("verbes",[8]);
+      p.declareFonction("verbe_principal",[8]);
+      p.declareFonction("sujet",[0,1,2,3,4,5,6,7]);
+      p.declareFonction("cod",[9,10]);
+      p.declareFonction("coi",[11,12,13,14]);
+      expect(p.fonction_detaillee(8)).toEqual([["verbes",8,8], ["verbe_principal",8,8]]);
+      expect(p.fonction_detaillee(3)).toEqual([["sujet",0,7]]);
+      expect(p.fonction_detaillee(10)).toEqual([["cod",9,10]]);
+  });
+
+  test("Corrige sait si la phrase contient telle ou telle fonction", () => {
+      let phrase = new PhraseCorrigee("La critique est aisée.");
+      phrase.declareFonction("verbe_principal",[2]);
+      phrase.declareFonction("sujet",[0,1]);
+      phrase.declareFonction("attribut_du_sujet",[3]);
+      expect(phrase.aFonction("sujet")).toBe(true);
+      expect(phrase.aFonction("attribut_du_sujet")).toBe(true);
+      expect(phrase.aFonction("verbe_principal")).toBe(true);
+      expect(phrase.aFonction("cod")).toBe(false);
   });
 });
 
