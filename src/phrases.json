@@ -5,7 +5,8 @@
         "_fonctions":{
             "verbe_principal":[2],
             "sujet":[0,1],
-            "cod":[3,4]
+            "cod":[3,4],
+            "groupe_verbal": [2,3,4]
         }
     },
     {
@@ -15,7 +16,8 @@
             "verbe_principal":[1],
             "sujet":[0],
             "cod":[2,3],
-            "coi":[4,5]
+            "coi":[4,5],
+            "groupe_verbal":[1,2,3,4,5]
         }
     },
     {
@@ -24,7 +26,8 @@
         "_fonctions":{
             "verbe_principal":[4],
             "sujet":[0,1,2],
-            "coi":[6,7]
+            "coi":[6,7],
+            "groupe_verbal":[3, 4, 5, 6, 7]
         }
     },
     {
@@ -34,7 +37,8 @@
             "verbe_principal":[2],
             "sujet":[0,1],
             "cod":[3],
-            "attribut_du_cod":[4]
+            "attribut_du_cod":[4],
+            "groupe_verbal" : [2,3,4]
         }
     },
     {
@@ -43,7 +47,8 @@
         "_fonctions":{
             "verbe_principal":[1],
             "sujet":[0],
-            "attribut_du_sujet":[2,3]
+            "attribut_du_sujet":[2,3],
+            "groupe_verbal":[1,2,3]
         }
     },
     {
@@ -52,7 +57,8 @@
         "_fonctions":{
             "verbe_principal":[1,2],
             "sujet":[0],
-            "complément_d_agent":[3,4]
+            "complément_d_agent":[3,4],
+            "groupe_verbal":[1,2,3,4]
         }
     }
 

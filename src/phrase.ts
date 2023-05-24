@@ -2,6 +2,7 @@ import {compare} from "./util";
 export type Fonction =
     "verbes" |
     "verbe_principal" |
+    "groupe_verbal" |
     "sujet" |
     "cod" | "coi" |
     "attribut_du_sujet" | "attribut_du_cod" |

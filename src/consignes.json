@@ -1,7 +1,8 @@
 [
     ["verbes" , "Clique sur les verbes."],
     ["verbe_principal" , "Clique sur le verbe principal"],
-    ["sujet" , "Surligne le sujet"],
+    ["groupe_verbal","Surligne le groupe verbal"],
+    ["sujet" , "Surligne le groupe sujet"],
     ["cod","Surligne le Complément d'objet direct (COD)."],
     ["coi" , "Surligne le Complément d'objet indirect (COI)."],
     ["attribut_du_sujet","Surligne l'attribut du sujet."],
