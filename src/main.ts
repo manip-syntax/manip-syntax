@@ -18,11 +18,13 @@ function analyse_fonction_requise(etape: number, phrase_eleve: PhraseEleve): voi
     const [fonction, consigne] = consignes[etape];
     non_null(document.getElementById("consigne-container")).innerHTML = `${consigne}`;
     non_null(document.getElementById("phrase-analyse-paragraphe")).innerHTML = affiche_phrase(phrase_eleve);
+    /*
     for (const elt of document.getElementsByClassName("phrase-cliquable")) {
         elt.addEventListener('click', () => {
             elt.classList.toggle("phrase-selectionne");
         });
     }
+    */
 
     fonction_de_validation = () => {
         const mots_selectionnes = Array.from(document.getElementsByClassName("phrase-selectionne"))
@@ -108,6 +110,29 @@ function selectionne_phrase() {
 
     }
 }
+
+// sélection des mots
+// // variable globale (bouh!!!!)
+let selection_active = false;
+const phrase_analyse_paragraphe = non_null(document.getElementById("phrase-analyse-paragraphe"));
+phrase_analyse_paragraphe.addEventListener('mousedown', e => {
+    const target = e.target as Element;
+    if (e.button != 0 || !target.classList.contains("phrase-cliquable")) {
+        return;
+    }
+    console.log(e);
+    selection_active = true;
+    target.classList.toggle("phrase-selectionne");
+});
+phrase_analyse_paragraphe.addEventListener('mouseover', e => {
+    const target = e.target as Element;
+    if (selection_active && target.classList.contains("phrase-cliquable")) {
+        target.classList.toggle("phrase-selectionne");
+    }
+});
+phrase_analyse_paragraphe.addEventListener('mouseup', _ => {
+    selection_active = false;
+});
 
 // bouton valider: évenement qui change pour éviter de surcharger le click sur le bouton
 let fonction_de_validation  = () => console.log("Problème: la validation n'a pas été mise en place");
