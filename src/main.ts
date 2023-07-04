@@ -16,15 +16,21 @@ function analyse_phrase(phrase_corrigee: PhraseCorrigee): void {
 
 function analyse_fonction_requise(etape: number, phrase_eleve: PhraseEleve): void {
     const [fonction, consigne] = consignes[etape];
+
+    function analyse_suivante ():void {
+        if (etape === consignes.length -1) {
+            analyse_finie();
+        } else {
+            analyse_fonction_requise(etape + 1, phrase_eleve);
+        }
+    }
+
+    if (!phrase_eleve.corrige.aFonction(fonction as Fonction)) {
+        // TODO demander d'abord à l'élève de trouver les fonctions? ou bien au fur et à mesure ?
+        analyse_suivante();
+    }
     non_null(document.getElementById("consigne-container")).innerHTML = `${consigne}`;
     non_null(document.getElementById("phrase-analyse-paragraphe")).innerHTML = affiche_phrase(phrase_eleve);
-    /*
-    for (const elt of document.getElementsByClassName("phrase-cliquable")) {
-        elt.addEventListener('click', () => {
-            elt.classList.toggle("phrase-selectionne");
-        });
-    }
-    */
 
     fonction_de_validation = () => {
         const mots_selectionnes = Array.from(document.getElementsByClassName("phrase-selectionne"))
@@ -49,11 +55,7 @@ function analyse_fonction_requise(etape: number, phrase_eleve: PhraseEleve): voi
                     });
             });
         } else {
-            if (etape === consignes.length -1) {
-                analyse_finie();
-            } else {
-                analyse_fonction_requise(etape + 1, phrase_eleve);
-            }
+            analyse_suivante();
         }
     };
 
@@ -125,6 +127,7 @@ phrase_analyse_paragraphe.addEventListener('mousedown', e => {
     target.classList.toggle("phrase-selectionne");
 });
 phrase_analyse_paragraphe.addEventListener('mouseover', e => {
+    // TODO bug: si on repasse trop vite ou trop lentement, on déselectionne/sélectionne plusieurs fois ce qui est désagréable et peu pratique
     const target = e.target as Element;
     if (selection_active && target.classList.contains("phrase-cliquable")) {
         target.classList.toggle("phrase-selectionne");
@@ -139,6 +142,13 @@ let fonction_de_validation  = () => console.log("Problème: la validation n'a pa
 non_null(document.getElementById("bouton-valider")).addEventListener('click', () => {
     fonction_de_validation();
 });
+// raccourci : appuyer sur entrée fait la même chose que d'appuyer sur valider
+// TODO si un modal avec un bouton "ok" est en place, appuyer sur ce bouton à la place
+document.onkeyup = function (e) {
+    if (e.which === 13) {
+        fonction_de_validation();
+    }
+};
 // bouton du modal de message: même chose
 let fonction_du_bouton_de_message = () => console.log("Problème: aucune fonction définie pour le bouton du message");
 non_null(document.getElementById("modal-message-bouton")).addEventListener('click', () => {
