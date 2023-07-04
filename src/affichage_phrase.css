@@ -3,6 +3,13 @@
     text-align: center;
     line-height: 50px;
     padding: 20px;
+    /* Empêcher la sélection de la phrase
+     * pour personnaliser le comportement */
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .phrase-cliquable:hover {
@@ -24,6 +31,10 @@
 
 .phrase-cod {
     text-decoration: dashed underline blue;
+}
+
+.phrase-coi {
+    text-decoration: dashed underline pink;
 }
 
 .phrase-verbes {
