@@ -1,5 +1,6 @@
 import {compare} from "./util";
 export type Fonction =
+// dans la phrase
     "verbes" |
     "verbe_principal" |
     "groupe_verbal" |
@@ -7,7 +8,18 @@ export type Fonction =
     "cod" | "coi" |
     "attribut_du_sujet" | "attribut_du_cod" |
     "complément_d_agent" |
-    "complément_circonstanciel"
+    "complément_circonstanciel" |
+    "complément_du_verbe_impersonnel" |
+// dans le GN
+    "complément_du_nom" |
+    "épithète" |
+    "apposition" |
+    "complément_de_l_adjectif" |
+// énonciatives et textuelles
+    "modalisateur" |
+    "auto-énonciative" |
+    "connecteur" |
+    "balise_textuelle"
 ;
 
 // Ce type est un array de nombres, chaque nombre correspondant à la position d'un mot dans une phrase.
