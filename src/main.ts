@@ -3,6 +3,7 @@ import './choix_phrase.css';
 import './modal.css';
 import { anime_disparition_modal, cree_html_element, non_null } from './util';
 import { affiche_phrase } from './affichage_phrase';
+import { nouvelle_phrase } from './nouvelle_phrase';
 import { charge_phrases } from './charge_phrases';
 import { Fonction, PhraseCorrigee, PhraseEleve } from './phrase';
 import consignes from './consignes.json';
@@ -24,10 +25,12 @@ function analyse_fonction_requise(etape: number, phrase_eleve: PhraseEleve): voi
             analyse_fonction_requise(etape + 1, phrase_eleve);
         }
     }
+    console.log(fonction);
+    console.log(phrase_eleve.corrige.aFonction(fonction as Fonction));
 
     if (!phrase_eleve.corrige.aFonction(fonction as Fonction)) {
         // TODO demander d'abord à l'élève de trouver les fonctions? ou bien au fur et à mesure ?
-        analyse_suivante();
+        return analyse_suivante();
     }
     non_null(document.getElementById("consigne-container")).innerHTML = `${consigne}`;
     non_null(document.getElementById("phrase-analyse-paragraphe")).innerHTML = affiche_phrase(phrase_eleve);
@@ -153,6 +156,11 @@ document.onkeyup = function (e) {
 let fonction_du_bouton_de_message = () => console.log("Problème: aucune fonction définie pour le bouton du message");
 non_null(document.getElementById("modal-message-bouton")).addEventListener('click', () => {
     fonction_du_bouton_de_message();
+});
+
+// Nouvelle phrase
+non_null(document.getElementById("nouvelle_phrase")).addEventListener('click', () => {
+    nouvelle_phrase();
 });
 
 selectionne_phrase();
