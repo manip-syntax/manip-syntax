@@ -3,6 +3,7 @@ export type Fonction =
 // dans la phrase
     "verbes" |
     "verbe_principal" |
+    "noyau" |
     "groupe_verbal" |
     "sujet" |
     "cod" | "coi" |

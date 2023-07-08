@@ -34,12 +34,21 @@
             <div class="modal modal-message" id="modal-message">
                 <div class="modal-contenu modal-message-contenu" id="modal-message-contenu">
                     <p class="modal-message-contenu-texte" id="modal-message-contenu-texte"></p>
-                    <button id="modal-message-bouton" type="button" class="bouton modal-message-bouton">Ok</button>
+                    <button id="modal-message-bouton" type="button" class="bouton modal-message-bouton">OK</button>
                 </div>
             </div>
             <div class="modal modal-nouvelle-phrase" id="modal-nouvelle-phrase">
                 <div class="modal-contenu modal-nouvelle-phrase-contenu" id="modal-nouvelle-phrase-contenu">
-                    <p class="modal-message-contenu-texte" id="modal-nouvelle-phrase-contenu-texte"></p>
+                    <h2>Nouvelle phrase</h2>
+                    <form>
+                        <div>
+                            <label for="nouvelle_phrase" class="modal-message-contenu-texte">Entrez la nouvelle phrase :</label>
+                            <textarea name="nouvelle_phrase"></textarea>
+                        </div>
+                        <label for="nouvelle_phrase_fonctions" class="modal-message-contenu-texte">Sélectionnez les fonctions présentes dans cette phrase :</label>
+                        <div id="nouvelle_phrase-fonctions-selection"></div>
+                    </form>
+                    <button id="modal-nouvelle_phrase-bouton" type="button" class="bouton modal-message-bouton">OK</button>
                 </div>
             </div>
         </div>
