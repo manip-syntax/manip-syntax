@@ -9,6 +9,36 @@ non_null(document.getElementById("modal-nouvelle_phrase-bouton")).addEventListen
     fonction_du_bouton_de_nouvelle_phrase();
 });
 
+
+const fonctions_choix : { [nom: string] : Fonction } = {
+    "Sujet" : "sujet",
+    "Verbe" : "verbe_principal",
+    "COD" : "cod",
+    "COI" : "coi",
+    "Attribut du sujet" : "attribut_du_sujet",
+    "Attribut du COD" : "attribut_du_cod",
+    "Complément d'agent" : "complément_d_agent",
+    "Complément circonstanciel" : "complément_circonstanciel",
+    "Complément du verbe impersonnel" : "complément_du_verbe_impersonnel",
+    "Modalisateur" : "modalisateur",
+    "Fonction auto-énonciative" : "auto-énonciative",
+    "Connecteur" : "connecteur",
+    "Balise textuelle" : "balise_textuelle"
+};
+
+function analyse_de_fonction(pos:number, phrase: PhraseEleve): void {
+        const [nom, fonction] = Object.entries(fonctions_choix)[pos];
+        non_null(document.getElementById("phrase-analyse-paragraphe")).innerHTML = affiche_phrase(phrase);
+        non_null(document.getElementById("consigne-container")).innerHTML = `Fonction à renseigner : ${nom}`;
+        fonctions_communes.fonction_de_validation = () => {
+            const mots_selectionnes = Array.from(document.getElementsByClassName("phrase-selectionne"))
+                              .map(elt => Number(elt.id.split('-')[2]));
+            phrase.declareFonction(fonction, mots_selectionnes);
+            const npos = pos === Object.entries(fonctions_choix).length - 1 ? 0 : pos + 1;
+            analyse_de_fonction(npos, phrase);
+        };
+}
+
 export function nouvelle_phrase() : void {
     // Disparition des autres modals
     for (const modal of non_null(document.getElementsByClassName("modal")) as HTMLCollectionOf<HTMLElement>) {
@@ -18,21 +48,6 @@ export function nouvelle_phrase() : void {
     const modal_nouvelle_phrase = non_null(document.getElementById("modal-nouvelle-phrase"));
     modal_nouvelle_phrase.style.display = "block";
     // remplissage du choix des  fonctions
-    const fonctions_choix : { [nom: string] : Fonction } = {
-        "Sujet" : "sujet",
-        "Verbe" : "verbe_principal",
-        "COD" : "cod",
-        "COI" : "coi",
-        "Attribut du sujet" : "attribut_du_sujet",
-        "Attribut du COD" : "attribut_du_cod",
-        "Complément d'agent" : "complément_d_agent",
-        "Complément circonstanciel" : "complément_circonstanciel",
-        "Complément du verbe impersonnel" : "complément_du_verbe_impersonnel",
-        "Modalisateur" : "modalisateur",
-        "Fonction auto-énonciative" : "auto-énonciative",
-        "Connecteur" : "connecteur",
-        "Balise textuelle" : "balise_textuelle"
-    };
     let options = "";
     Object.entries(fonctions_choix).forEach(
         ([nom, fonction, ]) => {
@@ -56,8 +71,7 @@ export function nouvelle_phrase() : void {
         }
         let nouvelle_phrase = new PhraseEleve(nouveau_texte, new PhraseCorrigee(nouveau_texte));
         modal_nouvelle_phrase.style.display = 'none';
-        non_null(document.getElementById("phrase-analyse-paragraphe")).innerHTML = affiche_phrase(nouvelle_phrase);
-        non_null(document.getElementById("consigne-container")).innerHTML = "Sélectionnez";
+        analyse_de_fonction(0, nouvelle_phrase);
         
 
 

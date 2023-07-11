@@ -124,7 +124,6 @@ phrase_analyse_paragraphe.addEventListener('mousedown', e => {
     if (e.button != 0 || !target.classList.contains("phrase-cliquable")) {
         return;
     }
-    console.log(e);
     selection_active = true;
     target.classList.toggle("phrase-selectionne");
 });
