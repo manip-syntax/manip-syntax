@@ -1,7 +1,7 @@
 import { affiche_phrase } from './affichage_phrase';
 import { Fonction, PhraseCorrigee, PhraseEleve } from './phrase';
 import { non_null } from './util';
-import consignes from './consignes.json';
+import { fonctions_communes } from './fonctions_partagees';
 
 // Nouvelle phrase: bouton ok
 let fonction_du_bouton_de_nouvelle_phrase = () => console.log("Problème: aucune fonction définie pour le bouton OK de la nouvelle phrase");
@@ -33,20 +33,33 @@ export function nouvelle_phrase() : void {
         "Connecteur" : "connecteur",
         "Balise textuelle" : "balise_textuelle"
     };
-    let html_boutons = "";
+    let options = "";
     Object.entries(fonctions_choix).forEach(
         ([nom, fonction, ]) => {
-            html_boutons += `<div><input type="checkbox" id="nouvelle_phrase_${fonction}" name="nouvelle_phrase_${fonction}" value="${fonction}" class="checkbox nouvelle_phrase-checkbox"><label for="${fonction}">${nom}</label></div>`;
+            options += `<option value="${fonction}">${nom}</option>\n`;
         });
-    non_null(document.getElementById("nouvelle_phrase-fonctions-selection")).innerHTML = html_boutons;
+    const liste_fonctions = non_null(document.getElementById("nouvelle_phrase-fonctions-selection"));
+    liste_fonctions.innerHTML = options;
+    liste_fonctions.style.display = 'block';
+    // Divers éléments à afficher
+    non_null(document.getElementById("conseil")).innerHTML = "Sélectionnez chaque fonction comme si vous étiez vous-même l'élève. Cliquez sur valider quand vous avez terminé votre sélection. Valider dans rien sélectionner indique que cette fonction est absente de la phrase. Vous pouvez toujours corriger une éventuelle erreur en sélectionnant une fonction dans la liste déroulante.";
+    const bouton_valider = non_null(document.getElementById("bouton-valider"));
+    bouton_valider.style.width = "50%";
+    bouton_valider.innerHTML = "Valider la fonction";
+    non_null(document.getElementById("bouton-valider-phrase")).style.display = "block";
 
     fonction_du_bouton_de_nouvelle_phrase = () => {
-        modal_nouvelle_phrase.style.display = 'none';
         let nouveau_texte = non_null(document.getElementById("nouvelle_phrase-texterea") as HTMLTextAreaElement).value;
+        if (nouveau_texte.trim() === '') {
+            // rien n'a été entré
+            return;
+        }
         let nouvelle_phrase = new PhraseEleve(nouveau_texte, new PhraseCorrigee(nouveau_texte));
+        modal_nouvelle_phrase.style.display = 'none';
         non_null(document.getElementById("phrase-analyse-paragraphe")).innerHTML = affiche_phrase(nouvelle_phrase);
+        non_null(document.getElementById("consigne-container")).innerHTML = "Sélectionnez";
+        
 
-        // itération sur les checkboxes -> on vérifie si elle est cochée et on passe à la suivante
 
     };
     

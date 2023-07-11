@@ -6,6 +6,7 @@ import { affiche_phrase } from './affichage_phrase';
 import { nouvelle_phrase } from './nouvelle_phrase';
 import { charge_phrases } from './charge_phrases';
 import { Fonction, PhraseCorrigee, PhraseEleve } from './phrase';
+import { fonctions_communes } from './fonctions_partagees';
 import consignes from './consignes.json';
 
 function analyse_phrase(phrase_corrigee: PhraseCorrigee): void {
@@ -25,8 +26,6 @@ function analyse_fonction_requise(etape: number, phrase_eleve: PhraseEleve): voi
             analyse_fonction_requise(etape + 1, phrase_eleve);
         }
     }
-    console.log(fonction);
-    console.log(phrase_eleve.corrige.aFonction(fonction as Fonction));
 
     if (!phrase_eleve.corrige.aFonction(fonction as Fonction)) {
         // TODO demander d'abord à l'élève de trouver les fonctions? ou bien au fur et à mesure ?
@@ -35,7 +34,7 @@ function analyse_fonction_requise(etape: number, phrase_eleve: PhraseEleve): voi
     non_null(document.getElementById("consigne-container")).innerHTML = `${consigne}`;
     non_null(document.getElementById("phrase-analyse-paragraphe")).innerHTML = affiche_phrase(phrase_eleve);
 
-    fonction_de_validation = () => {
+    fonctions_communes.fonction_de_validation = () => {
         const mots_selectionnes = Array.from(document.getElementsByClassName("phrase-selectionne"))
                               .map(elt => Number(elt.id.split('-')[2]));
         
@@ -141,15 +140,15 @@ phrase_analyse_paragraphe.addEventListener('mouseup', _ => {
 });
 
 // bouton valider: évenement qui change pour éviter de surcharger le click sur le bouton
-let fonction_de_validation  = () => console.log("Problème: la validation n'a pas été mise en place");
+//let fonctions_communes.fonction_de_validation  = () => console.log("Problème: la validation n'a pas été mise en place");
 non_null(document.getElementById("bouton-valider")).addEventListener('click', () => {
-    fonction_de_validation();
+    fonctions_communes.fonction_de_validation();
 });
 // raccourci : appuyer sur entrée fait la même chose que d'appuyer sur valider
 // TODO si un modal avec un bouton "ok" est en place, appuyer sur ce bouton à la place
 document.onkeyup = function (e) {
     if (e.which === 13) {
-        fonction_de_validation();
+        fonctions_communes.fonction_de_validation();
     }
 };
 // bouton du modal de message: même chose

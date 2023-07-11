@@ -90,18 +90,29 @@ body {
   color: white; /* Add a text color */
   padding: 14px 28px; /* Add some padding */
   cursor: pointer; /* Add a pointer cursor on mouse-over */
+  border-radius: 5px;
+  font-size: 30px;
+  display: block;
+  margin: -1px;
+    transition: 0.5s;
 }
 
 .boutons-analyse-valider {
     background-color: #f44336;
-    border-radius: 5px;
-    font-size: 30px;
-    display: block;
     width: 100%;
-    transition: 0.5s;
+    float: left;
 }
 .boutons-analyse-valider:hover {
     background-color: #da190b;
+}
+
+.boutons-valider-phrase {
+    background-color: #04AA6D;
+    width: 50%;
+    float: right;
+}
+.boutons-valider-phrase:hover {
+    background-color: #05c780;
 }
 
 
