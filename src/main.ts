@@ -1,7 +1,7 @@
 import './general.css';
 import './choix_phrase.css';
 import './modal.css';
-import { anime_disparition_modal, cree_html_element, non_null } from './util';
+import { anime_disparition_modal, byID, cree_html_element, non_null } from './util';
 import { affiche_phrase } from './affichage_phrase';
 import { nouvelle_phrase } from './nouvelle_phrase';
 import { charge_phrases } from './charge_phrases';
@@ -159,6 +159,26 @@ non_null(document.getElementById("modal-message-bouton")).addEventListener('clic
 // Nouvelle phrase
 non_null(document.getElementById("nouvelle_phrase")).addEventListener('click', () => {
     nouvelle_phrase();
+});
+
+// analyse depuis un fichier
+non_null(document.getElementById("analyse_fichier")).addEventListener('click', () => {
+    for (const modal of non_null(document.getElementsByClassName("modal")) as HTMLCollectionOf<HTMLElement>) {
+        modal.style.display = "none";
+    }
+    non_null(document.getElementById("modal-analyse-fichier")).style.display = "block";
+});
+
+// événement après chargement d'un fichier
+non_null(document.getElementById("analyse_fichier_input")).addEventListener("change", e => {
+    const target = e.target as HTMLInputElement;
+    const lecteur = new FileReader();
+    lecteur.addEventListener('load', (_) => {
+        analyse_phrase(PhraseCorrigee.fromJSON(lecteur.result));
+        byID("modal-analyse-fichier").style.display = "none";
+    });
+    lecteur.readAsText(target.files[0]);
+
 });
 
 selectionne_phrase();

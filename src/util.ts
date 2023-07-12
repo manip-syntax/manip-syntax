@@ -54,4 +54,8 @@ export function anime_disparition_modal(elt: HTMLElement, parent: HTMLElement) :
     elt.addEventListener("animationend",f); 
 
 }
+
+export function byID(id: string):HTMLElement {
+    return non_null(document.getElementById(id));
+}
     

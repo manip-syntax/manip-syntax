@@ -46,7 +46,7 @@ function analyse_de_fonction(pos:number, phrase: PhraseEleve): void {
         }
 
         fonction_de_validation_de_la_phrase = () => {
-            const filename = "phrase.v0.2.0.json";
+            const filename = "phrase.{{numéro_de_version}}.json";
 
             // TODO ajout de la version dans le fichier json?
             const blob = new Blob([JSON.stringify(phrase)], { type: "text/json" });
