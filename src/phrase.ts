@@ -53,6 +53,24 @@ export class Phrase {
         this.phrase = phrase;
     }
 
+    get copie(): Phrase {
+        /* Copie le contenu de la phrase
+         */
+        let copie = new Phrase(this.contenu);
+        copie.verbes = this.verbes;
+        copie._fonctions = this._fonctions;
+        return copie;
+    }
+
+    // http://choly.ca/post/typescript-json/#comment-2579491209
+    toJSON(): PhraseJSON { 
+        // une copie pour garder le strict nécessaire: les données
+        const copie = this.copie;
+        let copie_obj = Object.assign(copie);
+        delete copie_obj["_phrase_cassee"];
+        return copie_obj;
+    }
+
     
     get phraseCassee(): string[] { // TEST
         return this._phrase_cassee;
@@ -123,6 +141,10 @@ export class Phrase {
     }
 
     declareFonction(f: Fonction, mots: MotsPos): void { // TEST
+        if (mots.length === 0) {
+            // TODO partie à tester
+            return;
+        }
         if (f === "verbes") {
             //  TODO partie à tester?
             this.verbes = mots;

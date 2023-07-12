@@ -8,11 +8,18 @@ let fonction_du_bouton_de_nouvelle_phrase = () => console.log("Problème: aucune
 non_null(document.getElementById("modal-nouvelle_phrase-bouton")).addEventListener('click', () => {
     fonction_du_bouton_de_nouvelle_phrase();
 });
+// Nouvelle phrase: bouton validation de la phrase
+let fonction_de_validation_de_la_phrase = () => console.log("Problème: aucune fonction définie pour la validation de la nouvelle phrase");
+non_null(document.getElementById("bouton-valider-phrase")).addEventListener('click', () => {
+    fonction_de_validation_de_la_phrase();
+});
 
 
 const fonctions_choix : { [nom: string] : Fonction } = {
     "Sujet" : "sujet",
-    "Verbe" : "verbe_principal",
+    "Verbes" : "verbes",
+    "Verbe principal" : "verbe_principal",
+    "Groupe verbal" : "groupe_verbal",
     "COD" : "cod",
     "COI" : "coi",
     "Attribut du sujet" : "attribut_du_sujet",
@@ -29,13 +36,37 @@ const fonctions_choix : { [nom: string] : Fonction } = {
 function analyse_de_fonction(pos:number, phrase: PhraseEleve): void {
         const [nom, fonction] = Object.entries(fonctions_choix)[pos];
         non_null(document.getElementById("phrase-analyse-paragraphe")).innerHTML = affiche_phrase(phrase);
-        non_null(document.getElementById("consigne-container")).innerHTML = `Fonction à renseigner : ${nom}`;
-        fonctions_communes.fonction_de_validation = () => {
+        non_null(document.getElementById("consigne-container")).innerHTML = `À renseigner : ${nom}`;
+
+        const enregistre_fonction = () => {
             const mots_selectionnes = Array.from(document.getElementsByClassName("phrase-selectionne"))
                               .map(elt => Number(elt.id.split('-')[2]));
             phrase.declareFonction(fonction, mots_selectionnes);
+            return phrase;
+        }
+
+        fonction_de_validation_de_la_phrase = () => {
+            const filename = "phrase.v0.2.0.json";
+
+            // TODO ajout de la version dans le fichier json?
+            const blob = new Blob([JSON.stringify(phrase)], { type: "text/json" });
+            const lien = document.createElement('a');
+            lien.download = filename;
+            lien.href = window.URL.createObjectURL(blob);
+            lien.dataset.downloadurl = ["text/json", lien.download, lien.href].join(":");
+            const evt = new MouseEvent('click', {
+                view: window,
+                bubbles: true,
+                cancelable: true,
+            });
+            lien.dispatchEvent(evt);
+            lien.remove();
+            nouvelle_phrase();
+        };
+
+        fonctions_communes.fonction_de_validation = () => {
             const npos = pos === Object.entries(fonctions_choix).length - 1 ? 0 : pos + 1;
-            analyse_de_fonction(npos, phrase);
+            analyse_de_fonction(npos, enregistre_fonction());
         };
 }
 
@@ -61,7 +92,9 @@ export function nouvelle_phrase() : void {
     const bouton_valider = non_null(document.getElementById("bouton-valider"));
     bouton_valider.style.width = "50%";
     bouton_valider.innerHTML = "Valider la fonction";
-    non_null(document.getElementById("bouton-valider-phrase")).style.display = "block";
+    // validation de la phrase
+    const valider_phrase = non_null(document.getElementById("bouton-valider-phrase"));
+    valider_phrase.style.display = "block";
 
     fonction_du_bouton_de_nouvelle_phrase = () => {
         let nouveau_texte = non_null(document.getElementById("nouvelle_phrase-texterea") as HTMLTextAreaElement).value;
