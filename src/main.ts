@@ -31,8 +31,8 @@ function analyse_fonction_requise(etape: number, phrase_eleve: PhraseEleve): voi
         // TODO demander d'abord à l'élève de trouver les fonctions? ou bien au fur et à mesure ?
         return analyse_suivante();
     }
-    non_null(document.getElementById("consigne-container")).innerHTML = `${consigne}`;
-    non_null(document.getElementById("phrase-analyse-paragraphe")).innerHTML = affiche_phrase(phrase_eleve);
+    byID("consigne-container").innerHTML = `${consigne}`;
+    byID("phrase-analyse-paragraphe").innerHTML = affiche_phrase(phrase_eleve);
 
     fonctions_communes.fonction_de_validation = () => {
         const mots_selectionnes = Array.from(document.getElementsByClassName("phrase-selectionne"))
@@ -42,7 +42,7 @@ function analyse_fonction_requise(etape: number, phrase_eleve: PhraseEleve): voi
             !phrase_eleve.corrige.aFonction(fonction as Fonction) :
             phrase_eleve.declare(fonction as Fonction, mots_selectionnes);
         if (!reponse_correcte) {
-            const modal_message = non_null(document.getElementById("modal-message-contenu"));
+            const modal_message = byID("modal-message-contenu");
             modal_message.classList.add("modal-message-erreur");
             // TODO on pourrait peut-être être plus précis et dire s'il manque des mots, par exemple, ou si tous les mots sont faux
             definit_message_modal("Il y a une erreur dans ton analyse !", "Reprendre l'analyse", () => {
@@ -67,9 +67,9 @@ function definit_message_modal(texte: string, bouton: string, fonction: () => vo
     /* Le texte est affiché dans le modal, le bouton est un texte à afficher dans le bouton
      * la fonction est appelée lorsque le bouton est appuyé, après la disparition du modal
      */
-    const modal_message = non_null(document.getElementById("modal-message"));
-    const modal_message_contenu = non_null(document.getElementById("modal-message-contenu-texte"));
-    const modal_message_bouton = non_null(document.getElementById("modal-message-bouton"));
+    const modal_message = byID("modal-message");
+    const modal_message_contenu = byID("modal-message-contenu-texte");
+    const modal_message_bouton = byID("modal-message-bouton");
 
     modal_message_contenu.innerHTML = texte;
     modal_message_bouton.innerHTML = bouton;
@@ -77,7 +77,7 @@ function definit_message_modal(texte: string, bouton: string, fonction: () => vo
     fonction_du_bouton_de_message = () => {
         // disparition du modal puis appel de la fonction suivante
         anime_disparition_modal(
-            non_null(document.getElementById("modal-message-contenu")),
+            byID("modal-message-contenu"),
             modal_message);
 
         fonction();
@@ -92,12 +92,12 @@ function analyse_finie(): void {
 
 function selectionne_phrase() {
     // Sélection de la phrase et affichage du modal
-    const modal = non_null(document.getElementById("modal-choix-phrase"));
+    const modal = byID("modal-choix-phrase");
     modal.style.display = "block";
 
     // affichage des phrases à sélectionner
     const phrases = charge_phrases(5,0);
-    const html_liste = non_null(document.getElementById("modal-choix-phrase-liste"));
+    const html_liste = byID("modal-choix-phrase-liste");
     // réinitialisation de la liste
     html_liste.innerHTML = "";
 
@@ -109,7 +109,7 @@ function selectionne_phrase() {
         // sélection d'une phrase
         html_elt.addEventListener('click',() => {
             analyse_phrase(phrases[i]);
-            anime_disparition_modal(non_null(document.getElementById("modal-choix-phrase-contenu")), modal);
+            anime_disparition_modal(byID("modal-choix-phrase-contenu"), modal);
         });
 
     }
@@ -118,7 +118,7 @@ function selectionne_phrase() {
 // sélection des mots
 // // variable globale (bouh!!!!)
 let selection_active = false;
-const phrase_analyse_paragraphe = non_null(document.getElementById("phrase-analyse-paragraphe"));
+const phrase_analyse_paragraphe = byID("phrase-analyse-paragraphe");
 phrase_analyse_paragraphe.addEventListener('mousedown', e => {
     const target = e.target as Element;
     if (e.button != 0 || !target.classList.contains("phrase-cliquable")) {
@@ -140,7 +140,7 @@ phrase_analyse_paragraphe.addEventListener('mouseup', _ => {
 
 // bouton valider: évenement qui change pour éviter de surcharger le click sur le bouton
 //let fonctions_communes.fonction_de_validation  = () => console.log("Problème: la validation n'a pas été mise en place");
-non_null(document.getElementById("bouton-valider")).addEventListener('click', () => {
+byID("bouton-valider").addEventListener('click', () => {
     fonctions_communes.fonction_de_validation();
 });
 // raccourci : appuyer sur entrée fait la même chose que d'appuyer sur valider
@@ -152,32 +152,61 @@ document.onkeyup = function (e) {
 };
 // bouton du modal de message: même chose
 let fonction_du_bouton_de_message = () => console.log("Problème: aucune fonction définie pour le bouton du message");
-non_null(document.getElementById("modal-message-bouton")).addEventListener('click', () => {
+byID("modal-message-bouton").addEventListener('click', () => {
     fonction_du_bouton_de_message();
 });
 
 // Nouvelle phrase
-non_null(document.getElementById("nouvelle_phrase")).addEventListener('click', () => {
+byID("nouvelle_phrase").addEventListener('click', () => {
     nouvelle_phrase();
 });
 
 // analyse depuis un fichier
-non_null(document.getElementById("analyse_fichier")).addEventListener('click', () => {
+byID("analyse_fichier").addEventListener('click', () => {
     for (const modal of non_null(document.getElementsByClassName("modal")) as HTMLCollectionOf<HTMLElement>) {
         modal.style.display = "none";
     }
-    non_null(document.getElementById("modal-analyse-fichier")).style.display = "block";
+    byID("modal-analyse-fichier").style.display = "block";
 });
 
 // événement après chargement d'un fichier
-non_null(document.getElementById("analyse_fichier_input")).addEventListener("change", e => {
+byID("analyse_fichier_input").addEventListener("change", e => {
     const target = e.target as HTMLInputElement;
     const lecteur = new FileReader();
+    const disparition_modal = () => {
+        anime_disparition_modal(byID("modal-analyse-fichier-contenu"),byID("modal-analyse-fichier"));
+    }
+        
+    // vérifications
+    if (target.files!.length == 0) {
+        disparition_modal();
+        return definit_message_modal("Pas de fichier chargé.","OK",() => {});
+    } 
+    const fichier = target.files![0];
+    if (!((fichier.type ? fichier.type : "Introuvable").includes("json"))) {
+        disparition_modal();
+        return definit_message_modal("Format invalide","OK",() => {});
+    }
+
     lecteur.addEventListener('load', (_) => {
-        analyse_phrase(PhraseCorrigee.fromJSON(lecteur.result));
-        byID("modal-analyse-fichier").style.display = "none";
+        const json_contenu = lecteur.result ?? "";
+        if (typeof json_contenu !== "string" || json_contenu === "") {
+            disparition_modal();
+            return definit_message_modal("Fichier invalide","OK",() => {});
+        }
+
+        try {
+            analyse_phrase(PhraseCorrigee.fromJSON(json_contenu));
+        } catch (e) {
+            disparition_modal();
+            if (e instanceof TypeError) {
+                return definit_message_modal("Ce fichier n'est pas compatible avec la version actuelle du programme.", "OK", () => {});
+            }
+            return definit_message_modal("Fichier invalide", "OK", () => {});
+        }
+        disparition_modal();
     });
-    lecteur.readAsText(target.files[0]);
+    lecteur.readAsText(fichier);
 
 });
 
