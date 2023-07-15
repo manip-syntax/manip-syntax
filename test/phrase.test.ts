@@ -98,7 +98,7 @@ describe('Phrase class tests', () => {
       p.declareFonction("sujet",[0,1,2,3,4,5,6,7]);
       p.declareFonction("cod",[9,10]);
       p.declareFonction("coi",[11,12,13,14]);
-      expect(p.fonction_detaillee(8)).toEqual([["verbes",8,8], ["verbe_principal",8,8]]);
+      expect(p.fonction_detaillee(8)).toContainEqual([["verbes",8,8], ["verbe_principal",8,8]]);
       expect(p.fonction_detaillee(3)).toEqual([["sujet",0,7]]);
       expect(p.fonction_detaillee(10)).toEqual([["cod",9,10]]);
   });

@@ -58,4 +58,11 @@ export function anime_disparition_modal(elt: HTMLElement, parent: HTMLElement) :
 export function byID(id: string):HTMLElement {
     return non_null(document.getElementById(id));
 }
+
+export function assert(val: boolean, msg: string): void {
+    // renvoie une erreur si val est false
+    if (val === false) {
+        throw Error(msg);
+    }
+}
     
