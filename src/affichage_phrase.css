@@ -37,6 +37,22 @@
     text-decoration: dashed underline pink;
 }
 
+.phrase-attribut_du_sujet {
+    text-decoration: dashed underline green;
+}
+
+.phrase-attribut_du_cod {
+    text-decoration: dashed underline cyan;
+}
+
+.phrase-complement_d_agent {
+    text-decoration: underline pink;
+}
+
+.phrase-complement_du_verbe_impersonnel {
+    text-decoration: underline green;
+}
+
 .phrase-verbes {
     font-style: italic;
 }

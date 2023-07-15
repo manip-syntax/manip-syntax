@@ -8,17 +8,17 @@ export type Fonction =
     "sujet" |
     "cod" | "coi" |
     "attribut_du_sujet" | "attribut_du_cod" |
-    "complément_d_agent" |
-    "complément_circonstanciel" |
-    "complément_du_verbe_impersonnel" |
+    "complement_d_agent" |
+    "complement_circonstanciel" |
+    "complement_du_verbe_impersonnel" |
 // dans le GN
-    "complément_du_nom" |
-    "épithète" |
+    "complement_du_nom" |
+    "epithète" |
     "apposition" |
-    "complément_de_l_adjectif" |
+    "complement_de_l_adjectif" |
 // énonciatives et textuelles
     "modalisateur" |
-    "auto-énonciative" |
+    "auto-enonciative" |
     "connecteur" |
     "balise_textuelle"
 ;

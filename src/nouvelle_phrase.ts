@@ -2,6 +2,7 @@ import { affiche_phrase } from './affichage_phrase';
 import { Fonction, PhraseCorrigee, PhraseEleve } from './phrase';
 import { byID, non_null } from './util';
 import { fonctions_communes } from './fonctions_partagees';
+import './nouvelle_phrase.css';
 
 // Nouvelle phrase: bouton ok
 let fonction_du_bouton_de_nouvelle_phrase = () => console.log("Problème: aucune fonction définie pour le bouton OK de la nouvelle phrase");
@@ -29,9 +30,9 @@ const fonctions_choix : { [nom: string] : Fonction } = {
     "COI" : "coi",
     "Attribut du sujet" : "attribut_du_sujet",
     "Attribut du COD" : "attribut_du_cod",
-    "Complément d'agent" : "complément_d_agent",
+    "Complément d'agent" : "complement_d_agent",
     //"Complément circonstanciel" : "complément_circonstanciel",
-    "Complément du verbe impersonnel" : "complément_du_verbe_impersonnel",
+    "Complément du verbe impersonnel" : "complement_du_verbe_impersonnel",
     //"Modalisateur" : "modalisateur",
     //"Fonction auto-énonciative" : "auto-énonciative",
     //"Connecteur" : "connecteur",
