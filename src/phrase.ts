@@ -31,6 +31,8 @@ type MultiMotsPos = MotsPos[];
 // voir la fonction fonction_detaillee pour le détail de cet type
 export type FonctionEnchassee = [ Fonction, number, number];
 
+// TODO vérifier que les fonctions entrées sont dans les bornes
+
 class SyntagmeAbstrait {
     /* Représente la base de toute les classes de groupes de mots
      */
@@ -39,16 +41,21 @@ class SyntagmeAbstrait {
     protected _fonctions_uniques: { [id: string] : MotsPos } = {};
     protected _fonctions_multiples: { [id: string] : MultiMotsPos } = {};
     protected _groupes_enchasses: GroupeEnchasse[] = [];
-    public static Fonctions_multiples: Fonction[] = ["complement_circonstanciel", "modalisateur","auto-enonciative","connecteur","balise_textuelle"];
-
-    get groupes_enchasses(): GroupeEnchasse[] {
-        return this._groupes_enchasses;
-    }
+    public static Fonctions_multiples: Fonction[] = ["complement_circonstanciel", "modalisateur","auto-enonciative","connecteur","balise_textuelle","epithete","complement_du_nom","complement_de_l_adjectif","apposition"];
 
     cree_groupe_enchasse(contenu: MotsPos): GroupeEnchasse {
         const n = new GroupeEnchasse(contenu);
         this._groupes_enchasses.push(n);
         return n;
+    }
+
+    get groupes_enchasses_nombre(): number {
+        return this._groupes_enchasses.length;
+    }
+
+    groupe_enchasse(i: number): GroupeEnchasse {
+        assert(i < this.groupes_enchasses_nombre,`groupe_enchasse: ${i} ne correspond à aucun groupe enchassé.`);
+        return this._groupes_enchasses[i];
     }
 
     fonction(i: number) : Fonction[] { // TEST à faire
@@ -62,7 +69,7 @@ class SyntagmeAbstrait {
                 rv.push(key as Fonction);
             }
         }
-        for (const key in this._fonctions_multiples) { // TODO partie à tester
+        for (const key in this._fonctions_multiples) { 
             for (const e of this._fonctions_multiples[key]) {
                 if (e.includes(i)) {
                     rv.push(key as Fonction);
@@ -96,47 +103,50 @@ class SyntagmeAbstrait {
             .sort( (a, b) => (a[2] - a[1]) > (b[2] - b[1]) ? -1 : 1);
     }
 
-    fonctionPos(f: Fonction, numero_de_fonction: number = -1): MotsPos { // TEST à faire
+    fonctionPos(f: Fonction, numero_de_fonction: number = -1): MotsPos { // TEST 
         /* Renvoie les index correspondant à la fonction
          * s'ils existent
          * numero_de_fonction ne s'applique que s'il y a plusieurs fonctions dans la même phrase (par exemple des compléments circonstanciels)
          * Cette fonction renvoie un tableau vide en cas d'erreur
          */
-        if (numero_de_fonction >= 0) { // TODO partie à tester
-            assert(f in SyntagmeAbstrait.Fonctions_multiples,`fonctionPos:  ${f} n'est pas une fonction multiple`);
+        if (numero_de_fonction >= 0) { 
+            assert(SyntagmeAbstrait.Fonctions_multiples.includes(f),`fonctionPos:  ${f} n'est pas une fonction multiple`);
+        }
+
+        if (SyntagmeAbstrait.Fonctions_multiples.includes(f)) { 
+            assert(numero_de_fonction > -1,`fonctionPos: numero_de_fonction doit être supérieur à -1 pour les fonctions multiples comme ${f}`);
+
             if (! (f in this._fonctions_multiples) || numero_de_fonction >= this._fonctions_multiples[f].length) {
                 return [];
             }
             return this._fonctions_multiples[f][numero_de_fonction];
         }
 
-        if (! (f in this._fonctions_uniques)) { // TODO partie à tester
+        if (! (f in this._fonctions_uniques)) { 
             return [];
         }
         return this._fonctions_uniques[f];
     }
 
-    declareFonction(f: Fonction, mots: MotsPos, numero_de_fonction: number = -1): void { // TEST à faire
+    declareFonction(f: Fonction, mots: MotsPos, numero_de_fonction: number = -1): void { // TEST
         /* Déclare une fonction contenant les mots correspondants
          * si numero_de_fonction est précisé, la fonction correspondante sera modifiée.
          * S'il s'agit d'une fonction multiple et qu'il n'y a pas de numero_de_fonction,
          * la fonction sera ajoutée
          * Pour ajouter une fonction à un groupe enchâssé, il faut le déclarer directement dans ce groupe
+         * On peut utiliser cette méthode pour supprimer une fonction: il suffit que mots soit un array vide
          */
-        if (mots.length === 0) {
-            // TODO partie à tester
-            return;
-        }
         mots = mots.sort(
                 (a,b) => a -b
             );
-        if (SyntagmeAbstrait.Fonctions_multiples.includes(f)) { // TODO partie à tester
+        if (SyntagmeAbstrait.Fonctions_multiples.includes(f)) { 
             if (numero_de_fonction >= 0) {
-                assert(f in this._fonctions_multiples,`declareFonction: ${f} n'a pas été créé.`);
-                assert(numero_de_fonction <= this._fonctions_multiples[f].length, `declareFonction: ${numero_de_fonction} introuvable pour ${f}`);
+                assert(f in this._fonctions_multiples,`declareFonction: ${f} n'a pas été créé.`); // TEST
+                assert(numero_de_fonction < this._fonctions_multiples[f].length, `declareFonction: ${numero_de_fonction} introuvable pour ${f}`);
                 this._fonctions_multiples[f][numero_de_fonction] = mots;
             } else {
                 if (! (f in this._fonctions_multiples)) {
+                    // nouvel array pour la fonction qui n'a pas encore été créée
                     this._fonctions_multiples[f] = [];
                 }
                 this._fonctions_multiples[f].push(mots);
@@ -206,7 +216,7 @@ export class Phrase extends SyntagmeAbstrait {
         return this._separateur;
     }
 
-    fonction(i: number) : Fonction[] { // TEST à faire
+    fonction(i: number) : Fonction[] { // TEST 
         /* Renvoie la ou les fonctions déclarées pour tel mot.
          */
         let rv:Fonction[] = super.fonction(i);
@@ -221,20 +231,20 @@ export class Phrase extends SyntagmeAbstrait {
          * s'ils existent
          * numero_de_fonction ne s'applique que s'il y a plusieurs fonctions dans la même phrase (par exemple des compléments circonstanciels)
          */
-        if (f == "verbes") { // TODO partie à tester
+        if (f == "verbes") { 
             return this.verbes;
         }
         return super.fonctionPos(f, numero_de_fonction);
     }
     
-    fonctionMots(f: Fonction, numero_de_fonction: number = -1): string { // TEST à faire
+    fonctionMots(f: Fonction, numero_de_fonction: number = -1): string { // TEST 
         /* Similaire à fonctionPos
          * mais renvoie les mots correspondants
          */
-        if (numero_de_fonction >= 0) {
-            assert(f in SyntagmeAbstrait.Fonctions_multiples,`fonctionMots: ${f} n'est pas une fonction multiple`);
+        if (numero_de_fonction >= 0) { 
+            assert(SyntagmeAbstrait.Fonctions_multiples.includes(f),`fonctionMots: ${f} n'est pas une fonction multiple`);
             assert(f in this._fonctions_multiples,`fonctionMots: ${f} n'a pas été créé.`);
-            assert(numero_de_fonction <= this._fonctions_multiples[f].length, `fonctionMots: ${numero_de_fonction} introuvable pour ${f}`);
+            assert(numero_de_fonction < this._fonctions_multiples[f].length, `fonctionMots: ${numero_de_fonction} introuvable pour ${f}`);
         }
 
         return this.fonctionPos(f, numero_de_fonction)
@@ -248,8 +258,11 @@ export class Phrase extends SyntagmeAbstrait {
          * S'il s'agit d'une fonction multiple et qu'il n'y a pas de numero_de_fonction,
          * la fonction sera ajoutée
          */
+        if (mots.length > 0) {
+            // les mots rentrés sont-ils dans les bornes ? Le problème ne se pose pas si on veut supprimer la fonction
+            assert(mots[0] >= 0 && mots[mots.length -1] < this.longueur, `declareFonction: ${mots} ne correspond pas à une liste de mots valides. La longueur est de ${this.longueur}`);
+        }
         if (f === "verbes") {
-            //  TODO partie à tester?
             this.verbes = mots;
         } else {
             super.declareFonction(f, mots, numero_de_fonction);
@@ -308,7 +321,6 @@ export class PhraseCorrigee extends Phrase {
 export class GroupeEnchasse extends SyntagmeAbstrait {
     /* Représente un groupe de mots enchâssés dans une phrase
      */
-    Fonctions_multiples: Fonction[]  = [...SyntagmeAbstrait.Fonctions_multiples,"epithete","complement_du_nom","complement_de_l_adjectif","apposition"];
 
     constructor(private _contenu: MotsPos) {
         super();
