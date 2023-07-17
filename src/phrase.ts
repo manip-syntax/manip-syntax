@@ -58,6 +58,13 @@ class SyntagmeAbstrait {
         return this._groupes_enchasses[i];
     }
 
+    fonctions_multiples_nombre(f: Fonction): number {
+        /* renvoie le nombre de f dans un syntagme donné
+         */
+        const m = this._fonctions_multiples;
+        return f in m ? m[f].length : 0;
+    }
+
     fonction(i: number) : Fonction[] { // TEST à faire
         /* Renvoie la ou les fonctions déclarées pour tel mot.
          */
@@ -140,7 +147,7 @@ class SyntagmeAbstrait {
                 (a,b) => a -b
             );
         if (SyntagmeAbstrait.Fonctions_multiples.includes(f)) { 
-            if (numero_de_fonction >= 0) {
+            if (numero_de_fonction > 0) { // on accepte que le numéro soit de zéro pour créer une première fonction
                 assert(f in this._fonctions_multiples,`declareFonction: ${f} n'a pas été créé.`); // TEST
                 assert(numero_de_fonction < this._fonctions_multiples[f].length, `declareFonction: ${numero_de_fonction} introuvable pour ${f}`);
                 this._fonctions_multiples[f][numero_de_fonction] = mots;
@@ -148,6 +155,10 @@ class SyntagmeAbstrait {
                 if (! (f in this._fonctions_multiples)) {
                     // nouvel array pour la fonction qui n'a pas encore été créée
                     this._fonctions_multiples[f] = [];
+                }
+                if (numero_de_fonction === 0) {
+                    this._fonctions_multiples[f][0] = mots;
+                    return;
                 }
                 this._fonctions_multiples[f].push(mots);
             }

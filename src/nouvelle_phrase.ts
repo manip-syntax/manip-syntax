@@ -24,6 +24,7 @@ let enregistre_fonction = () => {
 const fonctions_choix : { [nom: string] : Fonction } = {
     "Sujet" : "sujet",
     "Verbes" : "verbes",
+    "Noyau" : "noyau",
     "Verbe principal" : "verbe_principal",
     "Groupe verbal" : "groupe_verbal",
     "COD" : "cod",
@@ -31,23 +32,25 @@ const fonctions_choix : { [nom: string] : Fonction } = {
     "Attribut du sujet" : "attribut_du_sujet",
     "Attribut du COD" : "attribut_du_cod",
     "Complément d'agent" : "complement_d_agent",
-    //"Complément circonstanciel" : "complément_circonstanciel",
+    "Complément circonstanciel" : "complement_circonstanciel",
     "Complément du verbe impersonnel" : "complement_du_verbe_impersonnel",
-    //"Modalisateur" : "modalisateur",
-    //"Fonction auto-énonciative" : "auto-énonciative",
-    //"Connecteur" : "connecteur",
-    //"Balise textuelle" : "balise_textuelle"
+    "Modalisateur" : "modalisateur",
+    "Fonction auto-énonciative" : "auto-enonciative",
+    "Connecteur" : "connecteur",
+    "Balise textuelle" : "balise_textuelle"
 };
 
 function analyse_de_fonction(pos:number, phrase: PhraseEleve): void {
         const [nom, fonction] = Object.entries(fonctions_choix)[pos];
         non_null(document.getElementById("phrase-analyse-paragraphe")).innerHTML = affiche_phrase(phrase);
-        non_null(document.getElementById("consigne-container")).innerHTML = `À renseigner : ${nom}`;
+        const nom_complet = PhraseEleve.Fonctions_multiples.includes(fonction) ? `${nom} ${phrase.fonctions_multiples_nombre(fonction) + 1}` : nom;
+        non_null(document.getElementById("consigne-container")).innerHTML = `À renseigner : ${nom_complet}`;
 
         enregistre_fonction = () => {
             const mots_selectionnes = Array.from(document.getElementsByClassName("phrase-selectionne"))
                               .map(elt => Number(elt.id.split('-')[2]));
-            phrase.declareFonction(fonction, mots_selectionnes);
+            const numero_de_fonction = PhraseEleve.Fonctions_multiples.includes(fonction) ? phrase.fonctions_multiples_nombre(fonction) : -1;
+            phrase.declareFonction(fonction, mots_selectionnes, numero_de_fonction);
             return phrase;
         }
 
@@ -75,7 +78,6 @@ function analyse_de_fonction(pos:number, phrase: PhraseEleve): void {
             analyse_de_fonction(npos, enregistre_fonction());
             // sélecteur
             const selecteur = byID("nouvelle_phrase-fonctions-selection") as HTMLSelectElement;
-            // BUG: si on sélectionne depuis le sélecteur, c'est le mauvais index qui est choisi
             selecteur.selectedIndex = npos;
         };
 }

@@ -50,7 +50,7 @@ describe('Phrase class tests', () => {
       p3.declareFonction("complement_circonstanciel",cc1,0); // normalement, pas de nouveau cc, mais on change l'ancien
       expect(p3.fonctionPos("complement_circonstanciel",0)).toEqual(cc1);
       expect(p3.fonctionPos("complement_circonstanciel",2)).toEqual([]);
-      expect(() => { p3.declareFonction("auto-enonciative",[1,2],0); }).toThrow();
+      expect(() => { p3.declareFonction("auto-enonciative",[1,2],1); }).toThrow();
       expect(p3.fonctionPos("auto-enonciative",0)).toEqual([]);
       expect(() => { p3.declareFonction("complement_circonstanciel",cc1,2);}).toThrow();
 
