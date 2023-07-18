@@ -43,6 +43,11 @@ class SyntagmeAbstrait {
     protected _groupes_enchasses: GroupeEnchasse[] = [];
     public static Fonctions_multiples: Fonction[] = ["complement_circonstanciel", "modalisateur","auto-enonciative","connecteur","balise_textuelle","epithete","complement_du_nom","complement_de_l_adjectif","apposition"];
 
+    _fonction_enchassee = (f: Fonction, m: MotsPos) => {
+        return [f, m[0], m.slice(-1)[0]] as FonctionEnchassee;
+    }
+
+
     cree_groupe_enchasse(contenu: MotsPos): GroupeEnchasse {
         const n = new GroupeEnchasse(contenu);
         this._groupes_enchasses.push(n);
@@ -102,12 +107,36 @@ class SyntagmeAbstrait {
          * L'ordre correspond à l'ordre des enchassements:
          * le contenant se trouve avant le contenu // TODO partie à tester
          */
+        let rv: FonctionEnchassee[] = [];
+
+        for (const key in this._fonctions_uniques) {
+            if (this._fonctions_uniques[key].includes(i)) {
+                rv.push(this._fonction_enchassee(key as Fonction, this._fonctions_uniques[key]));
+            }
+        }
+        const m = this._fonctions_multiples;
+        for (const key in m) {
+            for (const e of m[key]) {
+                if (e.includes(i)) {
+                    rv.push(this._fonction_enchassee(key as Fonction, e));
+                }
+            }
+        }
+        // TODO enchassements
+
+        return rv
+            .sort( (a, b) => (a[2] - a[1]) > (b[2] - b[1]) ? -1 : 1);
+
+
+            /*
         return this.fonction(i)
             .map( x => {
-                const positions = this.fonctionPos(x);
+                const numero_de_fonction: number = SyntagmeAbstrait.Fonctions_multiples.includes(x) ? 0: -1;
+                const positions = this.fonctionPos(x, numero_de_fonction);
                 return [x, positions[0], positions.slice(-1)[0]] as FonctionEnchassee;
             })
             .sort( (a, b) => (a[2] - a[1]) > (b[2] - b[1]) ? -1 : 1);
+            */
     }
 
     fonctionPos(f: Fonction, numero_de_fonction: number = -1): MotsPos { // TEST 
@@ -147,20 +176,17 @@ class SyntagmeAbstrait {
                 (a,b) => a -b
             );
         if (SyntagmeAbstrait.Fonctions_multiples.includes(f)) { 
-            if (numero_de_fonction > 0) { // on accepte que le numéro soit de zéro pour créer une première fonction
-                assert(f in this._fonctions_multiples,`declareFonction: ${f} n'a pas été créé.`); // TEST
-                assert(numero_de_fonction < this._fonctions_multiples[f].length, `declareFonction: ${numero_de_fonction} introuvable pour ${f}`);
-                this._fonctions_multiples[f][numero_de_fonction] = mots;
+            let fm = this._fonctions_multiples;
+            if (! (f in fm)) {
+                assert(numero_de_fonction <= 0, `declareFonction: ${numero_de_fonction} introuvable pour ${f}`);
+                // nouvel array pour la fonction qui n'a pas encore été créée
+                fm[f] = [];
+            }
+            if (numero_de_fonction === -1 || numero_de_fonction === fm[f].length) {
+                fm[f].push(mots);
             } else {
-                if (! (f in this._fonctions_multiples)) {
-                    // nouvel array pour la fonction qui n'a pas encore été créée
-                    this._fonctions_multiples[f] = [];
-                }
-                if (numero_de_fonction === 0) {
-                    this._fonctions_multiples[f][0] = mots;
-                    return;
-                }
-                this._fonctions_multiples[f].push(mots);
+                assert(numero_de_fonction < fm[f].length, `declareFonction: ${numero_de_fonction} introuvable pour ${f}`);
+                fm[f][numero_de_fonction] = mots;
             }
         } else {
             this._fonctions_uniques[f] = mots;
@@ -233,6 +259,14 @@ export class Phrase extends SyntagmeAbstrait {
         let rv:Fonction[] = super.fonction(i);
         if (this.verbes.includes(i)) {
             rv.push("verbes");
+        }
+        return rv;
+    }
+
+    fonction_detaillee(i: number): FonctionEnchassee[] {
+        let rv = super.fonction_detaillee(i);
+        if (this.verbes.includes(i)) {
+            rv.push(this._fonction_enchassee("verbes",this.verbes));
         }
         return rv;
     }
@@ -335,8 +369,16 @@ export class GroupeEnchasse extends SyntagmeAbstrait {
 
     constructor(private _contenu: MotsPos) {
         super();
-        console.log(this._contenu);
     }
+
+    declareFonction(f: Fonction, mots: MotsPos, numero_de_fonction: number = -1): void {
+        if (mots.length > 0) {
+            // les mots rentrés sont-ils dans les bornes ? Le problème ne se pose pas si on veut supprimer la fonction
+            assert(mots[0] >= 0 && mots[mots.length -1] < this._contenu.length, `declareFonction: ${mots} ne correspond pas à une liste de mots valides. La longueur est de ${this._contenu.length}`);
+        }
+        super.declareFonction(f, mots, numero_de_fonction);
+    }
+
 }
 
 export class PhraseEleve extends Phrase {

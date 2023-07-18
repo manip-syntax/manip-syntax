@@ -52,7 +52,7 @@ describe('Phrase class tests', () => {
       expect(p3.fonctionPos("complement_circonstanciel",2)).toEqual([]);
       expect(() => { p3.declareFonction("auto-enonciative",[1,2],1); }).toThrow();
       expect(p3.fonctionPos("auto-enonciative",0)).toEqual([]);
-      expect(() => { p3.declareFonction("complement_circonstanciel",cc1,2);}).toThrow();
+      expect(() => { p3.declareFonction("complement_circonstanciel",cc1,3);}).toThrow();
 
       // divers aspects de fonctionMots
       expect( () => { p3.fonctionMots("sujet",0);}).toThrow();
@@ -145,6 +145,11 @@ describe('Phrase class tests', () => {
       expect(p.fonction_detaillee(8)).toHaveLength(2);
       expect(p.fonction_detaillee(3)).toEqual([["sujet",0,7]]);
       expect(p.fonction_detaillee(10)).toEqual([["cod",9,10]]);
+
+      let p2 = new Phrase("Il vécut à Paris en 1801.");
+      p2.declareFonction("complement_circonstanciel",[2,3]);
+      p2.declareFonction("complement_circonstanciel",[4,5]);
+      expect(p2.fonction_detaillee(4)).toEqual([["complement_circonstanciel",4,5]]);
   });
 
   test("Corrige sait si la phrase contient telle ou telle fonction", () => {
