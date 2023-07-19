@@ -1,6 +1,6 @@
 import { affiche_phrase } from './affichage_phrase';
 import { Fonction, PhraseCorrigee, PhraseEleve } from './phrase';
-import { byID, non_null } from './util';
+import { assert, byID, non_null } from './util';
 import { fonctions_communes } from './fonctions_partagees';
 import './nouvelle_phrase.css';
 
@@ -16,7 +16,7 @@ non_null(document.getElementById("bouton-valider-phrase")).addEventListener('cli
 });
 let enregistre_fonction = () => {
     console.log("Problème: enregistre_fonction n'a pas été instancié");
-    return new PhraseEleve("vide",new PhraseCorrigee("vide"));
+    return new PhraseEnveloppe("vide");
 }
 
 
@@ -40,17 +40,86 @@ const fonctions_choix : { [nom: string] : Fonction } = {
     "Balise textuelle" : "balise_textuelle"
 };
 
-function analyse_de_fonction(pos:number, phrase: PhraseEleve): void {
+
+class _fonction_tracee {
+    public pos: number = 0;
+    public longueur: number = 0;
+    public changee: boolean = false;
+    public nom: Fonction; 
+    constructor(nom: Fonction) {
+        this.pos = 0;
+        this.longueur = 0;
+        this.nom = nom;
+    }
+}
+
+class PhraseEnveloppe {
+
+    private _phrase: PhraseEleve;
+    private _fonctions_multiples_traceur : { [nom: string] : _fonction_tracee } = {
+        "complement_circonstanciel": new _fonction_tracee("complement_circonstanciel"),
+        "balise_textuelle" : new _fonction_tracee("balise_textuelle"),
+        "modalisateur" : new _fonction_tracee("modalisateur"),
+        "auto-enonciative" : new _fonction_tracee("auto-enonciative"),
+        "connecteur" : new _fonction_tracee("connecteur")
+    };
+
+    _verifie_existence_fonction(nom: Fonction) {
+        assert(nom in this._fonctions_multiples_traceur,"${nom} n'est pas une fonction multiple");
+    }
+
+    constructor(texte: string) {
+        this._phrase = new PhraseEleve(texte, new PhraseCorrigee(texte));
+    }
+
+    get phrase(): PhraseEleve {
+        return this._phrase;
+    }
+
+    fm_pos(nom: Fonction): number {
+        this._verifie_existence_fonction(nom);
+        return this._fonctions_multiples_traceur[nom].pos;
+    }
+
+    fm_ajouter(nom: Fonction): void {
+        this._verifie_existence_fonction(nom);
+        this._fonctions_multiples_traceur[nom].pos += 1;
+        this._fonctions_multiples_traceur[nom].changee = true;
+    }
+
+    fm_changer(nom: Fonction, val: boolean): boolean {
+        this._verifie_existence_fonction(nom);
+        this._fonctions_multiples_traceur[nom].changee = val;
+        return val;
+    }
+
+    fm_changee(nom: Fonction): boolean {
+        this._verifie_existence_fonction(nom);
+        return this._fonctions_multiples_traceur[nom].changee;
+    }
+}
+
+function analyse_de_fonction(pos:number, phrase: PhraseEnveloppe): void {
         const [nom, fonction] = Object.entries(fonctions_choix)[pos];
-        non_null(document.getElementById("phrase-analyse-paragraphe")).innerHTML = affiche_phrase(phrase);
-        const nom_complet = PhraseEleve.Fonctions_multiples.includes(fonction) ? `${nom} ${phrase.fonctions_multiples_nombre(fonction) + 1}` : nom;
+        non_null(document.getElementById("phrase-analyse-paragraphe")).innerHTML = affiche_phrase(phrase.phrase);
+        const nom_complet = PhraseEleve.Fonctions_multiples.includes(fonction) ? `${nom} ${phrase.fm_pos(fonction)+1}` : nom;
         non_null(document.getElementById("consigne-container")).innerHTML = `À renseigner : ${nom_complet}`;
 
         enregistre_fonction = () => {
             const mots_selectionnes = Array.from(document.getElementsByClassName("phrase-selectionne"))
                               .map(elt => Number(elt.id.split('-')[2]));
-            const numero_de_fonction = PhraseEleve.Fonctions_multiples.includes(fonction) ? phrase.fonctions_multiples_nombre(fonction) : -1;
-            phrase.declareFonction(fonction, mots_selectionnes, numero_de_fonction);
+            const numero_de_fonction = PhraseEleve.Fonctions_multiples.includes(fonction) ? phrase.fm_pos(fonction) : -1;
+            if (PhraseEleve.Fonctions_multiples.includes(fonction)) {
+                if (phrase.phrase.fonctions_multiples_nombre(fonction) === phrase.fm_pos(fonction) 
+                    && mots_selectionnes.length === 0) {
+                    // si c'est une fonction multiple et que rien n'a été enregistré, on passe
+                    phrase.fm_changer(fonction, false);
+                    return phrase;
+                } else {
+                    phrase.fm_ajouter(fonction);
+                }
+            }
+            phrase.phrase.declareFonction(fonction, mots_selectionnes, numero_de_fonction);
             return phrase;
         }
 
@@ -74,8 +143,17 @@ function analyse_de_fonction(pos:number, phrase: PhraseEleve): void {
         };
 
         fonctions_communes.fonction_de_validation = () => {
-            const npos = pos === Object.entries(fonctions_choix).length - 1 ? 0 : pos + 1;
-            analyse_de_fonction(npos, enregistre_fonction());
+            enregistre_fonction();
+            const _valide = () => {
+                if (PhraseEleve.Fonctions_multiples.includes(fonction) && phrase.fm_changee(fonction) === true) {
+                    console.log("oui");
+                    return pos;
+                } else {
+                    return pos === Object.entries(fonctions_choix).length - 1 ? 0 : pos + 1;
+                }
+            };
+            const npos = _valide();
+            analyse_de_fonction(npos, phrase);
             // sélecteur
             const selecteur = byID("nouvelle_phrase-fonctions-selection") as HTMLSelectElement;
             selecteur.selectedIndex = npos;
@@ -114,7 +192,7 @@ export function nouvelle_phrase() : void {
             // rien n'a été entré
             return;
         }
-        let nouvelle_phrase = new PhraseEleve(nouveau_texte, new PhraseCorrigee(nouveau_texte));
+        let nouvelle_phrase = new PhraseEnveloppe(nouveau_texte);
         modal_nouvelle_phrase.style.display = 'none';
         analyse_de_fonction(0, nouvelle_phrase);
 

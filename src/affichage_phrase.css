@@ -53,6 +53,11 @@
     text-decoration: underline green;
 }
 
+.phrase-complement_circonstanciel {
+    border-style: dashed;
+    border-color: red;
+}
+
 .phrase-verbes {
     font-style: italic;
 }
