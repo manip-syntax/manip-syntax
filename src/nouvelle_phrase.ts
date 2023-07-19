@@ -99,8 +99,17 @@ class PhraseEnveloppe {
     }
 }
 
+const selecteur = byID("nouvelle_phrase-fonctions-selection") as HTMLSelectElement;
+function ajout_element_selecteur(numero: number) {
+    const current_pos = selecteur.selectedIndex;
+    selecteur.add( new Option(numero.toString(), (numero+1).toString()), selecteur.options[current_pos+1]);
+}
+
+
+
 function analyse_de_fonction(pos:number, phrase: PhraseEnveloppe): void {
-        const [nom, fonction] = Object.entries(fonctions_choix)[pos];
+        const nom = selecteur.options[pos].text;
+        const fonction = selecteur.options[pos].value as Fonction;
         non_null(document.getElementById("phrase-analyse-paragraphe")).innerHTML = affiche_phrase(phrase.phrase);
         const nom_complet = PhraseEleve.Fonctions_multiples.includes(fonction) ? `${nom} ${phrase.fm_pos(fonction)+1}` : nom;
         non_null(document.getElementById("consigne-container")).innerHTML = `À renseigner : ${nom_complet}`;
@@ -116,6 +125,8 @@ function analyse_de_fonction(pos:number, phrase: PhraseEnveloppe): void {
                     phrase.fm_changer(fonction, false);
                     return phrase;
                 } else {
+                    // nouvelle fonction multiple
+                    ajout_element_selecteur(phrase.fm_pos(fonction));
                     phrase.fm_ajouter(fonction);
                 }
             }
@@ -149,13 +160,12 @@ function analyse_de_fonction(pos:number, phrase: PhraseEnveloppe): void {
                     console.log("oui");
                     return pos;
                 } else {
-                    return pos === Object.entries(fonctions_choix).length - 1 ? 0 : pos + 1;
+                    return pos === selecteur.options.length - 1 ? 0 : pos + 1;
                 }
             };
             const npos = _valide();
             analyse_de_fonction(npos, phrase);
             // sélecteur
-            const selecteur = byID("nouvelle_phrase-fonctions-selection") as HTMLSelectElement;
             selecteur.selectedIndex = npos;
         };
 }
