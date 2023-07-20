@@ -81,9 +81,20 @@ class PhraseEnveloppe {
         return this._fonctions_multiples_traceur[nom].pos;
     }
 
+    fm_pos_set(nom: Fonction, numero: number) {
+        /* Change la valeur de pos pour la fonction
+         */
+        if (numero > 0) {
+            this._verifie_existence_fonction(nom);
+            assert(this._fonctions_multiples_traceur[nom].longueur >= numero,`numero introuvable pour ${nom}: longueur: ${this._fonctions_multiples_traceur[nom].longueur}. numero: ${numero}`);
+        }
+        this._fonctions_multiples_traceur[nom].pos = numero;
+    }
+
     fm_ajouter(nom: Fonction): void {
         this._verifie_existence_fonction(nom);
         this._fonctions_multiples_traceur[nom].pos += 1;
+        this._fonctions_multiples_traceur[nom].longueur += 1;
         this._fonctions_multiples_traceur[nom].changee = true;
     }
 
@@ -113,21 +124,41 @@ function analyse_de_fonction(pos:number, phrase: PhraseEnveloppe): void {
         const fonction = selecteur.options[pos].value as Fonction;
         non_null(document.getElementById("phrase-analyse-paragraphe")).innerHTML = affiche_phrase(phrase.phrase);
         non_null(document.getElementById("consigne-container")).innerHTML = `À renseigner : ${nom}`;
+        // édition de la fonction?
+        // // quelle fonction exactement?
+        let numero = -1;
+        if (PhraseEleve.Fonctions_multiples.includes(fonction)) {
+            numero = parseInt(nom.split("-")[1]) - 1;
+            console.log("numero",numero);
+            phrase.fm_pos_set(fonction, numero);
+        }
+        //// selection des mots précédemment sélectionnés
+        const mots_selectionnes = phrase.phrase.fonctionPos(fonction, numero);
+        Array.from(document.getElementsByClassName("phrase-cliquable"))
+            .forEach( elt => {
+                if (mots_selectionnes.includes(Number(elt.id.split('-')[2]))) {
+                    elt.classList.add("phrase-selectionne");
+                }
+            });
+
+
+
 
         enregistre_fonction = () => {
             const mots_selectionnes = Array.from(document.getElementsByClassName("phrase-selectionne"))
                               .map(elt => Number(elt.id.split('-')[2]));
             const numero_de_fonction = PhraseEleve.Fonctions_multiples.includes(fonction) ? phrase.fm_pos(fonction) : -1;
             if (PhraseEleve.Fonctions_multiples.includes(fonction)) {
-                if (phrase.phrase.fonctions_multiples_nombre(fonction) === phrase.fm_pos(fonction) 
-                    && mots_selectionnes.length === 0) {
+                if (phrase.phrase.fonctions_multiples_nombre(fonction) === phrase.fm_pos(fonction)) {
+                    if (mots_selectionnes.length === 0) {
                     // si c'est une fonction multiple et que rien n'a été enregistré, on passe
                     phrase.fm_changer(fonction, false);
                     return phrase;
-                } else {
-                    // nouvelle fonction multiple
-                    ajout_element_selecteur(nom, fonction, phrase.fm_pos(fonction));
-                    phrase.fm_ajouter(fonction);
+                    } else {
+                        // nouvelle fonction multiple
+                        ajout_element_selecteur(nom, fonction, phrase.fm_pos(fonction));
+                        phrase.fm_ajouter(fonction);
+                    }
                 }
             }
             phrase.phrase.declareFonction(fonction, mots_selectionnes, numero_de_fonction);
