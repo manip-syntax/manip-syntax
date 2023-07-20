@@ -235,7 +235,7 @@ export class Phrase extends SyntagmeAbstrait {
                     arr = f.filter( x => x.length > 0);
                 }
                 if (arr.length > 0) {
-                    this._fonctions_multiples[n] = arr;
+                    copie._fonctions_multiples[n] = arr;
                 }
             }
         );
