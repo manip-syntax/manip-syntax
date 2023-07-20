@@ -222,8 +222,24 @@ export class Phrase extends SyntagmeAbstrait {
          */
         let copie = new Phrase(this.contenu);
         copie.verbes = this.verbes;
-        copie._fonctions_uniques = this._fonctions_uniques;
-        copie._fonctions_multiples = this._fonctions_multiples;
+        Object.entries(this._fonctions_uniques)
+            .forEach( ([n,f,]) => {
+                if (f.length > 0) {
+                    copie._fonctions_uniques[n] = f;
+                }
+            });
+        Object.entries(this._fonctions_multiples)
+            .forEach( ([n, f,]) => {
+                let arr:MultiMotsPos = []
+                if (f.length > 0) {
+                    arr = f.filter( x => x.length > 0);
+                }
+                if (arr.length > 0) {
+                    this._fonctions_multiples[n] = arr;
+                }
+            }
+        );
+        // TODO à améliorer
         copie._groupes_enchasses = this._groupes_enchasses;
         return copie;
     }
@@ -234,6 +250,9 @@ export class Phrase extends SyntagmeAbstrait {
         const copie = this.copie;
         let copie_obj = Object.assign(copie);
         delete copie_obj["_phrase_cassee"];
+        if (copie_obj.verbes.length === 0) {
+            delete(copie_obj["verbes"]);
+        }
         return copie_obj;
     }
 
