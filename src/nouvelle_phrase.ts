@@ -32,12 +32,12 @@ const fonctions_choix : { [nom: string] : Fonction } = {
     "Attribut du sujet" : "attribut_du_sujet",
     "Attribut du COD" : "attribut_du_cod",
     "Complément d'agent" : "complement_d_agent",
-    "Complément circonstanciel" : "complement_circonstanciel",
+    "Complément circonstanciel-1" : "complement_circonstanciel",
     "Complément du verbe impersonnel" : "complement_du_verbe_impersonnel",
-    "Modalisateur" : "modalisateur",
-    "Fonction auto-énonciative" : "auto-enonciative",
-    "Connecteur" : "connecteur",
-    "Balise textuelle" : "balise_textuelle"
+    "Modalisateur-1" : "modalisateur",
+    "Fonction auto-énonciative-1" : "auto-enonciative",
+    "Connecteur-1" : "connecteur",
+    "Balise textuelle-1" : "balise_textuelle"
 };
 
 
@@ -100,9 +100,10 @@ class PhraseEnveloppe {
 }
 
 const selecteur = byID("nouvelle_phrase-fonctions-selection") as HTMLSelectElement;
-function ajout_element_selecteur(numero: number) {
+function ajout_element_selecteur(nom: string, f: Fonction, numero: number) {
     const current_pos = selecteur.selectedIndex;
-    selecteur.add( new Option(numero.toString(), (numero+1).toString()), selecteur.options[current_pos+1]);
+    nom = nom.split("-")[0];
+    selecteur.add( new Option(`${nom}-${numero+2}`, f), selecteur.options[current_pos+1]);
 }
 
 
@@ -111,8 +112,7 @@ function analyse_de_fonction(pos:number, phrase: PhraseEnveloppe): void {
         const nom = selecteur.options[pos].text;
         const fonction = selecteur.options[pos].value as Fonction;
         non_null(document.getElementById("phrase-analyse-paragraphe")).innerHTML = affiche_phrase(phrase.phrase);
-        const nom_complet = PhraseEleve.Fonctions_multiples.includes(fonction) ? `${nom} ${phrase.fm_pos(fonction)+1}` : nom;
-        non_null(document.getElementById("consigne-container")).innerHTML = `À renseigner : ${nom_complet}`;
+        non_null(document.getElementById("consigne-container")).innerHTML = `À renseigner : ${nom}`;
 
         enregistre_fonction = () => {
             const mots_selectionnes = Array.from(document.getElementsByClassName("phrase-selectionne"))
@@ -126,7 +126,7 @@ function analyse_de_fonction(pos:number, phrase: PhraseEnveloppe): void {
                     return phrase;
                 } else {
                     // nouvelle fonction multiple
-                    ajout_element_selecteur(phrase.fm_pos(fonction));
+                    ajout_element_selecteur(nom, fonction, phrase.fm_pos(fonction));
                     phrase.fm_ajouter(fonction);
                 }
             }
@@ -138,7 +138,8 @@ function analyse_de_fonction(pos:number, phrase: PhraseEnveloppe): void {
             const filename = "phrase.{{numéro_de_version}}.json";
 
             // TODO ajout de la version dans le fichier json?
-            const blob = new Blob([JSON.stringify(enregistre_fonction())], { type: "text/json" });
+            // TODO supprimer les éléments vides
+            const blob = new Blob([JSON.stringify(enregistre_fonction().phrase)], { type: "text/json" });
             const lien = document.createElement('a');
             lien.download = filename;
             lien.href = window.URL.createObjectURL(blob);
@@ -155,15 +156,7 @@ function analyse_de_fonction(pos:number, phrase: PhraseEnveloppe): void {
 
         fonctions_communes.fonction_de_validation = () => {
             enregistre_fonction();
-            const _valide = () => {
-                if (PhraseEleve.Fonctions_multiples.includes(fonction) && phrase.fm_changee(fonction) === true) {
-                    console.log("oui");
-                    return pos;
-                } else {
-                    return pos === selecteur.options.length - 1 ? 0 : pos + 1;
-                }
-            };
-            const npos = _valide();
+            const npos = pos += 1;
             analyse_de_fonction(npos, phrase);
             // sélecteur
             selecteur.selectedIndex = npos;
