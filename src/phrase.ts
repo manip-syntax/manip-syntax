@@ -46,6 +46,16 @@ class SyntagmeAbstrait {
         return [f, m[0], m.slice(-1)[0]] as FonctionEnchassee;
     }
 
+    get vide(): boolean {
+        /* vrai si ce syntagme n'a aucune fonction enregisrée
+         */
+        for (const g of this._groupes_enchasses) {
+            if (g.vide) {
+                return true;
+            }
+        }
+        return (this._fonctions_uniques.keys.length === 0 && this._fonctions_multiples.keys.length === 0);
+    }
 
     cree_groupe_enchasse(contenu: MotsPos): GroupeEnchasse {
         const n = new GroupeEnchasse(contenu);
@@ -67,6 +77,29 @@ class SyntagmeAbstrait {
          */
         const m = this._fonctions_multiples;
         return f in m ? m[f].length : 0;
+    }
+
+     get copie(): SyntagmeAbstrait {
+        let copie = new SyntagmeAbstrait();
+        Object.entries(this._fonctions_uniques)
+            .forEach( ([n,f,]) => {
+                if (f.length > 0) {
+                    copie._fonctions_uniques[n] = f;
+                }
+            });
+        Object.entries(this._fonctions_multiples)
+            .forEach( ([n, f,]) => {
+                let arr:MultiMotsPos = []
+                if (f.length > 0) {
+                    arr = f.filter( x => x.length > 0);
+                }
+                if (arr.length > 0) {
+                    copie._fonctions_multiples[n] = arr;
+                }
+            }
+        );
+        copie._groupes_enchasses = this._groupes_enchasses.filter( g => !g.vide);
+        return copie;
     }
 
     fonction(i: number) : Fonction[] { // TEST 
@@ -98,7 +131,7 @@ class SyntagmeAbstrait {
         return rv;
     }
 
-    fonction_detaillee(i: number): FonctionEnchassee[] { // TEST à faire
+    fonction_detaillee(i: number): FonctionEnchassee[] { // TEST
         /* Cette fonction renvoie un array de fonctions valables
          * pour le mot entré.
          * Chaque élément contient le nom de la fonction,
@@ -211,27 +244,11 @@ export class Phrase extends SyntagmeAbstrait {
     get copie(): Phrase { // TODO test à faire
         /* Copie le contenu de la phrase
          */
-        let copie = new Phrase(this.contenu);
-        copie.verbes = this.verbes;
-        Object.entries(this._fonctions_uniques)
-            .forEach( ([n,f,]) => {
-                if (f.length > 0) {
-                    copie._fonctions_uniques[n] = f;
-                }
-            });
-        Object.entries(this._fonctions_multiples)
-            .forEach( ([n, f,]) => {
-                let arr:MultiMotsPos = []
-                if (f.length > 0) {
-                    arr = f.filter( x => x.length > 0);
-                }
-                if (arr.length > 0) {
-                    copie._fonctions_multiples[n] = arr;
-                }
-            }
-        );
-        // TODO à améliorer
-        copie._groupes_enchasses = this._groupes_enchasses;
+        let copie = super.copie as Phrase;
+        if (this.verbes.length > 0) {
+            copie.verbes = this.verbes;
+        }
+        copie.contenu = this.contenu;
         return copie;
     }
 
@@ -240,10 +257,6 @@ export class Phrase extends SyntagmeAbstrait {
         // une copie pour garder le strict nécessaire: les données
         const copie = this.copie;
         let copie_obj = Object.assign(copie);
-        delete copie_obj["_phrase_cassee"];
-        if (copie_obj.verbes.length === 0) {
-            delete(copie_obj["verbes"]);
-        }
         return copie_obj;
     }
 
