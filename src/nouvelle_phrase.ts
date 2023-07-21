@@ -19,21 +19,6 @@ let enregistre_fonction = () => {
     return new CreateurPhrase("vide");
 }
 
-
-
-
-
-class _fonction_tracee {
-    public pos: number = 0;
-    public longueur: number = 0;
-    public changee: boolean = false;
-    public nom: Fonction; 
-    constructor(nom: Fonction) {
-        this.pos = 0;
-        this.longueur = 0;
-        this.nom = nom;
-    }
-}
 class FonctionTracee {
     public validee: boolean = false;
     public changee: boolean = false;
@@ -53,13 +38,6 @@ class FonctionTracee {
 class CreateurPhrase {
 
     private _phrase: PhraseEleve;
-    private _fonctions_multiples_traceur : { [nom: string] : _fonction_tracee } = {
-        "complement_circonstanciel": new _fonction_tracee("complement_circonstanciel"),
-        "balise_textuelle" : new _fonction_tracee("balise_textuelle"),
-        "modalisateur" : new _fonction_tracee("modalisateur"),
-        "auto-enonciative" : new _fonction_tracee("auto-enonciative"),
-        "connecteur" : new _fonction_tracee("connecteur")
-    };
     private _traceur: FonctionTracee[] = [];
     private _pos: number = 0;
     private _selecteur: HTMLSelectElement = byID("nouvelle_phrase-fonctions-selection") as HTMLSelectElement;
@@ -104,7 +82,6 @@ class CreateurPhrase {
         return this._traceur[this._pos];
     }
 
-    
     ajouter_fonction_tracee(pos: number, nom: string, fonction: Fonction, numero:number = -1) {
         /* Ajouter une fonction dans le traceur et dans le selecteur
          * pos correspond à l'emplacement dans la liste
@@ -117,48 +94,6 @@ class CreateurPhrase {
         const f = new FonctionTracee(nom, fonction, numero);
         this._traceur.splice(pos, 0, f);
         this._selecteur.add(new Option(f.nom, f.fonction), pos);
-    }
-
-    _verifie_existence_fonction(nom: Fonction) {
-        assert(nom in this._fonctions_multiples_traceur,"${nom} n'est pas une fonction multiple");
-    }
-
-
-    get phrase(): PhraseEleve {
-        return this._phrase;
-    }
-
-    fm_pos(nom: Fonction): number {
-        this._verifie_existence_fonction(nom);
-        return this._fonctions_multiples_traceur[nom].pos;
-    }
-
-    fm_pos_set(nom: Fonction, numero: number) {
-        /* Change la valeur de pos pour la fonction
-         */
-        if (numero > 0) {
-            this._verifie_existence_fonction(nom);
-            assert(this._fonctions_multiples_traceur[nom].longueur >= numero,`numero introuvable pour ${nom}: longueur: ${this._fonctions_multiples_traceur[nom].longueur}. numero: ${numero}`);
-        }
-        this._fonctions_multiples_traceur[nom].pos = numero;
-    }
-
-    fm_ajouter(nom: Fonction): void {
-        this._verifie_existence_fonction(nom);
-        this._fonctions_multiples_traceur[nom].pos += 1;
-        this._fonctions_multiples_traceur[nom].longueur += 1;
-        this._fonctions_multiples_traceur[nom].changee = true;
-    }
-
-    fm_changer(nom: Fonction, val: boolean): boolean {
-        this._verifie_existence_fonction(nom);
-        this._fonctions_multiples_traceur[nom].changee = val;
-        return val;
-    }
-
-    fm_changee(nom: Fonction): boolean {
-        this._verifie_existence_fonction(nom);
-        return this._fonctions_multiples_traceur[nom].changee;
     }
 
     analyse_de_fonction(pos: number = -1): void {
@@ -185,7 +120,7 @@ class CreateurPhrase {
             const mots_selectionnes = Array.from(document.getElementsByClassName("phrase-selectionne"))
                               .map(elt => Number(elt.id.split('-')[2]));
             if (this.fonction_courante.est_multiple) {
-                if (this.phrase.fonctions_multiples_nombre(fonction) === this.fonction_courante.numero) {
+                if (this._phrase.fonctions_multiples_nombre(fonction) === this.fonction_courante.numero) {
                     if (mots_selectionnes.length === 0) {
                         // si c'est une fonction multiple et que rien n'a été enregistré, on passe
                         return this;
@@ -204,8 +139,7 @@ class CreateurPhrase {
             const filename = "phrase.{{numéro_de_version}}.json";
 
             // TODO ajout de la version dans le fichier json?
-            // TODO supprimer les éléments vides
-            const blob = new Blob([JSON.stringify(enregistre_fonction().phrase)], { type: "text/json" });
+            const blob = new Blob([JSON.stringify(enregistre_fonction()._phrase)], { type: "text/json" });
             const lien = document.createElement('a');
             lien.download = filename;
             lien.href = window.URL.createObjectURL(blob);
