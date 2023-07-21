@@ -127,7 +127,18 @@ describe('Phrase class tests', () => {
       pp.declareFonction("complement_circonstanciel",[4,5]);
       expect(pp.fonction(3)).toEqual(["complement_circonstanciel"]);
       expect(pp.fonction(4)).toEqual(["complement_circonstanciel"]);
+  });
 
+  test("Phrase trouve la bonne fonction enchassée pour un numéro donné.", () => {
+      const phrase = "Le petit enfant mange.";
+      let p = new Phrase(phrase);
+      p.declareFonction("sujet",[0,1,2]);
+      let gn_sujet = p.cree_groupe_enchasse([0,1,2]);
+      gn_sujet.declareFonction("noyau",[2]);
+      gn_sujet.declareFonction("epithete",[1]);
+      expect(p.fonction(1).sort()).toEqual(["epithete","sujet"]);
+      expect(p.fonction(2).sort()).toEqual(["noyau","sujet"]);
+      expect(p.fonction(0)).toEqual(["sujet"]);
   });
 
   test("Phrase trouve la bonne fonction détaillée pour une position donnée", () => {
@@ -150,6 +161,19 @@ describe('Phrase class tests', () => {
       p2.declareFonction("complement_circonstanciel",[2,3]);
       p2.declareFonction("complement_circonstanciel",[4,5]);
       expect(p2.fonction_detaillee(4)).toEqual([["complement_circonstanciel",4,5]]);
+  });
+
+  test("Phrase trouve la bonne fonction détaillée dans le bon ordre pour un numéro donné, enchassements compris", () => {
+      const phrase = "L'enfant qui travaille est assis";
+      let p = new Phrase(phrase);
+      p.declareFonction("sujet",[0,1,2,3]);
+      let gn_sujet = p.cree_groupe_enchasse([0,1,2,3]);
+      gn_sujet.declareFonction("noyau",[1]);
+      gn_sujet.declareFonction("complement_du_nom",[2,3]);
+      expect(p.fonction_detaillee(2)).toEqual([["sujet",0,3],["complement_du_nom",2,3]]);
+      expect(p.fonction_detaillee(3)).toEqual([["sujet",0,3],["complement_du_nom",2,3]]);
+      expect(p.fonction_detaillee(1)).toEqual([["sujet",0,3],["noyau",1,1]]);
+      expect(p.fonction_detaillee(0)).toEqual([["sujet",0,3]]);
   });
 
   test("Corrige sait si la phrase contient telle ou telle fonction", () => {

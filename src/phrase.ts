@@ -31,7 +31,6 @@ type MultiMotsPos = MotsPos[];
 // voir la fonction fonction_detaillee pour le détail de cet type
 export type FonctionEnchassee = [ Fonction, number, number];
 
-// TODO vérifier que les fonctions entrées sont dans les bornes
 
 class SyntagmeAbstrait {
     /* Représente la base de toute les classes de groupes de mots
@@ -70,7 +69,7 @@ class SyntagmeAbstrait {
         return f in m ? m[f].length : 0;
     }
 
-    fonction(i: number) : Fonction[] { // TEST à faire
+    fonction(i: number) : Fonction[] { // TEST 
         /* Renvoie la ou les fonctions déclarées pour tel mot.
          */
 
@@ -90,7 +89,7 @@ class SyntagmeAbstrait {
             }
         }
 
-        for (const elt of this._groupes_enchasses) {// TODO partie à tester
+        for (const elt of this._groupes_enchasses) {
             const res = elt.fonction(i);
             if (res) {
                 rv.push(...res);
@@ -105,7 +104,7 @@ class SyntagmeAbstrait {
          * Chaque élément contient le nom de la fonction,
          * le début de la fonction et la fin de la fonction
          * L'ordre correspond à l'ordre des enchassements:
-         * le contenant se trouve avant le contenu // TODO partie à tester
+         * le contenant se trouve avant le contenu 
          */
         let rv: FonctionEnchassee[] = [];
 
@@ -122,21 +121,13 @@ class SyntagmeAbstrait {
                 }
             }
         }
-        // TODO enchassements
+        for (const g of this._groupes_enchasses) {
+            rv.push(...g.fonction_detaillee(i));
+
+        }
 
         return rv
             .sort( (a, b) => (a[2] - a[1]) > (b[2] - b[1]) ? -1 : 1);
-
-
-            /*
-        return this.fonction(i)
-            .map( x => {
-                const numero_de_fonction: number = SyntagmeAbstrait.Fonctions_multiples.includes(x) ? 0: -1;
-                const positions = this.fonctionPos(x, numero_de_fonction);
-                return [x, positions[0], positions.slice(-1)[0]] as FonctionEnchassee;
-            })
-            .sort( (a, b) => (a[2] - a[1]) > (b[2] - b[1]) ? -1 : 1);
-            */
     }
 
     fonctionPos(f: Fonction, numero_de_fonction: number = -1): MotsPos { // TEST 
@@ -217,7 +208,7 @@ export class Phrase extends SyntagmeAbstrait {
         this.phrase = phrase;
     }
 
-    get copie(): Phrase {
+    get copie(): Phrase { // TODO test à faire
         /* Copie le contenu de la phrase
          */
         let copie = new Phrase(this.contenu);
@@ -245,7 +236,7 @@ export class Phrase extends SyntagmeAbstrait {
     }
 
     // http://choly.ca/post/typescript-json/#comment-2579491209
-    toJSON(): PhraseJSON {  // TEST À FAIRE
+    toJSON(): PhraseJSON {  // TODO TEST À FAIRE
         // une copie pour garder le strict nécessaire: les données
         const copie = this.copie;
         let copie_obj = Object.assign(copie);
