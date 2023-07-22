@@ -3,3 +3,29 @@
     width: 100%;
     display: block;
 }
+
+/* Sélecteur de fonctions
+ */
+
+.selecteur {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.selecteur-element {
+    padding: 5px;
+    font-size:16px;
+}
+
+.selecteur-element:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
+}
+.selecteur-element.selectionne {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.selecteur-element.valide {
+    font-style: italic;
+}
+

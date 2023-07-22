@@ -23,7 +23,7 @@ class FonctionTracee {
     public validee: boolean = false;
     public changee: boolean = false;
     public est_multiple: boolean = false;
-    constructor(public nom_de_base: string, public fonction: Fonction, public numero: number = -1) {
+    constructor(public nom_de_base: string, public fonction: Fonction, public html_node: HTMLElement, public numero: number = -1) {
         this.est_multiple = numero > -1;
     }
 
@@ -40,8 +40,9 @@ class CreateurPhrase {
     private _phrase: PhraseEleve;
     private _traceur: FonctionTracee[] = [];
     private _pos: number = 0;
-    private _selecteur: HTMLSelectElement = byID("nouvelle_phrase-fonctions-selection") as HTMLSelectElement;
-    static liste_des_fonctions: { [nom: string] : Fonction } = {
+    private _selecteur: HTMLElement = byID("nouvelle_phrase-fonctions-selection") as HTMLElement;
+    private _selecteur_courant: HTMLElement = this._selecteur;
+    static liste_des_fonctions_niveau_1: { [nom: string] : Fonction } = {
         "Sujet" : "sujet",
         "Verbes" : "verbes",
         "Noyau" : "noyau",
@@ -59,10 +60,15 @@ class CreateurPhrase {
         "Connecteur" : "connecteur",
         "Balise textuelle" : "balise_textuelle"
     };
+    static liste_des_fonctions_niveau_2: { [nom: string] : Fonction } = {
+        "Épithète" : "epithete",
+        "Complément du nom" : "complement_du_nom",
+    };
 
     constructor(texte: string) {
         this._phrase = new PhraseEleve(texte, new PhraseCorrigee(texte));
-        Object.entries(CreateurPhrase.liste_des_fonctions).forEach(
+        this._selecteur.innerHTML = ''; // réinitialisation du sélecteur
+        Object.entries(CreateurPhrase.liste_des_fonctions_niveau_1).forEach(
             elt => this.ajouter_fonction_tracee(this._traceur.length, elt[0], elt[1])
         );
         this._selecteur.style.display = 'block';
@@ -72,14 +78,29 @@ class CreateurPhrase {
         /* Cette fonction permet de modifier la position dans le CreateurPhrase
          * mais aussi dans le sélecteur
          */
+        this._selecteur.children[this._pos].classList.remove("selectionne");
         assert(i < this._traceur.length,`${i} est plus grand que la longueur du traceur: ${this._traceur.length}.`);
         this._pos = i;
-        assert(i < this._selecteur.options.length,`${i} est plus grand que la longueur du sélecteur ${this._selecteur.options.length}.`);
-        this._selecteur.selectedIndex = i;
+        assert(i < this._selecteur.childElementCount,`${i} est plus grand que la longueur du sélecteur ${this._selecteur.childElementCount}.`);
+        this._selecteur.children[i].classList.add("selectionne");
     }
 
     get fonction_courante(): FonctionTracee {
         return this._traceur[this._pos];
+    }
+
+    set_pos_selecteur(selecteur: HTMLElement, pos: number):number {
+        /* Donne à chaque élément d'un sélecteur sa position et renvoie la dernière position enregistrée
+         */
+        for (let elt of selecteur.children) {
+            if (elt.classList.contains("selecteur")) {
+                pos = this.set_pos_selecteur(elt as HTMLElement, pos);
+            } else {
+                elt.setAttribute("pos",pos.toString());
+                pos += 1;
+            }
+        }
+        return pos;
     }
 
     ajouter_fonction_tracee(pos: number, nom: string, fonction: Fonction, numero:number = -1) {
@@ -90,11 +111,48 @@ class CreateurPhrase {
             numero = 0;
         }
         assert(pos <= this._traceur.length,`${pos} est plus grand que la longueur du traceur`);
-        assert(pos <= this._selecteur.options.length, `${pos} est plus grand que la longueur du selecteur: ${this._selecteur.options.length}`);
-        const f = new FonctionTracee(nom, fonction, numero);
+
+        let elt = document.createElement("div");
+        const f = new FonctionTracee(nom, fonction, elt, numero);
         this._traceur.splice(pos, 0, f);
-        this._selecteur.add(new Option(f.nom, f.fonction), pos);
+
+        elt.setAttribute("value",f.fonction);
+        elt.setAttribute("class","selecteur-element");
+        elt.innerHTML = f.nom;
+        //this._selecteur_courant.insertBefore(elt, this._selecteur_courant.children[pos]); // TODO ne peut pas être children.pos parce qu'il y aura d'autres sélecteurs qu'il faut ignorer
+        this.fonction_courante.html_node.insertAdjacentElement("afterend", elt);
+
+        // mise à jour de la position 
+        this.set_pos_selecteur(this._selecteur, 0);
     }
+
+    valide_fonction(b: boolean) {
+        /* valide la fonction si b est vrai
+         */
+        this.fonction_courante.validee = b;
+        if (b) {
+            this._selecteur.children[this._pos].classList.add("valide");
+            if (PhraseEleve.Fonctions_contenants.includes(this.fonction_courante.fonction)) {
+                this._selecteur_courant = document.createElement("div");
+                this._selecteur_courant.setAttribute("class","selecteur");
+                this.fonction_courante.html_node.insertAdjacentElement("afterend",this._selecteur_courant);
+                let i = this._pos;
+                Object.entries(CreateurPhrase.liste_des_fonctions_niveau_2).forEach(
+                    elt => {
+                        this.ajouter_fonction_tracee(i,elt[0], elt[1]);
+                        i += 1;
+                    }
+                );
+            this._selecteur_courant = this._selecteur;
+            }
+        } else {
+            if (PhraseEleve.Fonctions_contenants.includes(this.fonction_courante.fonction)) {
+                // remove fonctions TODO
+            }
+            this._selecteur.children[this._pos].classList.remove("valide");
+        }
+    }
+    
 
     analyse_de_fonction(pos: number = -1): void {
         if (pos === -1) {
@@ -131,7 +189,7 @@ class CreateurPhrase {
                 }
             }
             this._phrase.declareFonction(fonction, mots_selectionnes, this.fonction_courante.numero);
-            this.fonction_courante.validee = true;
+            this.valide_fonction(mots_selectionnes.length > 0);
             return this;
         }
 
@@ -161,10 +219,6 @@ class CreateurPhrase {
 }
 }
 
-
-
-
-
 export function nouvelle_phrase() : void {
     // Disparition des autres modals
     for (const modal of non_null(document.getElementsByClassName("modal")) as HTMLCollectionOf<HTMLElement>) {
@@ -190,15 +244,23 @@ export function nouvelle_phrase() : void {
         }
         let nouvelle_phrase = new CreateurPhrase(nouveau_texte);
         modal_nouvelle_phrase.style.display = 'none';
-        nouvelle_phrase.analyse_de_fonction();
+        nouvelle_phrase.analyse_de_fonction(0);
 
         // Evénement pour le sélecteur
-        byID("nouvelle_phrase-fonctions-selection").addEventListener('change', e => {
-            const target = e.target as HTMLSelectElement;
+        byID("nouvelle_phrase-fonctions-selection").addEventListener('click', e => {
+            const target = e.target as HTMLElement;
             // enregistrement
             enregistre_fonction();
             // chargement de la fonction désirée
-            nouvelle_phrase.analyse_de_fonction(target.selectedIndex);
+            const val = () => {
+                let v = target.getAttribute("pos");
+                if (typeof v === "string") {
+                    return parseInt(v);
+                } 
+                assert(false, `la valeur de l'attribut est nulle.`);
+                return -1;
+            };
+            nouvelle_phrase.analyse_de_fonction(val());
         });
     };
     

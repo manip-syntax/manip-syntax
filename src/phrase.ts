@@ -13,6 +13,7 @@ export type Fonction =
     "complement_du_verbe_impersonnel" |
 // dans le GN
     "complement_du_nom" |
+    "complement_du_pronom" |
     "epithete" |
     "apposition" |
     "complement_de_l_adjectif" |
@@ -40,14 +41,15 @@ class SyntagmeAbstrait {
     protected _fonctions_uniques: { [id: string] : MotsPos } = {};
     protected _fonctions_multiples: { [id: string] : MultiMotsPos } = {};
     protected _groupes_enchasses: GroupeEnchasse[] = [];
-    public static Fonctions_multiples: Fonction[] = ["complement_circonstanciel", "modalisateur","auto-enonciative","connecteur","balise_textuelle","epithete","complement_du_nom","complement_de_l_adjectif","apposition"];
+    public static Fonctions_multiples: Fonction[] = ["complement_circonstanciel", "modalisateur","auto-enonciative","connecteur","balise_textuelle","epithete","complement_du_nom","complement_du_pronom","complement_de_l_adjectif","apposition"];
+    public static Fonctions_contenants: Fonction[] = ["sujet","cod","coi","attribut_du_sujet","attribut_du_cod","complement_circonstanciel","complement_du_verbe_impersonnel","complement_du_nom","complement_du_pronom","epithete","apposition","complement_de_l_adjectif"];
 
     _fonction_enchassee = (f: Fonction, m: MotsPos) => {
         return [f, m[0], m.slice(-1)[0]] as FonctionEnchassee;
     }
 
     get vide(): boolean {
-        /* vrai si ce syntagme n'a aucune fonction enregisrée
+        /* vrai si ce syntagme n'a aucune fonction enregistrée
          */
         for (const g of this._groupes_enchasses) {
             if (g.vide) {
