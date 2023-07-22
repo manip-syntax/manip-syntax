@@ -48,6 +48,7 @@ body {
   grid-template-areas: 
     'header header header header header header' 
     'left central central central central right'
+    'left margin margin margin margin right'
     'footer footer footer footer footer footer';
     grid-template-columns: 0.5fr 1fr 1fr 1fr 1fr 0.5fr;
 } 
@@ -85,6 +86,11 @@ body {
 
 /* Boutons 
  */
+
+.boutons {
+    bottom: -10%;
+    float: bottom;
+}
 .bouton {
   border: none; /* Remove borders */
   color: white; /* Add a text color */
