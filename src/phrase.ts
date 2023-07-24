@@ -48,24 +48,24 @@ class SyntagmeAbstrait {
         return [f, m[0], m.slice(-1)[0]] as FonctionEnchassee;
     }
 
-    get vide(): boolean {
+    get vide(): boolean {// TEST
         /* vrai si ce syntagme n'a aucune fonction enregistrée
          */
         for (const g of this._groupes_enchasses) {
-            if (g.vide) {
-                return true;
+            if (!g.vide) {
+                return false;
             }
         }
-        return (this._fonctions_uniques.keys.length === 0 && this._fonctions_multiples.keys.length === 0);
+        return (Object.keys(this._fonctions_uniques).length === 0 && Object.keys(this._fonctions_multiples).length === 0);
     }
 
-    cree_groupe_enchasse(contenu: MotsPos): GroupeEnchasse {
+    cree_groupe_enchasse(contenu: MotsPos): GroupeEnchasse { // TEST
         const n = new GroupeEnchasse(contenu);
         this._groupes_enchasses.push(n);
         return n;
     }
 
-    get groupes_enchasses_nombre(): number {
+    get groupes_enchasses_nombre(): number {// TEST
         return this._groupes_enchasses.length;
     }
 
@@ -81,7 +81,7 @@ class SyntagmeAbstrait {
         return f in m ? m[f].length : 0;
     }
 
-     get copie(): SyntagmeAbstrait {
+     get copie(): SyntagmeAbstrait { // TEST
         let copie = new SyntagmeAbstrait();
         Object.entries(this._fonctions_uniques)
             .forEach( ([n,f,]) => {
@@ -100,7 +100,7 @@ class SyntagmeAbstrait {
                 }
             }
         );
-        copie._groupes_enchasses = this._groupes_enchasses.filter( g => !g.vide);
+        copie._groupes_enchasses = this._groupes_enchasses.filter( g => !g.vide).map(g => g.copie); 
         return copie;
     }
 
@@ -394,6 +394,12 @@ export class GroupeEnchasse extends SyntagmeAbstrait {
 
     constructor(private _contenu: MotsPos) {
         super();
+    }
+
+    get copie(): GroupeEnchasse {
+        let copie = super.copie as GroupeEnchasse;
+        copie._contenu = this._contenu;
+        return copie;
     }
 
     declareFonction(f: Fonction, mots: MotsPos, numero_de_fonction: number = -1): void {

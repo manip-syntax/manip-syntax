@@ -204,5 +204,26 @@ describe('Phrase class tests', () => {
       ge2.declareFonction("complement_circonstanciel",[0,1],0);
       expect(ge2.vide).toBe(false);
   });
+
+  test("Phrase copie correctement", () => {
+      let sa = new Phrase("Peu importe le contenu pourvu qu'il soit assez long pour correspondre aux numéros des fonctions déclarées.");
+      sa.declareFonction("sujet",[0,1,2]);
+      sa.declareFonction("complement_circonstanciel",[3,4,5],0);
+      sa.declareFonction("complement_circonstanciel",[6,7,8],1);
+      let copie = sa.copie;
+      expect(copie.fonctionPos("sujet")).toEqual([0,1,2]);
+      expect(copie.fonctionPos("complement_circonstanciel",0)).toEqual([3,4,5]);
+      expect(copie.fonctionPos("complement_circonstanciel",1)).toEqual([6,7,8]);
+
+      let ge = sa.cree_groupe_enchasse([0,1,2]);
+      expect(sa.groupes_enchasses_nombre).toBe(1);
+      copie = sa.copie;
+      // copie ne doit pas avoir de groupe enchâssé puisque le contenu de ce groupe est vide
+      expect(copie.groupes_enchasses_nombre).toBe(0);
+      // ceci n'est pas un doublon, mais une vérification que la copie n'a pas retiré le groupe enchâssé de l'original
+      expect(sa.groupes_enchasses_nombre).toBe(1);
+      ge.declareFonction("epithete",[0]);
+      expect(sa.copie.groupes_enchasses_nombre).toBe(1);
+  });
 });
 
