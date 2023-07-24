@@ -1,5 +1,5 @@
 import { affiche_phrase } from './affichage_phrase';
-import { Fonction, PhraseCorrigee, PhraseEleve } from './phrase';
+import { GroupeEnchasse, Fonction, Phrase, PhraseCorrigee, PhraseEleve } from './phrase';
 import { assert, byID, non_null } from './util';
 import { fonctions_communes } from './fonctions_partagees';
 import './nouvelle_phrase.css';
@@ -23,7 +23,12 @@ class FonctionTracee {
     public validee: boolean = false;
     public changee: boolean = false;
     public est_multiple: boolean = false;
-    constructor(public nom_de_base: string, public fonction: Fonction, public html_node: HTMLElement, public numero: number = -1) {
+    constructor(public nom_de_base: string,
+                public fonction: Fonction,
+                public html_node: HTMLElement,
+                public syntagme: Phrase | GroupeEnchasse,
+                public numero: number = -1,
+                public parent?: FonctionTracee) {
         this.est_multiple = numero > -1;
     }
 
@@ -32,6 +37,13 @@ class FonctionTracee {
             return `${this.nom_de_base}-${this.numero + 1}`;
         }
         return this.nom_de_base;
+    }
+
+    get arbre_genealogique(): string {
+        if (typeof this.parent === "undefined") {
+            return this.nom;
+        }
+        return `${this.parent.arbre_genealogique} > ${this.nom}`;
     }
 }
 
@@ -129,7 +141,7 @@ class CreateurPhrase {
     }
         
 
-    ajouter_fonction_tracee(pos: number, nom: string, fonction: Fonction, numero:number = -1) {
+    ajouter_fonction_tracee(pos: number, nom: string, fonction: Fonction, syntagme: Phrase|GroupeEnchasse = this._phrase, numero:number = -1, parent?: FonctionTracee) {
         /* Ajouter une fonction dans le traceur et dans le selecteur
          * pos correspond à l'emplacement dans la liste
          */
@@ -139,7 +151,7 @@ class CreateurPhrase {
         assert(pos <= this._traceur.length,`${pos} est plus grand que la longueur du traceur`);
 
         let elt = document.createElement("div");
-        const f = new FonctionTracee(nom, fonction, elt, numero);
+        const f = new FonctionTracee(nom, fonction, elt, syntagme, numero, parent);
         this._traceur.splice(pos, 0, f);
 
         elt.setAttribute("value",f.fonction);
@@ -153,10 +165,9 @@ class CreateurPhrase {
         this.set_pos_selecteur(this._selecteur, 0);
     }
     
-    cree_groupe_enchasse(b: boolean):void {
+    cree_groupe_enchasse(b: boolean, syntagme: GroupeEnchasse, parent: FonctionTracee):void {
         /* Crée un groupe enchâssé si b est vrai
          */
-        // TODO vérifier le bon ordre d'ajout entre les fonctions enchassées et les fonctions multiples (ie CC validé -> nouveau CC + groupes enchassés = problème pour le moment
         if (!PhraseEleve.Fonctions_contenants.includes(this.fonction_courante.fonction)) {
             return;
         }
@@ -164,13 +175,14 @@ class CreateurPhrase {
             // remove fonctions TODO uniquement s'il y en a déjà
             return;
         }
+
         let selecteur_courant = document.createElement("div");
         selecteur_courant.setAttribute("class","selecteur");
         this.fonction_courante.html_node.insertAdjacentElement("afterend",selecteur_courant);
         let i = this._pos + 1;
         Object.entries(CreateurPhrase.liste_des_fonctions_niveau_2).forEach(
             elt => {
-                this.ajouter_fonction_tracee(i,elt[0], elt[1]);
+                this.ajouter_fonction_tracee(i,elt[0], elt[1], syntagme, -1, parent);
                 i += 1;
             }
         );
@@ -196,10 +208,10 @@ class CreateurPhrase {
         } else {
             this.pos = pos;
         }
-        const nom = this.fonction_courante.nom;
         const fonction = this.fonction_courante.fonction;
+        const syntagme = this.fonction_courante.syntagme;
         byID("phrase-analyse-paragraphe").innerHTML = affiche_phrase(this._phrase);
-        byID("consigne-container").innerHTML = `À renseigner : ${nom}`;
+        byID("consigne-container").innerHTML = `À renseigner : ${this.fonction_courante.arbre_genealogique}`;
 
         // selection des mots précédemment sélectionnés
         const mots_selectionnes = this._phrase.fonctionPos(fonction, this.fonction_courante.numero);
@@ -220,13 +232,13 @@ class CreateurPhrase {
                         return this;
                     } else {
                         // nouvelle fonction multiple
-                        this.ajouter_fonction_tracee(pos + 1, this.fonction_courante.nom_de_base, fonction, this.fonction_courante.numero + 1);
+                        this.ajouter_fonction_tracee(pos + 1, this.fonction_courante.nom_de_base, fonction, syntagme, this.fonction_courante.numero + 1);
                     }
                 }
             }
-            this._phrase.declareFonction(fonction, mots_selectionnes, this.fonction_courante.numero);
+            syntagme.declareFonction(fonction, mots_selectionnes, this.fonction_courante.numero);
             const est_valide = this.valide_fonction(mots_selectionnes.length > 0);
-            this.cree_groupe_enchasse(est_valide);
+            this.cree_groupe_enchasse(est_valide, syntagme.cree_groupe_enchasse(mots_selectionnes), this.fonction_courante);
             return this;
         }
 
