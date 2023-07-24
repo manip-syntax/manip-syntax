@@ -41,7 +41,6 @@ class CreateurPhrase {
     private _traceur: FonctionTracee[] = [];
     private _pos: number = 0;
     private _selecteur: HTMLElement = byID("nouvelle_phrase-fonctions-selection") as HTMLElement;
-    private _selecteur_courant: HTMLElement = this._selecteur;
     static liste_des_fonctions_niveau_1: { [nom: string] : Fonction } = {
         "Sujet" : "sujet",
         "Verbes" : "verbes",
@@ -78,11 +77,10 @@ class CreateurPhrase {
         /* Cette fonction permet de modifier la position dans le CreateurPhrase
          * mais aussi dans le sélecteur
          */
-        this._selecteur.children[this._pos].classList.remove("selectionne");
+        this.fonction_courante.html_node.classList.remove("selectionne");
         assert(i < this._traceur.length,`${i} est plus grand que la longueur du traceur: ${this._traceur.length}.`);
         this._pos = i;
-        assert(i < this._selecteur.childElementCount,`${i} est plus grand que la longueur du sélecteur ${this._selecteur.childElementCount}.`);
-        this._selecteur.children[i].classList.add("selectionne");
+        this.fonction_courante.html_node.classList.add("selectionne");
     }
 
     get fonction_courante(): FonctionTracee {
@@ -103,6 +101,34 @@ class CreateurPhrase {
         return pos;
     }
 
+    ajouter_node_selecteur(selecteur: HTMLElement, node: HTMLElement, pos_courante: number, pos_a_atteindre: number ) : number {
+
+        for (let elt of selecteur.children) {
+            if (elt.classList.contains("selecteur")) {
+                pos_courante = this.ajouter_node_selecteur(elt as HTMLElement,node, pos_courante, pos_a_atteindre);
+                if (pos_courante > pos_a_atteindre) {
+                    return pos_courante;
+                }
+            } else {
+                if (pos_courante === pos_a_atteindre) {
+                    elt.insertAdjacentElement("beforebegin", node);
+                }
+                if (pos_courante > pos_a_atteindre) {
+                    return pos_courante;
+                }
+                pos_courante += 1;
+            }
+        }
+
+        if (pos_courante === pos_a_atteindre) {
+            selecteur.appendChild(node);
+            return pos_courante + 1;
+        }
+
+        return pos_courante;
+    }
+        
+
     ajouter_fonction_tracee(pos: number, nom: string, fonction: Fonction, numero:number = -1) {
         /* Ajouter une fonction dans le traceur et dans le selecteur
          * pos correspond à l'emplacement dans la liste
@@ -119,38 +145,48 @@ class CreateurPhrase {
         elt.setAttribute("value",f.fonction);
         elt.setAttribute("class","selecteur-element");
         elt.innerHTML = f.nom;
-        //this._selecteur_courant.insertBefore(elt, this._selecteur_courant.children[pos]); // TODO ne peut pas être children.pos parce qu'il y aura d'autres sélecteurs qu'il faut ignorer
-        this.fonction_courante.html_node.insertAdjacentElement("afterend", elt);
+        //this._selecteur_courant.insertBefore(elt, this._selecteur_courant.children[pos]); // ne peut pas être children.pos parce qu'il y aura d'autres sélecteurs qu'il faut ignorer
+        //this.fonction_courante.html_node.insertAdjacentElement("afterend", elt);
+        this.ajouter_node_selecteur(this._selecteur, elt, 0, pos);
 
         // mise à jour de la position 
         this.set_pos_selecteur(this._selecteur, 0);
     }
+    
+    cree_groupe_enchasse(b: boolean):void {
+        /* Crée un groupe enchâssé si b est vrai
+         */
+        // TODO vérifier le bon ordre d'ajout entre les fonctions enchassées et les fonctions multiples (ie CC validé -> nouveau CC + groupes enchassés = problème pour le moment
+        if (!PhraseEleve.Fonctions_contenants.includes(this.fonction_courante.fonction)) {
+            return;
+        }
+        if (!b) {
+            // remove fonctions TODO uniquement s'il y en a déjà
+            return;
+        }
+        let selecteur_courant = document.createElement("div");
+        selecteur_courant.setAttribute("class","selecteur");
+        this.fonction_courante.html_node.insertAdjacentElement("afterend",selecteur_courant);
+        let i = this._pos + 1;
+        Object.entries(CreateurPhrase.liste_des_fonctions_niveau_2).forEach(
+            elt => {
+                this.ajouter_fonction_tracee(i,elt[0], elt[1]);
+                i += 1;
+            }
+        );
+    }
 
-    valide_fonction(b: boolean) {
+    valide_fonction(b: boolean): boolean {
         /* valide la fonction si b est vrai
          */
         this.fonction_courante.validee = b;
         if (b) {
             this._selecteur.children[this._pos].classList.add("valide");
-            if (PhraseEleve.Fonctions_contenants.includes(this.fonction_courante.fonction)) {
-                this._selecteur_courant = document.createElement("div");
-                this._selecteur_courant.setAttribute("class","selecteur");
-                this.fonction_courante.html_node.insertAdjacentElement("afterend",this._selecteur_courant);
-                let i = this._pos;
-                Object.entries(CreateurPhrase.liste_des_fonctions_niveau_2).forEach(
-                    elt => {
-                        this.ajouter_fonction_tracee(i,elt[0], elt[1]);
-                        i += 1;
-                    }
-                );
-            this._selecteur_courant = this._selecteur;
-            }
         } else {
-            if (PhraseEleve.Fonctions_contenants.includes(this.fonction_courante.fonction)) {
-                // remove fonctions TODO
-            }
             this._selecteur.children[this._pos].classList.remove("valide");
         }
+
+        return b;
     }
     
 
@@ -189,7 +225,8 @@ class CreateurPhrase {
                 }
             }
             this._phrase.declareFonction(fonction, mots_selectionnes, this.fonction_courante.numero);
-            this.valide_fonction(mots_selectionnes.length > 0);
+            const est_valide = this.valide_fonction(mots_selectionnes.length > 0);
+            this.cree_groupe_enchasse(est_valide);
             return this;
         }
 
