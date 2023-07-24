@@ -1,5 +1,5 @@
 import {describe, expect, test } from '@jest/globals';
-import { MotsPos, Phrase, PhraseCorrigee, PhraseEleve } from '../src/phrase';
+import { GroupeEnchasse, MotsPos, Phrase, PhraseCorrigee, PhraseEleve } from '../src/phrase';
 
 
 describe('Phrase class tests', () => {
@@ -185,6 +185,24 @@ describe('Phrase class tests', () => {
       expect(phrase.aFonction("attribut_du_sujet")).toBe(true);
       expect(phrase.aFonction("verbe_principal")).toBe(true);
       expect(phrase.aFonction("cod")).toBe(false);
+  });
+
+  test("GroupeEnchasse est bien noté vide quand il l'est, et non s'il est rempli", () => {
+      let ge = new GroupeEnchasse([0,2,3,4]);
+      expect(ge.vide).toBe(true);
+
+      // vide avec un groupe enchasse vide
+      ge.cree_groupe_enchasse([2,3]);
+      expect(ge.vide).toBe(true);
+      
+      // plein avec une fonction unique
+      ge.declareFonction("sujet",[0,3]);
+      expect(ge.vide).toBe(false);
+
+      // plein avec une fonction multiple
+      let ge2 = new GroupeEnchasse([0,1,2,3]);
+      ge2.declareFonction("complement_circonstanciel",[0,1],0);
+      expect(ge2.vide).toBe(false);
   });
 });
 
