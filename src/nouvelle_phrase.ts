@@ -103,7 +103,7 @@ class CreateurPhrase {
         /* Donne à chaque élément d'un sélecteur sa position et renvoie la dernière position enregistrée
          */
         for (let elt of selecteur.children) {
-            if (elt.classList.contains("selecteur")) {
+            if (elt.classList.contains("selecteur") || elt.classList.contains("sous_menu")) {
                 pos = this.set_pos_selecteur(elt as HTMLElement, pos);
             } else {
                 elt.setAttribute("pos",pos.toString());
@@ -116,8 +116,9 @@ class CreateurPhrase {
     ajouter_node_selecteur(selecteur: HTMLElement, node: HTMLElement, pos_courante: number, pos_a_atteindre: number ) : number {
 
         for (let elt of selecteur.children) {
-            if (elt.classList.contains("selecteur")) {
-                pos_courante = this.ajouter_node_selecteur(elt as HTMLElement,node, pos_courante, pos_a_atteindre);
+            if (elt.classList.contains("sous_menu")) {
+                // le 1 correspond au selecteur, le + 1 au fait qu'il y a normalement un autre élément du sous-menu qui est la fonction parent
+                pos_courante = this.ajouter_node_selecteur(elt.children[1] as HTMLElement,node, pos_courante + 1, pos_a_atteindre);
                 if (pos_courante > pos_a_atteindre) {
                     return pos_courante;
                 }
@@ -176,8 +177,14 @@ class CreateurPhrase {
             return;
         }
 
+
+        let sous_menu = document.createElement("div");
+        sous_menu.setAttribute("class","sous_menu");
+        this.fonction_courante.html_node.insertAdjacentElement("beforebegin", sous_menu);
+        sous_menu.insertAdjacentElement("afterbegin", this.fonction_courante.html_node);
+
         let selecteur_courant = document.createElement("div");
-        selecteur_courant.setAttribute("class","selecteur");
+        selecteur_courant.setAttribute("class","selecteur sous_menu_contenu");
         this.fonction_courante.html_node.insertAdjacentElement("afterend",selecteur_courant);
         let i = this._pos + 1;
         Object.entries(CreateurPhrase.liste_des_fonctions_niveau_2).forEach(
@@ -186,6 +193,14 @@ class CreateurPhrase {
                 i += 1;
             }
         );
+
+        sous_menu.addEventListener("mouseenter", () => {
+            selecteur_courant.style.display = 'block';
+        });
+
+        sous_menu.addEventListener("mouseleave", () => {
+            selecteur_courant.style.display = 'none';
+        });
     }
 
     valide_fonction(b: boolean): boolean {
