@@ -40,7 +40,7 @@ class SyntagmeAbstrait {
     // Pour être sûr qu'il s'agisse bien du type Fonction, des accesseurs sont en place.
     protected _fonctions_uniques: { [id: string] : MotsPos } = {};
     protected _fonctions_multiples: { [id: string] : MultiMotsPos } = {};
-    protected _groupes_enchasses: GroupeEnchasse[] = [];
+    protected _groupes_enchasses: Map<[Fonction, number], GroupeEnchasse> = new Map();
     public static Fonctions_multiples: Fonction[] = ["complement_circonstanciel", "modalisateur","auto-enonciative","connecteur","balise_textuelle","epithete","complement_du_nom","complement_du_pronom","complement_de_l_adjectif","apposition"];
     public static Fonctions_contenants: Fonction[] = ["sujet","cod","coi","attribut_du_sujet","attribut_du_cod","complement_circonstanciel","complement_du_verbe_impersonnel","complement_du_nom","complement_du_pronom","epithete","apposition","complement_de_l_adjectif"];
 
@@ -51,7 +51,7 @@ class SyntagmeAbstrait {
     get vide(): boolean {// TEST
         /* vrai si ce syntagme n'a aucune fonction enregistrée
          */
-        for (const g of this._groupes_enchasses) {
+        for (const [,g] of this._groupes_enchasses) {
             if (!g.vide) {
                 return false;
             }
@@ -59,20 +59,42 @@ class SyntagmeAbstrait {
         return (Object.keys(this._fonctions_uniques).length === 0 && Object.keys(this._fonctions_multiples).length === 0);
     }
 
-    cree_groupe_enchasse(contenu: MotsPos): GroupeEnchasse { // TEST
+    cree_groupe_enchasse(contenu: MotsPos, f: Fonction, numero:number): GroupeEnchasse { // TEST
         const n = new GroupeEnchasse(contenu);
-        this._groupes_enchasses.push(n);
+        this._groupes_enchasses.set([f,numero], n);
         return n;
     }
 
     get groupes_enchasses_nombre(): number {// TEST
-        return this._groupes_enchasses.length;
+        return this._groupes_enchasses.size;
     }
 
-    groupe_enchasse(i: number): GroupeEnchasse {
-        assert(i < this.groupes_enchasses_nombre,`groupe_enchasse: ${i} ne correspond à aucun groupe enchassé.`);
-        return this._groupes_enchasses[i];
+    groupe_enchasse(f: Fonction, numero:number): GroupeEnchasse {
+        let val = undefined;
+        for (const [k,v] of this._groupes_enchasses) {
+            if (k[0] === f && k[1] === numero) {
+                val = v;
+            }
+        }
+        if (typeof val === "undefined") {
+            throw Error(`Pas de groupe avec la fonction ${f} et le numéro ${numero}`);
+        } else {
+            return val;
+        }
     }
+
+    supprime_groupe_enchasse(f: Fonction, n: number): boolean {
+        /* vrai si le groupe correspondant a pu être supprimé.
+         */
+        for (const [k,] of this._groupes_enchasses) {
+            if (k[0] === f && k[1] === n) {
+                return this._groupes_enchasses.delete(k);
+            }
+        }
+        return false;
+    }
+
+
 
     fonctions_multiples_nombre(f: Fonction): number {
         /* renvoie le nombre de f dans un syntagme donné
@@ -100,7 +122,7 @@ class SyntagmeAbstrait {
                 }
             }
         );
-        copie._groupes_enchasses = this._groupes_enchasses.filter( g => !g.vide).map(g => g.copie); 
+        copie._groupes_enchasses = new Map([...this._groupes_enchasses.entries()].filter( g => !g[1].vide).map(g => [g[0],g[1].copie]));
         return copie;
     }
 
@@ -124,7 +146,7 @@ class SyntagmeAbstrait {
             }
         }
 
-        for (const elt of this._groupes_enchasses) {
+        for (const [,elt] of this._groupes_enchasses) {
             const res = elt.fonction(i);
             if (res) {
                 rv.push(...res);
@@ -156,7 +178,7 @@ class SyntagmeAbstrait {
                 }
             }
         }
-        for (const g of this._groupes_enchasses) {
+        for (const [,g] of this._groupes_enchasses) {
             rv.push(...g.fonction_detaillee(i));
 
         }

@@ -1,5 +1,5 @@
 import { affiche_phrase } from './affichage_phrase';
-import { GroupeEnchasse, Fonction, Phrase, PhraseCorrigee, PhraseEleve } from './phrase';
+import { GroupeEnchasse, Fonction, MotsPos, Phrase, PhraseCorrigee, PhraseEleve } from './phrase';
 import { assert, byID, non_null } from './util';
 import { fonctions_communes } from './fonctions_partagees';
 import './nouvelle_phrase.css';
@@ -43,6 +43,15 @@ class FonctionTracee {
             return this.nom;
         }
         return `${this.parent.arbre_genealogique} > ${this.nom}`;
+    }
+
+    get id_sous_menu(): string {
+        const num = this.numero === -1 ? "" : `-${this.numero}`;
+        const id = `${this.fonction}${num}`;
+        if (typeof this.parent === "undefined") {
+            return id;
+        }
+        return `${this.parent.id_sous_menu}-${id}`;
     }
 }
 
@@ -168,16 +177,23 @@ class CreateurPhrase {
         this.set_pos_selecteur(this._selecteur, 0);
     }
 
-    retirer_fonction_tracee(pos: number) {
-        /* retire une fonction du traceur et du selecteur
+    retirer_enfants(parent: FonctionTracee) {
+        /* Retire toute la descendance de parent
+         * du traceur et du sélecteur
          */
-        const f = this._traceur[pos];
-        f.html_node.remove();
-        delete(this._traceur[pos]);
-        this.set_pos_selecteur(this._selecteur, 0);
+        // TODO fonction très lente et peu efficace
+        for (const [i,f] of this._traceur.entries()) {
+            if (f.parent === parent) {
+                this.retirer_enfants(f);
+                f.html_node.remove();
+                delete(this._traceur[i]);
+                this._traceur = this._traceur.filter( elt => typeof elt !== "undefined");
+                this.set_pos_selecteur(this._selecteur,0);
+            }
+        }
     }
-    
-    gere_groupe_enchasse(b: boolean, syntagme: GroupeEnchasse, parent: FonctionTracee):void {
+
+    gere_groupe_enchasse(b: boolean, mots: MotsPos, parent: FonctionTracee):void {
         /* Crée un groupe enchâssé si b est vrai
          * détruit un groupe enchâssé si b est faux
          */
@@ -185,13 +201,24 @@ class CreateurPhrase {
             return;
         }
         if (!b) {
-            // remove fonctions TODO uniquement s'il y en a déjà
+            // retrait des fonctions
+            if (parent.syntagme.supprime_groupe_enchasse(parent.fonction, parent.numero)) {
+                // déplacement du parent
+                const menu = byID(parent.id_sous_menu);
+                menu.insertAdjacentElement("beforebegin", parent.html_node);
+                // suppression du sélecteur et du traceur
+                this.retirer_enfants(parent);
+                // suppression du sous-menu
+                menu.remove()
+            }
             return;
         }
 
 
+        let syntagme = parent.syntagme.cree_groupe_enchasse(mots, parent.fonction, parent.numero);
         let sous_menu = document.createElement("div");
         sous_menu.setAttribute("class","sous_menu");
+        sous_menu.setAttribute("id", parent.id_sous_menu);
         this.fonction_courante.html_node.insertAdjacentElement("beforebegin", sous_menu);
         sous_menu.insertAdjacentElement("afterbegin", this.fonction_courante.html_node);
 
@@ -269,7 +296,7 @@ class CreateurPhrase {
             }
             syntagme.declareFonction(fonction, mots_selectionnes, this.fonction_courante.numero);
             const est_valide = this.valide_fonction(mots_selectionnes.length > 0);
-            this.gere_groupe_enchasse(est_valide, syntagme.cree_groupe_enchasse(mots_selectionnes), this.fonction_courante);
+            this.gere_groupe_enchasse(est_valide, mots_selectionnes, this.fonction_courante);
             return this;
         }
 
