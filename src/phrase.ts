@@ -237,6 +237,10 @@ export class Phrase extends SyntagmeAbstrait {
         return this.phrase;
     }
 
+    get mots_pos(): MotsPos {
+        return [...Array(this._phrase_cassee.length).keys()];
+    }
+
     set contenu(phrase: string) {
         /* Met à jour le contenu de la phrase
          */
@@ -322,16 +326,22 @@ export class Phrase extends SyntagmeAbstrait {
             .join(" ");
     }
 
+    mots_valides(mots: MotsPos): boolean {
+        if (mots.length > 0) {
+            // les mots rentrés sont-ils dans les bornes ? Le problème ne se pose pas si on veut supprimer la fonction
+            return mots[0] >= 0 && mots[mots.length -1] < this.longueur;
+        }
+        return true;
+    }
+
     declareFonction(f: Fonction, mots: MotsPos, numero_de_fonction: number = -1): void { // TEST 
         /* Déclare une fonction contenant les mots correspondants
          * si numero_de_fonction est précisé, la fonction correspondante sera modifiée.
          * S'il s'agit d'une fonction multiple et qu'il n'y a pas de numero_de_fonction,
          * la fonction sera ajoutée
          */
-        if (mots.length > 0) {
-            // les mots rentrés sont-ils dans les bornes ? Le problème ne se pose pas si on veut supprimer la fonction
-            assert(mots[0] >= 0 && mots[mots.length -1] < this.longueur, `declareFonction: ${mots} ne correspond pas à une liste de mots valides. La longueur est de ${this.longueur}`);
-        }
+        assert(this.mots_valides(mots),
+               `declareFonction: ${mots} ne correspond pas à une liste de mots valides. La longueur est de ${this.longueur}`);
         if (f === "verbes") {
             this.verbes = mots;
         } else {
@@ -402,14 +412,25 @@ export class GroupeEnchasse extends SyntagmeAbstrait {
         return copie;
     }
 
-    declareFonction(f: Fonction, mots: MotsPos, numero_de_fonction: number = -1): void {
+    get mots_pos(): MotsPos {
+        return this._contenu;
+    }
+
+    mots_valides(mots: MotsPos): boolean {
         if (mots.length > 0) {
             // les mots rentrés sont-ils dans les bornes ? Le problème ne se pose pas si on veut supprimer la fonction
             for (const m of mots) {
-                assert(this._contenu.includes(m),
-                       `declareFonction: ${mots} ne correspond pas à une liste de mots valides. La longueur est de ${this._contenu.length}`);
+                if (!this._contenu.includes(m)) {
+                    return false;
+                }
             }
         }
+        return true;
+    }
+
+    declareFonction(f: Fonction, mots: MotsPos, numero_de_fonction: number = -1): void {
+        assert(this.mots_valides(mots),
+               `declareFonction: ${mots} ne correspond pas à une liste de mots valides.`);
         super.declareFonction(f, mots, numero_de_fonction);
     }
 

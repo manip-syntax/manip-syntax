@@ -3,7 +3,7 @@
  */
 import './affichage_phrase.css';
 
-import { Fonction, FonctionEnchassee, PhraseEleve } from "./phrase";
+import { Fonction, FonctionEnchassee, MotsPos, PhraseEleve } from "./phrase";
 
 function renvoie_crochet(f: Fonction, est_crochet_ouvrant: boolean): string {
     /*
@@ -46,7 +46,10 @@ function fin_balise(fe: FonctionEnchassee, pos: number): string {
 }
 
 
-export function affiche_phrase(phrase: PhraseEleve) : string {
+export function affiche_phrase(phrase: PhraseEleve, mots_a_inclure: MotsPos = []) : string {
+    if (mots_a_inclure.length === 0) {
+        mots_a_inclure = phrase.mots_pos;
+    }
     // découpage de la phrase en constituants
     // cette regex permet de conserver le séparateur
     const reg = new RegExp("(" + PhraseEleve.Separateur + ")");
@@ -65,7 +68,8 @@ export function affiche_phrase(phrase: PhraseEleve) : string {
         }
         const fonctions_elt = phrase.fonction_detaillee(i);
         fonctions_elt.forEach( fe => rv_array.push(debut_balise(fe,i)));
-        rv_array.push(`<span class="phrase-cliquable" id="phrase-mot-${i}">${elt}</span>`);
+        const cliquable = mots_a_inclure.includes(i) ? 'class="phrase-cliquable"' : 'class="phrase-non-cliquable"';
+        rv_array.push(`<span ${cliquable} id="phrase-mot-${i}">${elt}</span>`);
         fonctions_elt.forEach( fe => rv_array.push(fin_balise(fe,i)));
         // incrémentation à la fin
         i+=1;

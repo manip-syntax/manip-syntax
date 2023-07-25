@@ -21,7 +21,6 @@ let enregistre_fonction = () => {
 
 class FonctionTracee {
     public validee: boolean = false;
-    public changee: boolean = false;
     public est_multiple: boolean = false;
     constructor(public nom_de_base: string,
                 public fonction: Fonction,
@@ -168,9 +167,19 @@ class CreateurPhrase {
         // mise à jour de la position 
         this.set_pos_selecteur(this._selecteur, 0);
     }
+
+    retirer_fonction_tracee(pos: number) {
+        /* retire une fonction du traceur et du selecteur
+         */
+        const f = this._traceur[pos];
+        f.html_node.remove();
+        delete(this._traceur[pos]);
+        this.set_pos_selecteur(this._selecteur, 0);
+    }
     
-    cree_groupe_enchasse(b: boolean, syntagme: GroupeEnchasse, parent: FonctionTracee):void {
+    gere_groupe_enchasse(b: boolean, syntagme: GroupeEnchasse, parent: FonctionTracee):void {
         /* Crée un groupe enchâssé si b est vrai
+         * détruit un groupe enchâssé si b est faux
          */
         if (!PhraseEleve.Fonctions_contenants.includes(this.fonction_courante.fonction)) {
             return;
@@ -232,7 +241,7 @@ class CreateurPhrase {
         }
         const fonction = this.fonction_courante.fonction;
         const syntagme = this.fonction_courante.syntagme;
-        byID("phrase-analyse-paragraphe").innerHTML = affiche_phrase(this._phrase);
+        byID("phrase-analyse-paragraphe").innerHTML = affiche_phrase(this._phrase, syntagme.mots_pos);
         byID("consigne-container").innerHTML = `À renseigner : ${this.fonction_courante.arbre_genealogique}`;
 
         // selection des mots précédemment sélectionnés
@@ -260,7 +269,7 @@ class CreateurPhrase {
             }
             syntagme.declareFonction(fonction, mots_selectionnes, this.fonction_courante.numero);
             const est_valide = this.valide_fonction(mots_selectionnes.length > 0);
-            this.cree_groupe_enchasse(est_valide, syntagme.cree_groupe_enchasse(mots_selectionnes), this.fonction_courante);
+            this.gere_groupe_enchasse(est_valide, syntagme.cree_groupe_enchasse(mots_selectionnes), this.fonction_courante);
             return this;
         }
 
