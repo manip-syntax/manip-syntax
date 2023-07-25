@@ -74,6 +74,9 @@ class CreateurPhrase {
     static liste_des_fonctions_niveau_2: { [nom: string] : Fonction } = {
         "Épithète" : "epithete",
         "Complément du nom" : "complement_du_nom",
+        "Complément du pronom": "complement_du_pronom",
+        "Apposition" : "apposition",
+        "Complément de l'adjectif": "complement_de_l_adjectif"
     };
 
     constructor(texte: string) {
@@ -187,7 +190,10 @@ class CreateurPhrase {
         selecteur_courant.setAttribute("class","selecteur sous_menu_contenu");
         this.fonction_courante.html_node.insertAdjacentElement("afterend",selecteur_courant);
         let i = this._pos + 1;
-        Object.entries(CreateurPhrase.liste_des_fonctions_niveau_2).forEach(
+        Object.entries(CreateurPhrase.liste_des_fonctions_niveau_2)
+            .concat(Object.entries(CreateurPhrase.liste_des_fonctions_niveau_1))
+            .forEach(
+            // TODO améliorer pour ne sélectionner que les fonctions qui peuvent aller avec la fonction contenant
             elt => {
                 this.ajouter_fonction_tracee(i,elt[0], elt[1], syntagme, -1, parent);
                 i += 1;
@@ -206,11 +212,12 @@ class CreateurPhrase {
     valide_fonction(b: boolean): boolean {
         /* valide la fonction si b est vrai
          */
-        this.fonction_courante.validee = b;
+        const fc = this.fonction_courante;
+        fc.validee = b;
         if (b) {
-            this._selecteur.children[this._pos].classList.add("valide");
+            fc.html_node.classList.add("valide");
         } else {
-            this._selecteur.children[this._pos].classList.remove("valide");
+            fc.html_node.classList.remove("valide");
         }
 
         return b;
