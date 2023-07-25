@@ -405,7 +405,10 @@ export class GroupeEnchasse extends SyntagmeAbstrait {
     declareFonction(f: Fonction, mots: MotsPos, numero_de_fonction: number = -1): void {
         if (mots.length > 0) {
             // les mots rentrés sont-ils dans les bornes ? Le problème ne se pose pas si on veut supprimer la fonction
-            assert(mots[0] >= 0 && mots[mots.length -1] < this._contenu.length, `declareFonction: ${mots} ne correspond pas à une liste de mots valides. La longueur est de ${this._contenu.length}`);
+            for (const m of mots) {
+                assert(this._contenu.includes(m),
+                       `declareFonction: ${mots} ne correspond pas à une liste de mots valides. La longueur est de ${this._contenu.length}`);
+            }
         }
         super.declareFonction(f, mots, numero_de_fonction);
     }
