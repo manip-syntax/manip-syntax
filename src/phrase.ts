@@ -410,10 +410,17 @@ export class PhraseCorrigee extends Phrase {
         return !compare(pos,[]);
     }
 
-    estFonction(f:Fonction, mot:MotsPos): boolean { // TEST 
+    estFonction(f:Fonction, mots:MotsPos): boolean { // TEST 
         /*Vrai si mot a cette fonction d'après le corrigé
          */
-        return compare(this.fonctionPos(f),mot.sort());
+        mots = mots.sort();
+        if (SyntagmeAbstrait.Fonctions_multiples.includes(f)) {
+            if  (f in this._fonctions_multiples) {
+                return this._fonctions_multiples[f].filter(e => compare(e,mots)).length > 0;
+            }
+            return false;
+        }
+        return compare(this.fonctionPos(f),mots.sort());
     }
 
 }
@@ -473,12 +480,19 @@ export class PhraseEleve extends Phrase {
         return this._corrige;
     }
 
-    declare(f: Fonction, elt: MotsPos): boolean { // TEST
+    declare(f: Fonction, elt: MotsPos, n:number = -1): boolean { // TEST
         /* Enregistre une fonction pour cette phrase.
          * Vrai si elt a bien cette fonction
          * d'après le corrigé
+         * Si la fonction est multiple, renvoie false
+         * si la fonction a déjà été déclarée
          */
-        this.declareFonction(f, elt);
+        if (SyntagmeAbstrait.Fonctions_multiples.includes(f) && f in this._fonctions_multiples) {
+            if (this._fonctions_multiples[f].filter(e => compare(e, elt)).length !== 0) {
+                return false;
+            }
+        }
+        this.declareFonction(f, elt, n);
         return this._corrige.estFonction(f, elt);
     }
 

@@ -238,5 +238,18 @@ describe('Phrase class tests', () => {
       ge.declareFonction("epithete",[0]);
       expect(sa.copie.groupes_enchasses_nombre).toBe(1);
   });
+
+  test("PhraseEleve et PhraseCorrigee gèrent correctement les syntagmes multiples", () => {
+      const phrase = "Hier, j'étais à Paris.";
+      let pc = new PhraseCorrigee(phrase);
+      pc.declareFonction("complement_circonstanciel",[0]);
+      pc.declareFonction("complement_circonstanciel",[3,4]);
+      let pe = new PhraseEleve(phrase, pc);
+      expect(pc.estFonction("complement_circonstanciel",[1])).toBe(false);
+      expect(pe.declare("complement_circonstanciel",[1],0)).toBe(false);
+      expect(pe.declare("complement_circonstanciel",[0],0)).toBe(true);
+      expect(pe.declare("complement_circonstanciel",[0],1)).toBe(false);
+      expect(pe.declare("complement_circonstanciel",[3,4],1)).toBe(true);
+  });
 });
 
