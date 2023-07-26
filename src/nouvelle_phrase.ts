@@ -6,17 +6,25 @@ import './nouvelle_phrase.css';
 
 // Nouvelle phrase: bouton ok
 let fonction_du_bouton_de_nouvelle_phrase = () => console.log("Problème: aucune fonction définie pour le bouton OK de la nouvelle phrase");
-byID("modal-nouvelle_phrase-bouton").addEventListener('click', () => {
-    fonction_du_bouton_de_nouvelle_phrase();
-});
 // Nouvelle phrase: bouton validation de la phrase
 let fonction_de_validation_de_la_phrase = () => console.log("Problème: aucune fonction définie pour la validation de la nouvelle phrase");
-byID("bouton-valider-phrase").addEventListener('click', () => {
-    fonction_de_validation_de_la_phrase();
-});
+let fonction_du_selecteur_nouvelle_phrase = (_: Event) => console.log("Aucune fonction définie pour le sélecteur");
 let enregistre_fonction = () => {
     console.log("Problème: enregistre_fonction n'a pas été instancié");
     return new CreateurPhrase("vide");
+}
+
+export function add_events_listener () {
+    byID("modal-nouvelle_phrase-bouton").addEventListener('click', () => {
+        fonction_du_bouton_de_nouvelle_phrase();
+    });
+
+    byID("bouton-valider-phrase").addEventListener('click', () => {
+        fonction_de_validation_de_la_phrase();
+    });
+    byID("nouvelle_phrase-fonctions-selection").addEventListener('click', e => {
+        fonction_du_selecteur_nouvelle_phrase(e);
+    });
 }
 
 class FonctionTracee {
@@ -55,7 +63,7 @@ class FonctionTracee {
     }
 }
 
-class CreateurPhrase {
+export class CreateurPhrase {
 
     private _phrase: PhraseEleve;
     private _traceur: FonctionTracee[] = [];
@@ -104,6 +112,10 @@ class CreateurPhrase {
         assert(i < this._traceur.length,`${i} est plus grand que la longueur du traceur: ${this._traceur.length}.`);
         this._pos = i;
         this.fonction_courante.html_node.classList.add("selectionne");
+    }
+
+    get pos():number {
+        return this._pos;
     }
 
     get fonction_courante(): FonctionTracee {
@@ -218,7 +230,7 @@ class CreateurPhrase {
         let syntagme = parent.syntagme.cree_groupe_enchasse(mots, parent.fonction, parent.numero);
         let sous_menu = document.createElement("div");
         sous_menu.setAttribute("class","sous_menu");
-        sous_menu.setAttribute("id", parent.id_sous_menu);
+        sous_menu.setAttribute("id", `sous_menu-${parent.id_sous_menu}`);
         this.fonction_courante.html_node.insertAdjacentElement("beforebegin", sous_menu);
         sous_menu.insertAdjacentElement("afterbegin", this.fonction_courante.html_node);
 
@@ -353,8 +365,8 @@ export function nouvelle_phrase() : void {
         modal_nouvelle_phrase.style.display = 'none';
         nouvelle_phrase.analyse_de_fonction(0);
 
+        fonction_du_selecteur_nouvelle_phrase = (e) => {
         // Evénement pour le sélecteur
-        byID("nouvelle_phrase-fonctions-selection").addEventListener('click', e => {
             const target = e.target as HTMLElement;
             // enregistrement
             enregistre_fonction();
@@ -368,7 +380,7 @@ export function nouvelle_phrase() : void {
                 return -1;
             };
             nouvelle_phrase.analyse_de_fonction(val());
-        });
+        };
     };
     
 }

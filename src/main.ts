@@ -3,7 +3,7 @@ import './choix_phrase.css';
 import './modal.css';
 import { anime_disparition_modal, byID, cree_html_element, non_null } from './util';
 import { affiche_phrase } from './affichage_phrase';
-import { nouvelle_phrase } from './nouvelle_phrase';
+import { add_events_listener, nouvelle_phrase } from './nouvelle_phrase';
 import { charge_phrases } from './charge_phrases';
 import { Fonction, PhraseCorrigee, PhraseEleve } from './phrase';
 import { fonctions_communes } from './fonctions_partagees';
@@ -209,6 +209,8 @@ byID("analyse_fichier_input").addEventListener("change", e => {
     lecteur.readAsText(fichier);
 
 });
+
+add_events_listener();
 
 selectionne_phrase();
 
