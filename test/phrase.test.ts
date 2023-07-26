@@ -133,7 +133,7 @@ describe('Phrase class tests', () => {
       const phrase = "Le petit enfant mange.";
       let p = new Phrase(phrase);
       p.declareFonction("sujet",[0,1,2]);
-      let gn_sujet = p.cree_groupe_enchasse([0,1,2]);
+      let gn_sujet = p.cree_groupe_enchasse([0,1,2],"sujet",-1);
       gn_sujet.declareFonction("noyau",[2]);
       gn_sujet.declareFonction("epithete",[1]);
       expect(p.fonction(1).sort()).toEqual(["epithete","sujet"]);
@@ -167,7 +167,7 @@ describe('Phrase class tests', () => {
       const phrase = "L'enfant qui travaille est assis";
       let p = new Phrase(phrase);
       p.declareFonction("sujet",[0,1,2,3]);
-      let gn_sujet = p.cree_groupe_enchasse([0,1,2,3]);
+      let gn_sujet = p.cree_groupe_enchasse([0,1,2,3], "sujet",-1);
       gn_sujet.declareFonction("noyau",[1]);
       gn_sujet.declareFonction("complement_du_nom",[2,3]);
       expect(p.fonction_detaillee(2)).toEqual([["sujet",0,3],["complement_du_nom",2,3]]);
@@ -192,7 +192,7 @@ describe('Phrase class tests', () => {
       expect(ge.vide).toBe(true);
 
       // vide avec un groupe enchasse vide
-      ge.cree_groupe_enchasse([2,3]);
+      ge.cree_groupe_enchasse([2,3],"cod",-1);
       expect(ge.vide).toBe(true);
       
       // plein avec une fonction unique
@@ -215,7 +215,7 @@ describe('Phrase class tests', () => {
       expect(copie.fonctionPos("complement_circonstanciel",0)).toEqual([3,4,5]);
       expect(copie.fonctionPos("complement_circonstanciel",1)).toEqual([6,7,8]);
 
-      let ge = sa.cree_groupe_enchasse([0,1,2]);
+      let ge = sa.cree_groupe_enchasse([0,1,2],"coi",-1);
       expect(sa.groupes_enchasses_nombre).toBe(1);
       copie = sa.copie;
       // copie ne doit pas avoir de groupe enchâssé puisque le contenu de ce groupe est vide
