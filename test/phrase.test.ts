@@ -205,6 +205,19 @@ describe('Phrase class tests', () => {
       expect(ge2.vide).toBe(false);
   });
 
+  test("Phrase renvoie les bons groupes enchassés et les supprime", () => {
+      let phrase = new Phrase("Le matin, le petit chaperon rouge entra dans le bois où se trouvait un grand méchant loup.");
+      const [cc1, cc2] = [[0,1], [7,8,9,10,11,12,13,14,15,16]];
+      phrase.cree_groupe_enchasse(cc1, "complement_circonstanciel",0);
+      phrase.cree_groupe_enchasse(cc2, "complement_circonstanciel",1);
+      expect(phrase.groupe_enchasse("complement_circonstanciel",0).mots_pos).toEqual(cc1);
+      expect(phrase.groupe_enchasse("complement_circonstanciel",1).mots_pos).toEqual(cc2);
+      expect(phrase.supprime_groupe_enchasse("complement_circonstanciel",0)).toBe(true);
+      expect(phrase.supprime_groupe_enchasse("sujet",-1)).toBe(false);
+      expect(() => phrase.groupe_enchasse("complement_circonstanciel",0)).toThrow();
+
+  });
+
   test("Phrase copie correctement", () => {
       let sa = new Phrase("Peu importe le contenu pourvu qu'il soit assez long pour correspondre aux numéros des fonctions déclarées.");
       sa.declareFonction("sujet",[0,1,2]);

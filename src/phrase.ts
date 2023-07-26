@@ -69,7 +69,7 @@ class SyntagmeAbstrait {
         return this._groupes_enchasses.size;
     }
 
-    groupe_enchasse(f: Fonction, numero:number): GroupeEnchasse {
+    groupe_enchasse(f: Fonction, numero:number): GroupeEnchasse { // TEST
         let val = undefined;
         for (const [k,v] of this._groupes_enchasses) {
             if (k[0] === f && k[1] === numero) {
@@ -83,7 +83,7 @@ class SyntagmeAbstrait {
         }
     }
 
-    supprime_groupe_enchasse(f: Fonction, n: number): boolean {
+    supprime_groupe_enchasse(f: Fonction, n: number): boolean {//TEST
         /* vrai si le groupe correspondant a pu être supprimé.
          */
         for (const [k,] of this._groupes_enchasses) {
@@ -93,8 +93,6 @@ class SyntagmeAbstrait {
         }
         return false;
     }
-
-
 
     fonctions_multiples_nombre(f: Fonction): number {
         /* renvoie le nombre de f dans un syntagme donné
@@ -434,7 +432,7 @@ export class GroupeEnchasse extends SyntagmeAbstrait {
         return copie;
     }
 
-    get mots_pos(): MotsPos {
+    get mots_pos(): MotsPos { // TEST
         return this._contenu;
     }
 
