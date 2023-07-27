@@ -271,9 +271,8 @@ export class Phrase extends SyntagmeAbstrait {
         /* Copie le contenu de la phrase
          */
         let copie = super.copie as Phrase;
-        if (this.verbes.length > 0) {
-            copie.verbes = this.verbes;
-        }
+        // pour des raisons pratiques, on garde les verbes dans tous les cas
+        copie.verbes = this.verbes;
         copie.contenu = this.contenu;
         return copie;
     }
@@ -406,6 +405,13 @@ export class PhraseCorrigee extends Phrase {
         /* Vrai si cette phrase contient cette fonction
          * d'après le corrigé.
          */
+        console.log(f);
+        if (SyntagmeAbstrait.Fonctions_multiples.includes(f)) { // À TESTER TODO 
+            if (f in this._fonctions_multiples) {
+                return this._fonctions_multiples[f].filter(e => !compare(e, [])).length > 0;
+            }
+            return false;
+        }
         const pos = this.fonctionPos(f);
         return !compare(pos,[]);
     }
@@ -495,6 +501,30 @@ export class PhraseEleve extends Phrase {
         this.declareFonction(f, elt, n);
         return this._corrige.estFonction(f, elt);
     }
+
+    est_complet(f: Fonction): boolean { // TODO
+        /* vrai si f, qui est une fonction multiple,
+         * correspond exactement au corrigé
+         */
+        // TODO ajouter un assert pour les fonctions multiples ?
+
+        const corrige_nombre = this._corrige.fonctions_multiples_nombre(f);
+        if (corrige_nombre !== this.fonctions_multiples_nombre(f)) {
+            return false;
+        }
+
+        const fp = this._fonctions_multiples[f];
+
+        for (let i = 0; i < corrige_nombre; i++) {
+            const mp = this._corrige.fonctionPos(f,i);
+            const r = fp.filter(e => compare(e, mp)).length;
+            if (r === 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
 }
 

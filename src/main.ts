@@ -16,14 +16,22 @@ function analyse_phrase(phrase_corrigee: PhraseCorrigee): void {
 
 }
 
-function analyse_fonction_requise(etape: number, phrase_eleve: PhraseEleve): void {
-    const [fonction, consigne] = consignes[etape];
+function analyse_fonction_requise(etape: number, phrase_eleve: PhraseEleve, fm_index = -1): void {
+    const fonction: Fonction = consignes[etape][0] as Fonction;
+
+    if (PhraseEleve.Fonctions_multiples.includes(fonction) && fm_index === -1) {
+        fm_index = 0;
+    }
+
+    const consigne = consignes[etape][1] + (fm_index >= 0 ? ` (${fm_index + 1})` : "");
 
     function analyse_suivante ():void {
         if (etape === consignes.length -1) {
             analyse_finie();
         } else {
-            analyse_fonction_requise(etape + 1, phrase_eleve);
+            const j = PhraseEleve.Fonctions_multiples.includes(fonction) && !phrase_eleve.est_complet(fonction) ? 0 : 1;
+            fm_index = j === 0 ? fm_index + 1 : -1;
+            analyse_fonction_requise(etape + j, phrase_eleve, fm_index);
         }
     }
 
@@ -39,14 +47,14 @@ function analyse_fonction_requise(etape: number, phrase_eleve: PhraseEleve): voi
                               .map(elt => Number(elt.id.split('-')[2]));
         
         let reponse_correcte = (mots_selectionnes.length === 0) ? 
-            !phrase_eleve.corrige.aFonction(fonction as Fonction) :
-            phrase_eleve.declare(fonction as Fonction, mots_selectionnes);
+            !phrase_eleve.corrige.aFonction(fonction) :
+            phrase_eleve.declare(fonction, mots_selectionnes, fm_index);
         if (!reponse_correcte) {
             const modal_message = byID("modal-message-contenu");
             modal_message.classList.add("modal-message-erreur");
             // TODO on pourrait peut-être être plus précis et dire s'il manque des mots, par exemple, ou si tous les mots sont faux
             definit_message_modal("Il y a une erreur dans ton analyse !", "Reprendre l'analyse", () => {
-                analyse_fonction_requise(etape, phrase_eleve);
+                analyse_fonction_requise(etape, phrase_eleve, fm_index);
                 modal_message.classList.remove("modal-message-erreur");
                 // préselection des mots précédemment choisis
                 Array.from(document.getElementsByClassName("phrase-cliquable"))
@@ -198,6 +206,7 @@ byID("analyse_fichier_input").addEventListener("change", e => {
         try {
             analyse_phrase(PhraseCorrigee.fromJSON(json_contenu));
         } catch (e) {
+            console.log(e);
             disparition_modal();
             if (e instanceof TypeError) {
                 return definit_message_modal("Ce fichier n'est pas compatible avec la version actuelle du programme.", "OK", () => {});
