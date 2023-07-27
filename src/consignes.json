@@ -1,5 +1,6 @@
 [
     ["verbes" , "Sélectionne les verbes."],
+    ["independante", "Sélectionne une indépendante"],
     ["verbe_principal" , "Sélectionne le verbe principal"],
     ["groupe_verbal","Sélectionne le groupe verbal"],
     ["sujet" , "Sélectionne le groupe sujet"],

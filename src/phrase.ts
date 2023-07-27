@@ -21,7 +21,9 @@ export type Fonction =
     "modalisateur" |
     "auto-enonciative" |
     "connecteur" |
-    "balise_textuelle"
+    "balise_textuelle" |
+// cas particuliers
+    "independante"
 ;
 
 // Ce type est un array de nombres, chaque nombre correspondant à la position d'un mot dans une phrase.
@@ -41,8 +43,8 @@ class SyntagmeAbstrait {
     protected _fonctions_uniques: { [id: string] : MotsPos } = {};
     protected _fonctions_multiples: { [id: string] : MultiMotsPos } = {};
     protected _groupes_enchasses: Map<[Fonction, number], GroupeEnchasse> = new Map();
-    public static Fonctions_multiples: Fonction[] = ["complement_circonstanciel", "modalisateur","auto-enonciative","connecteur","balise_textuelle","epithete","complement_du_nom","complement_du_pronom","complement_de_l_adjectif","apposition"];
-    public static Fonctions_contenants: Fonction[] = ["sujet","cod","coi","attribut_du_sujet","attribut_du_cod","complement_circonstanciel","complement_du_verbe_impersonnel","complement_du_nom","complement_du_pronom","epithete","apposition","complement_de_l_adjectif"];
+    public static Fonctions_multiples: Fonction[] = ["independante","complement_circonstanciel", "modalisateur","auto-enonciative","connecteur","balise_textuelle","epithete","complement_du_nom","complement_du_pronom","complement_de_l_adjectif","apposition"];
+    public static Fonctions_contenants: Fonction[] = ["independante","sujet","cod","coi","attribut_du_sujet","attribut_du_cod","complement_circonstanciel","complement_du_verbe_impersonnel","complement_du_nom","complement_du_pronom","epithete","apposition","complement_de_l_adjectif"];
 
     _fonction_enchassee = (f: Fonction, m: MotsPos) => {
         return [f, m[0], m.slice(-1)[0]] as FonctionEnchassee;
@@ -429,13 +431,19 @@ export class PhraseCorrigee extends Phrase {
         return compare(this.fonctionPos(f),mots.sort());
     }
 
+    * groupes_enchasses() {
+        for (let elt of this._groupes_enchasses) {
+            yield elt;
+        }
+    }
+
 }
 
 export class GroupeEnchasse extends SyntagmeAbstrait {
     /* Représente un groupe de mots enchâssés dans une phrase
      */
 
-    constructor(private _contenu: MotsPos) {
+    constructor(protected _contenu: MotsPos) {
         super();
     }
 
@@ -469,6 +477,102 @@ export class GroupeEnchasse extends SyntagmeAbstrait {
 
 }
 
+export class GroupeEnchasseCorrige extends GroupeEnchasse {
+    /* Classe utilisée à l'intérieur d'un groupe enchassé élève comme correction
+     * TODO essayer de supprimer la duplication de aFonction, groupes_enchasses et estFonction avec PhraseCorrigee
+     */
+
+    aFonction(f: Fonction): boolean { // TEST
+        /* Vrai si cette phrase contient cette fonction
+         * d'après le corrigé.
+         */
+        console.log(f);
+        if (SyntagmeAbstrait.Fonctions_multiples.includes(f)) { // À TESTER TODO 
+            if (f in this._fonctions_multiples) {
+                return this._fonctions_multiples[f].filter(e => !compare(e, [])).length > 0;
+            }
+            return false;
+        }
+        const pos = this.fonctionPos(f);
+        return !compare(pos,[]);
+    }
+
+    estFonction(f:Fonction, mots:MotsPos): boolean { // TEST 
+        /*Vrai si mot a cette fonction d'après le corrigé
+         */
+        mots = mots.sort();
+        if (SyntagmeAbstrait.Fonctions_multiples.includes(f)) {
+            if  (f in this._fonctions_multiples) {
+                return this._fonctions_multiples[f].filter(e => compare(e,mots)).length > 0;
+            }
+            return false;
+        }
+        return compare(this.fonctionPos(f),mots.sort());
+    }
+    
+    * groupes_enchasses() {
+        for (let elt of this._groupes_enchasses) {
+            yield elt;
+        }
+    }
+}
+
+export class GroupeEnchasseEleve extends GroupeEnchasse {
+    constructor(protected gec: GroupeEnchasseCorrige) {
+        super(gec.mots_pos);
+    }
+
+    cree_groupe_enchasse_eleve(corrige: GroupeEnchasseCorrige, f: Fonction, numero:number): GroupeEnchasseEleve { 
+        // double de PhraseEleve
+        const n = new GroupeEnchasseEleve(corrige);
+        this._groupes_enchasses.set([f,numero], n);
+        return n;
+    }
+
+    get corrige (): GroupeEnchasseCorrige {
+        return this.gec;
+    }
+
+    est_complet(f: Fonction): boolean { // TODO
+        /* vrai si f, qui est une fonction multiple,
+         * correspond exactement au corrigé
+         */
+        // TODO ajouter un assert pour les fonctions multiples ?
+
+        const corrige_nombre = this.corrige.fonctions_multiples_nombre(f);
+        if (corrige_nombre !== this.fonctions_multiples_nombre(f)) {
+            return false;
+        }
+
+        const fp = this._fonctions_multiples[f];
+
+        for (let i = 0; i < corrige_nombre; i++) {
+            const mp = this.corrige.fonctionPos(f,i);
+            const r = fp.filter(e => compare(e, mp)).length;
+            if (r === 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+    declare(f: Fonction, elt: MotsPos, n:number = -1): boolean { // TEST
+        /* Enregistre une fonction pour cette phrase.
+         * Vrai si elt a bien cette fonction
+         * d'après le corrigé
+         * Si la fonction est multiple, renvoie false
+         * si la fonction a déjà été déclarée
+         */
+        if (SyntagmeAbstrait.Fonctions_multiples.includes(f) && f in this._fonctions_multiples) {
+            if (this._fonctions_multiples[f].filter(e => compare(e, elt)).length !== 0) {
+                return false;
+            }
+        }
+        this.declareFonction(f, elt, n);
+        return this.corrige.estFonction(f, elt);
+    }
+
+}
+
 export class PhraseEleve extends Phrase {
     /* Cette classe
      * contient la phrase sélectionnée par l'utilisateur,
@@ -484,6 +588,12 @@ export class PhraseEleve extends Phrase {
 
     get corrige (): PhraseCorrigee {
         return this._corrige;
+    }
+
+    cree_groupe_enchasse_eleve (corrige: GroupeEnchasseCorrige, f: Fonction, numero:number): GroupeEnchasseEleve { 
+        const n = new GroupeEnchasseEleve(corrige);
+        this._groupes_enchasses.set([f,numero], n);
+        return n;
     }
 
     declare(f: Fonction, elt: MotsPos, n:number = -1): boolean { // TEST

@@ -33,6 +33,8 @@ function debut_balise(fe: FonctionEnchassee, pos: number): string {
     }
     return "";
 }
+// FIXME il va y avoir un problème avec l'affichage de certains groupes qui vont en englober d'autres induement, surtout si les élèves se plantent
+// il faudrait fermer les balises si le mot qui suit ne fait pas partie du groupe, et le rouvrir plus loin
 function fin_balise(fe: FonctionEnchassee, pos: number): string {
     /* Même fonction que debut_balise, mais pour la fin
      * Ajoute un crochet en fin de groupe

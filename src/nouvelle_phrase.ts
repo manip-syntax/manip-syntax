@@ -70,6 +70,7 @@ export class CreateurPhrase {
     private _pos: number = 0;
     private _selecteur: HTMLElement = byID("nouvelle_phrase-fonctions-selection") as HTMLElement;
     static liste_des_fonctions_niveau_1: { [nom: string] : Fonction } = {
+        "Indépendante" : "independante",
         "Sujet" : "sujet",
         "Verbes" : "verbes",
         "Noyau" : "noyau",
