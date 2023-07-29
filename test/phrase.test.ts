@@ -251,5 +251,37 @@ describe('Phrase class tests', () => {
       expect(pe.declare("complement_circonstanciel",[0],1)).toBe(false);
       expect(pe.declare("complement_circonstanciel",[3,4],1)).toBe(true);
   });
+
+  test("cree_groupe_enchasse fonctionne correctement", () => {
+      const texte = "Je fais ce que je veux.";
+
+      let pc = new PhraseCorrigee(texte);
+      pc.cree_groupe_enchasse([2,3,4,5], "cod", -1);
+      let gec = pc.groupe_enchasse("cod",-1);
+      gec.declareFonction("complement_du_pronom",[3,4,5]);
+      gec.declareFonction("noyau",[2]);
+
+      let pe = new PhraseEleve(texte, pc);
+      let gee = pe.cree_groupe_enchasse_eleve(gec, "cod",-1);
+      expect(gee.declare("complement_du_pronom",[3,4,5], 0)).toBe(true);
+
+  });
+
+  test("Les groupes enchâssés sont correctement sérialisés en JSON", () => {
+      let texte = "L'âne de Buridan mourut de faim et de soif.";
+      let p = new Phrase(texte);
+      let g = p.cree_groupe_enchasse([0,1,2,3], "sujet",-1);
+      g.declareFonction("noyau",[1]);
+      g.declareFonction("complement_du_nom",[2,3])
+
+      const json = JSON.stringify(p);
+      const pp = PhraseCorrigee.fromJSON(json);
+      const gp = pp.groupe_enchasse("sujet",-1);
+      expect(gp.mots_pos).toEqual([0,1,2,3]);
+      expect(gp.fonctionPos("noyau")).toEqual([1]);
+      expect(gp.fonctionPos("complement_du_nom",0)).toEqual([2,3]);
+
+
+  });
 });
 

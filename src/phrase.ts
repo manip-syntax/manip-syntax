@@ -284,6 +284,7 @@ export class Phrase extends SyntagmeAbstrait {
         // une copie pour garder le strict nécessaire: les données
         const copie = this.copie;
         let copie_obj = Object.assign(copie);
+        copie_obj._groupes_enchasses = Array.from(copie_obj._groupes_enchasses.entries());
         return copie_obj;
     }
 
@@ -399,15 +400,32 @@ export class PhraseCorrigee extends Phrase {
             return JSON.parse(json, PhraseCorrigee.reviver);
         } else {
             let phrase = Object.create(PhraseCorrigee.prototype);
-            return Object.assign(phrase, json);
+            const groupes_enchasses = typeof json._groupes_enchasses === "undefined" ? new Map() : new Map(Object.entries(json._groupes_enchasses)
+                                    .map( elt => {
+                                        return [elt[1][0],GroupeEnchasseCorrige.fromJSON(elt[1][1])];
+                                    })
+                                                                                                          );
+            return Object.assign(phrase, json, {
+                _groupes_enchasses: groupes_enchasses,
+            });
         }
+    }
+
+    cree_groupe_enchasse(contenu: MotsPos, f: Fonction, numero:number): GroupeEnchasse { 
+        const n = new GroupeEnchasseCorrige(contenu);
+        this._groupes_enchasses.set([f,numero], n);
+        return n;
+    }
+
+    groupe_enchasse(f: Fonction, n:number): GroupeEnchasseCorrige {
+        // on sait que les groupes enchassés de cette classe sont corrigés
+        return super.groupe_enchasse(f,n) as GroupeEnchasseCorrige;
     }
 
     aFonction(f: Fonction): boolean { // TEST
         /* Vrai si cette phrase contient cette fonction
          * d'après le corrigé.
          */
-        console.log(f);
         if (SyntagmeAbstrait.Fonctions_multiples.includes(f)) { // À TESTER TODO 
             if (f in this._fonctions_multiples) {
                 return this._fonctions_multiples[f].filter(e => !compare(e, [])).length > 0;
@@ -457,6 +475,32 @@ export class GroupeEnchasse extends SyntagmeAbstrait {
         return this._contenu;
     }
 
+    static reviver(key: string, value: any): any {
+        return key === "" ? GroupeEnchasse.fromJSON(value) : value;
+    }
+
+    static fromJSON(json: GroupeEnchasseJSON|string): GroupeEnchasse { 
+        if (typeof json === 'string') {
+            return JSON.parse(json, GroupeEnchasse.reviver);
+        } else {
+            let groupe = Object.create(GroupeEnchasse.prototype);
+            const groupes_enchasses = typeof json._groupes_enchasses === "undefined" ? new Map() : new Map(Object.entries(json._groupes_enchasses)
+                                    .map( elt => {
+                                        return [elt[1][0],GroupeEnchasseCorrige.fromJSON(elt[1][1])];
+                                    }));
+            return Object.assign(groupe, json, {
+                _groupes_enchasses: groupes_enchasses,
+            });
+        }
+    }
+
+    toJSON(): GroupeEnchasseJSON {
+        let copie = this.copie;
+        let copie_obj = Object.assign(copie);
+        copie_obj._groupes_enchasses = Array.from(copie_obj._groupes_enchasses.entries());
+        return copie_obj;
+    }
+
     mots_valides(mots: MotsPos): boolean {
         if (mots.length > 0) {
             // les mots rentrés sont-ils dans les bornes ? Le problème ne se pose pas si on veut supprimer la fonction
@@ -482,11 +526,16 @@ export class GroupeEnchasseCorrige extends GroupeEnchasse {
      * TODO essayer de supprimer la duplication de aFonction, groupes_enchasses et estFonction avec PhraseCorrigee
      */
 
+    cree_groupe_enchasse(contenu: MotsPos, f: Fonction, numero:number): GroupeEnchasse { 
+        const n = new GroupeEnchasseCorrige(contenu);
+        this._groupes_enchasses.set([f,numero], n);
+        return n;
+    }
+
     aFonction(f: Fonction): boolean { // TEST
         /* Vrai si cette phrase contient cette fonction
          * d'après le corrigé.
          */
-        console.log(f);
         if (SyntagmeAbstrait.Fonctions_multiples.includes(f)) { // À TESTER TODO 
             if (f in this._fonctions_multiples) {
                 return this._fonctions_multiples[f].filter(e => !compare(e, [])).length > 0;
@@ -590,7 +639,7 @@ export class PhraseEleve extends Phrase {
         return this._corrige;
     }
 
-    cree_groupe_enchasse_eleve (corrige: GroupeEnchasseCorrige, f: Fonction, numero:number): GroupeEnchasseEleve { 
+    cree_groupe_enchasse_eleve (corrige: GroupeEnchasseCorrige, f: Fonction, numero:number): GroupeEnchasseEleve {  // TEST 
         const n = new GroupeEnchasseEleve(corrige);
         this._groupes_enchasses.set([f,numero], n);
         return n;
@@ -642,7 +691,15 @@ interface PhraseJSON {
     phrase: string;
     _fonctions_uniques: { [id: string] : MotsPos|undefined};
     _fonctions_multiples?: { [id: string] : MultiMotsPos|undefined};
-    _groupes_enchasses?: GroupeEnchasse[];
+    _groupes_enchasses?: Map<[Fonction, number], GroupeEnchasse>;
     verbes: MotsPos;
 }
+
+interface GroupeEnchasseJSON {
+    _contenu: MotsPos;
+    _fonctions_uniques?: { [id: string] : MotsPos|undefined};
+    _fonctions_multiples?: { [id: string] : MultiMotsPos|undefined};
+    _groupes_enchasses?: Map<[Fonction, number], GroupeEnchasse>;
+}
+
 
