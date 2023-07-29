@@ -400,7 +400,7 @@ export class PhraseCorrigee extends Phrase {
             return JSON.parse(json, PhraseCorrigee.reviver);
         } else {
             let phrase = Object.create(PhraseCorrigee.prototype);
-            const groupes_enchasses = typeof json._groupes_enchasses === "undefined" ? new Map() : new Map(Object.entries(json._groupes_enchasses)
+            const groupes_enchasses: Map<[Fonction, number], GroupeEnchasseCorrige> = typeof json._groupes_enchasses === "undefined" ? new Map() : new Map(Object.entries(json._groupes_enchasses)
                                     .map( elt => {
                                         return [elt[1][0],GroupeEnchasseCorrige.fromJSON(elt[1][1])];
                                     })
@@ -450,8 +450,8 @@ export class PhraseCorrigee extends Phrase {
     }
 
     * groupes_enchasses() {
-        for (let elt of this._groupes_enchasses) {
-            yield elt;
+        for (const elt of this._groupes_enchasses) {
+            yield elt as [[Fonction, number], GroupeEnchasseCorrige];
         }
     }
 
@@ -475,24 +475,6 @@ export class GroupeEnchasse extends SyntagmeAbstrait {
         return this._contenu;
     }
 
-    static reviver(key: string, value: any): any {
-        return key === "" ? GroupeEnchasse.fromJSON(value) : value;
-    }
-
-    static fromJSON(json: GroupeEnchasseJSON|string): GroupeEnchasse { 
-        if (typeof json === 'string') {
-            return JSON.parse(json, GroupeEnchasse.reviver);
-        } else {
-            let groupe = Object.create(GroupeEnchasse.prototype);
-            const groupes_enchasses = typeof json._groupes_enchasses === "undefined" ? new Map() : new Map(Object.entries(json._groupes_enchasses)
-                                    .map( elt => {
-                                        return [elt[1][0],GroupeEnchasseCorrige.fromJSON(elt[1][1])];
-                                    }));
-            return Object.assign(groupe, json, {
-                _groupes_enchasses: groupes_enchasses,
-            });
-        }
-    }
 
     toJSON(): GroupeEnchasseJSON {
         let copie = this.copie;
@@ -525,8 +507,26 @@ export class GroupeEnchasseCorrige extends GroupeEnchasse {
     /* Classe utilisée à l'intérieur d'un groupe enchassé élève comme correction
      * TODO essayer de supprimer la duplication de aFonction, groupes_enchasses et estFonction avec PhraseCorrigee
      */
+    static reviver(key: string, value: any): any {
+        return key === "" ? GroupeEnchasseCorrige.fromJSON(value) : value;
+    }
 
-    cree_groupe_enchasse(contenu: MotsPos, f: Fonction, numero:number): GroupeEnchasse { 
+    static fromJSON(json: GroupeEnchasseJSON|string): GroupeEnchasseCorrige { 
+        if (typeof json === 'string') {
+            return JSON.parse(json, GroupeEnchasseCorrige.reviver);
+        } else {
+            let groupe = Object.create(GroupeEnchasseCorrige.prototype);
+            const groupes_enchasses = typeof json._groupes_enchasses === "undefined" ? new Map() : new Map(Object.entries(json._groupes_enchasses)
+                                    .map( elt => {
+                                        return [elt[1][0],GroupeEnchasseCorrige.fromJSON(elt[1][1])];
+                                    }));
+            return Object.assign(groupe, json, {
+                _groupes_enchasses: groupes_enchasses,
+            });
+        }
+    }
+
+    cree_groupe_enchasse(contenu: MotsPos, f: Fonction, numero:number): GroupeEnchasseCorrige { 
         const n = new GroupeEnchasseCorrige(contenu);
         this._groupes_enchasses.set([f,numero], n);
         return n;
@@ -561,7 +561,7 @@ export class GroupeEnchasseCorrige extends GroupeEnchasse {
     
     * groupes_enchasses() {
         for (let elt of this._groupes_enchasses) {
-            yield elt;
+            yield elt as [[Fonction, number], GroupeEnchasseCorrige]; // TODO FIXME le as ... est sans doute de trop
         }
     }
 }

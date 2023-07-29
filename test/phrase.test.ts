@@ -280,6 +280,7 @@ describe('Phrase class tests', () => {
       expect(gp.mots_pos).toEqual([0,1,2,3]);
       expect(gp.fonctionPos("noyau")).toEqual([1]);
       expect(gp.fonctionPos("complement_du_nom",0)).toEqual([2,3]);
+      expect(gp.aFonction("complement_du_nom")).toBe(true);
 
 
   });

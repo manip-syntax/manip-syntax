@@ -5,7 +5,7 @@ import { anime_disparition_modal, byID, cree_html_element, non_null } from './ut
 import { affiche_phrase } from './affichage_phrase';
 import { add_events_listener, nouvelle_phrase } from './nouvelle_phrase';
 import { charge_phrases } from './charge_phrases';
-import { Fonction, GroupeEnchasseCorrige, GroupeEnchasseEleve, PhraseCorrigee, PhraseEleve } from './phrase';
+import { Fonction, GroupeEnchasseEleve, PhraseCorrigee, PhraseEleve } from './phrase';
 import { fonctions_communes } from './fonctions_partagees';
 import consignes from './consignes.json';
 
@@ -18,6 +18,7 @@ function analyse_phrase(phrase_corrigee: PhraseCorrigee): void {
 
 function analyse_fonction_requise(etape: number, syntagme_eleve: PhraseEleve|GroupeEnchasseEleve, phrase_eleve: PhraseEleve, fm_index = -1): void {
     const fonction: Fonction = consignes[etape][0] as Fonction;
+    console.log(syntagme_eleve.corrige);
 
     if (PhraseEleve.Fonctions_multiples.includes(fonction) && fm_index === -1) {
         fm_index = 0;
@@ -29,13 +30,13 @@ function analyse_fonction_requise(etape: number, syntagme_eleve: PhraseEleve|Gro
         if (etape === consignes.length -1) {
             // on passe aux groupes enchâssés
             for (const [[f, n], groupe_enchasse] of syntagme_eleve.corrige.groupes_enchasses()) {
-                analyse_fonction_requise(0, syntagme_eleve.cree_groupe_enchasse_eleve(groupe_enchasse as GroupeEnchasseCorrige, f, n), phrase_eleve);
+                return analyse_fonction_requise(0, syntagme_eleve.cree_groupe_enchasse_eleve(groupe_enchasse , f, n), phrase_eleve);
             }
-            analyse_finie();
+            return analyse_finie();
         } else {
             const j = PhraseEleve.Fonctions_multiples.includes(fonction) && !syntagme_eleve.est_complet(fonction) ? 0 : 1;
             fm_index = j === 0 ? fm_index + 1 : -1;
-            analyse_fonction_requise(etape + j, syntagme_eleve, phrase_eleve, fm_index);
+            return analyse_fonction_requise(etape + j, syntagme_eleve, phrase_eleve, fm_index);
         }
     }
 
