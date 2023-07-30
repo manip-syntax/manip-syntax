@@ -210,6 +210,7 @@ export class CreateurPhrase {
         /* Crée un groupe enchâssé si b est vrai
          * détruit un groupe enchâssé si b est faux
          */
+                console.log(b, mots, parent.id_sous_menu);
         if (!PhraseEleve.Fonctions_contenants.includes(this.fonction_courante.fonction)) {
             return;
         }
@@ -217,7 +218,7 @@ export class CreateurPhrase {
             // retrait des fonctions
             if (parent.syntagme.supprime_groupe_enchasse(parent.fonction, parent.numero)) {
                 // déplacement du parent
-                const menu = byID(parent.id_sous_menu);
+                const menu = byID(`sous_menu-${parent.id_sous_menu}`);
                 menu.insertAdjacentElement("beforebegin", parent.html_node);
                 // suppression du sélecteur et du traceur
                 this.retirer_enfants(parent);
