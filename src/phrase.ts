@@ -126,6 +126,19 @@ class SyntagmeAbstrait {
         return copie;
     }
 
+    get profondeur(): number {
+        /* Renvoie la profondeur, c'est-à-dire le nombre de groupes enchâssés
+         * les uns dans les autres
+         * O correspond à un groupe qui ne contient aucun autre groupe
+         */
+        if (this._groupes_enchasses.size === 0) {
+            return 0;
+        }
+        return Math.max( ...[...this._groupes_enchasses.entries()]
+                        .map( ([_,v]) => v.profondeur)
+                       ) + 1;
+    }
+
     fonction(i: number) : Fonction[] { // TEST 
         /* Renvoie la ou les fonctions déclarées pour tel mot.
          */
