@@ -190,27 +190,29 @@ export class CreateurPhrase {
         this.set_pos_selecteur(this._selecteur, 0);
     }
 
-    retirer_enfants(parent: FonctionTracee) {
+    retirer_enfants(parent: FonctionTracee, index: number[], est_premier_appel: boolean = false) {
         /* Retire toute la descendance de parent
          * du traceur et du sélecteur
          */
         // TODO fonction très lente et peu efficace
         for (const [i,f] of this._traceur.entries()) {
             if (f.parent === parent) {
-                this.retirer_enfants(f);
+                index = this.retirer_enfants(f, index, false);
                 f.html_node.remove();
-                delete(this._traceur[i]);
-                this._traceur = this._traceur.filter( elt => typeof elt !== "undefined");
-                this.set_pos_selecteur(this._selecteur,0);
+                index.push(i)
             }
         }
+        if (est_premier_appel) {
+            this._traceur = this._traceur.filter( (_, i) => !index.includes(i));
+            this.set_pos_selecteur(this._selecteur,0);
+        }
+        return index;
     }
 
     gere_groupe_enchasse(b: boolean, mots: MotsPos, parent: FonctionTracee):void {
         /* Crée un groupe enchâssé si b est vrai
          * détruit un groupe enchâssé si b est faux
          */
-                console.log(b, mots, parent.id_sous_menu);
         if (!PhraseEleve.Fonctions_contenants.includes(this.fonction_courante.fonction)) {
             return;
         }
@@ -221,7 +223,7 @@ export class CreateurPhrase {
                 const menu = byID(`sous_menu-${parent.id_sous_menu}`);
                 menu.insertAdjacentElement("beforebegin", parent.html_node);
                 // suppression du sélecteur et du traceur
-                this.retirer_enfants(parent);
+                this.retirer_enfants(parent, [], true);// FIXME ne fonctionne pas pour le traceur
                 // suppression du sous-menu
                 menu.remove()
             }
