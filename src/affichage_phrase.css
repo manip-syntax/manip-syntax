@@ -62,3 +62,57 @@
     font-style: italic;
 }
 
+.phrase-noyau {
+    border-style: solid;
+    border-color: black;
+    border-width: 8px;
+    border-radius: 40px;
+}
+
+.phrase-complement_du_nom {
+    border-style: dotted;
+    border-color: green;
+}
+
+.phrase-epithete {
+    border-style: double;
+    border-color: green;
+}
+
+.phrase-apposition {
+    border-style: none double double double;
+    border-color: green;
+}
+
+.phrase-complement_de_l_adjectif {
+    border-style: dotted;
+    border-color: Tomato;
+}
+
+.phrase-modalisateur {
+    border-style: dashed;
+    border-color: green;
+}
+
+.phrase-auto-enonciative {
+    border-style: dashed;
+    border-color: blue;
+}
+
+.phrase-connecteur {
+    border-style: dashed;
+    border-color: Tomato;
+}
+
+.phrase-balise_textuelle {
+    border-style: dashed;
+    border-color: black ;
+}
+
+.phrase-independante {
+    border-left-style: solid;
+    border-color: rgb(60, 179, 113);
+    border-width: 8px;
+    background-color: rgb(60, 179, 113, 0.5);
+}
+
