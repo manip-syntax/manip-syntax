@@ -18,7 +18,6 @@ function analyse_phrase(phrase_corrigee: PhraseCorrigee): void {
 
 function analyse_fonction_requise(etape: number, syntagme_eleve: PhraseEleve|GroupeEnchasseEleve, phrase_eleve: PhraseEleve, groupes_enchasses_gen:Generator<[[Fonction, number], GroupeEnchasseCorrige], void, unknown>[], fm_index = -1): void {
     const fonction: Fonction = consignes[etape][0] as Fonction;
-    console.log(syntagme_eleve.corrige);
 
     if (PhraseEleve.Fonctions_multiples.includes(fonction) && fm_index === -1) {
         fm_index = 0;
