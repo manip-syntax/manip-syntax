@@ -50,6 +50,21 @@ class SyntagmeAbstrait {
         return [f, m[0], m.slice(-1)[0]] as FonctionEnchassee;
     }
 
+    _remplit_les_vides(): void {
+        /* Pour la désérialisation,
+         * remplit les attributs manquants
+         */
+        if (typeof this._fonctions_uniques === "undefined") {
+            this._fonctions_uniques = {};
+        }
+        if (typeof this._fonctions_multiples === "undefined") {
+            this._fonctions_multiples = {};
+        }
+        if (typeof this._groupes_enchasses === "undefined") {
+            this._groupes_enchasses = new Map();
+        }
+    }
+
     get vide(): boolean {// TEST
         /* vrai si ce syntagme n'a aucune fonction enregistrée
          */
@@ -405,9 +420,11 @@ export class PhraseCorrigee extends Phrase {
                                         return [elt[1][0],GroupeEnchasseCorrige.fromJSON(elt[1][1])];
                                     })
                                                                                                           );
-            return Object.assign(phrase, json, {
+            let o = Object.assign(phrase, json, {
                 _groupes_enchasses: groupes_enchasses,
             });
+            o._remplit_les_vides();
+            return o;
         }
     }
 
@@ -520,9 +537,11 @@ export class GroupeEnchasseCorrige extends GroupeEnchasse {
                                     .map( elt => {
                                         return [elt[1][0],GroupeEnchasseCorrige.fromJSON(elt[1][1])];
                                     }));
-            return Object.assign(groupe, json, {
+            let o = Object.assign(groupe, json, {
                 _groupes_enchasses: groupes_enchasses,
             });
+            o._remplit_les_vides();
+            return o;
         }
     }
 

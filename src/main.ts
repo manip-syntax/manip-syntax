@@ -48,7 +48,6 @@ function analyse_fonction_requise(etape: number, syntagme_eleve: PhraseEleve|Gro
     }
 
     if (!syntagme_eleve.corrige.aFonction(fonction)) {
-        // TODO demander d'abord à l'élève de trouver les fonctions? ou bien au fur et à mesure ?
         return analyse_suivante();
     }
     byID("consigne-container").innerHTML = `${consigne}`;
