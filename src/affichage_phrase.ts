@@ -4,6 +4,7 @@
 import './affichage_phrase.css';
 
 import { Fonction, FonctionEnchassee, MotsPos, PhraseEleve } from "./phrase";
+import { assert } from "./util";
 
 function renvoie_crochet(f: Fonction, est_crochet_ouvrant: boolean): string {
     /*
@@ -29,7 +30,7 @@ function debut_balise(fe: FonctionEnchassee, pos: number): string {
     // ne sont pas forcément les uns à côté des autres
     if (pos == fe[1] || fe[0] === "verbes") {
         const crochet = renvoie_crochet(fe[0], true);
-        return `${crochet}<span class="phrase-${fe[0]}">`;
+        return `${crochet}<span groupe class="phrase-${fe[0]}">`;
     }
     return "";
 }
@@ -77,5 +78,19 @@ export function affiche_phrase(phrase: PhraseEleve, mots_a_inclure: MotsPos = []
         i+=1;
     }
     return rv_array.join("");
+
+}
+
+export function installe_profondeur(racine: HTMLElement, profondeur_max: number) {
+    /* Installe différents niveaux de profondeur selon la hiérarchie de la phrase
+     */
+    assert(profondeur_max >= 0, `Erreur de profondeur, qui ne peut être inférieure à 0. Racine: ${racine}`);
+    for (let i = 0; i < racine.children.length; i++) {
+        let elt = racine.children[i] as HTMLElement;
+        if (elt.hasAttribute("groupe")) {
+            elt.style.margin = `${profondeur_max + 2}px`;
+            installe_profondeur(elt, profondeur_max - 1);
+        }
+    }
 
 }
