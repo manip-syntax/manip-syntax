@@ -84,11 +84,12 @@ export function affiche_phrase(phrase: PhraseEleve, mots_a_inclure: MotsPos = []
 export function installe_profondeur(racine: HTMLElement, profondeur_max: number) {
     /* Installe différents niveaux de profondeur selon la hiérarchie de la phrase
      */
+    // TODO FIXME problème probable des verbes par rapport aux verbes conjugués
     assert(profondeur_max >= 0, `Erreur de profondeur, qui ne peut être inférieure à 0. Racine: ${racine}`);
     for (let i = 0; i < racine.children.length; i++) {
         let elt = racine.children[i] as HTMLElement;
         if (elt.hasAttribute("groupe")) {
-            elt.style.margin = `${profondeur_max + 2}px`;
+            elt.style.padding = `${profondeur_max * 10}px`;
             installe_profondeur(elt, profondeur_max - 1);
         }
     }

@@ -1,4 +1,4 @@
-import { affiche_phrase } from './affichage_phrase';
+import { affiche_phrase, installe_profondeur } from './affichage_phrase';
 import { GroupeEnchasse, Fonction, MotsPos, Phrase, PhraseCorrigee, PhraseEleve } from './phrase';
 import { assert, byID, non_null } from './util';
 import { fonctions_communes } from './fonctions_partagees';
@@ -285,7 +285,9 @@ export class CreateurPhrase {
         const fonction = this.fonction_courante.fonction;
         const syntagme = this.fonction_courante.syntagme;
         byID("phrase-analyse-paragraphe").innerHTML = affiche_phrase(this._phrase, syntagme.mots_pos);
+        installe_profondeur(byID("phrase-analyse-paragraphe"), this._phrase.profondeur);
         byID("consigne-container").innerHTML = `À renseigner : ${this.fonction_courante.arbre_genealogique}`;
+
 
         // selection des mots précédemment sélectionnés
         const mots_selectionnes = this._phrase.fonctionPos(fonction, this.fonction_courante.numero);
@@ -350,6 +352,7 @@ export function nouvelle_phrase() : void {
 
     const modal_nouvelle_phrase = byID("modal-nouvelle-phrase");
     modal_nouvelle_phrase.style.display = "block";
+    byID("nouvelle_phrase-texterea").focus();
     // Divers éléments à afficher
     byID("conseil").innerHTML = "Sélectionnez chaque fonction comme si vous étiez vous-même l'élève. Cliquez sur valider quand vous avez terminé votre sélection. Valider dans rien sélectionner indique que cette fonction est absente de la phrase. Vous pouvez toujours corriger une éventuelle erreur en sélectionnant une fonction dans la liste déroulante.";
     const bouton_valider = byID("bouton-valider");

@@ -2,7 +2,7 @@ import './general.css';
 import './choix_phrase.css';
 import './modal.css';
 import { anime_disparition_modal, byID, cree_html_element, non_null } from './util';
-import { affiche_phrase } from './affichage_phrase';
+import { affiche_phrase, installe_profondeur } from './affichage_phrase';
 import { add_events_listener, nouvelle_phrase } from './nouvelle_phrase';
 import { charge_phrases } from './charge_phrases';
 import { Fonction, GroupeEnchasseCorrige, GroupeEnchasseEleve, PhraseCorrigee, PhraseEleve } from './phrase';
@@ -53,6 +53,8 @@ function analyse_fonction_requise(etape: number, syntagme_eleve: PhraseEleve|Gro
     }
     byID("consigne-container").innerHTML = `${consigne}`;
     byID("phrase-analyse-paragraphe").innerHTML = affiche_phrase(phrase_eleve);
+    installe_profondeur(byID("phrase-analyse-paragraphe"), phrase_eleve.profondeur);
+
 
     fonctions_communes.fonction_de_validation = () => {
         const mots_selectionnes = Array.from(document.getElementsByClassName("phrase-selectionne"))

@@ -44,7 +44,7 @@ class SyntagmeAbstrait {
     protected _fonctions_multiples: { [id: string] : MultiMotsPos } = {};
     protected _groupes_enchasses: Map<[Fonction, number], GroupeEnchasse> = new Map();
     public static Fonctions_multiples: Fonction[] = ["independante","complement_circonstanciel", "modalisateur","auto-enonciative","connecteur","balise_textuelle","epithete","complement_du_nom","complement_du_pronom","complement_de_l_adjectif","apposition"];
-    public static Fonctions_contenants: Fonction[] = ["independante","sujet","cod","coi","attribut_du_sujet","attribut_du_cod","complement_circonstanciel","complement_du_verbe_impersonnel","complement_du_nom","complement_du_pronom","epithete","apposition","complement_de_l_adjectif"];
+    public static Fonctions_contenants: Fonction[] = ["independante","sujet","cod","coi","attribut_du_sujet","attribut_du_cod","complement_circonstanciel","complement_du_verbe_impersonnel","complement_du_nom","complement_du_pronom","epithete","apposition","complement_de_l_adjectif","groupe_verbal"];
 
     _fonction_enchassee = (f: Fonction, m: MotsPos) => {
         return [f, m[0], m.slice(-1)[0]] as FonctionEnchassee;
