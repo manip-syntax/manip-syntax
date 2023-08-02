@@ -30,7 +30,7 @@ function debut_balise(fe: FonctionEnchassee, pos: number): string {
     // ne sont pas forcément les uns à côté des autres
     if (pos == fe[1] || fe[0] === "verbes") {
         const crochet = renvoie_crochet(fe[0], true);
-        return `${crochet}<span groupe class="phrase-${fe[0]}">`;
+        return `${crochet}<span groupe class="groupe-de-mots phrase-${fe[0]}">`;
     }
     return "";
 }

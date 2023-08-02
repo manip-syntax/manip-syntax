@@ -18,7 +18,7 @@
 }
 
 .selecteur {
-    position: fixed;
+    position: relative;
      /*background-color: #E7E9EB;*/
 
 }
@@ -37,6 +37,7 @@
     background-color: #cccccc;
     cursor: pointer;
 }
+
 .selecteur-element.selectionne {
     font-weight: bold;
     font-size: 20px;
