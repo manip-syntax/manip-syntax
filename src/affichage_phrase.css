@@ -27,9 +27,9 @@
 }
 
 .groupe-de-mots::before {
-    font-size: 15px;
+    font-size: 13px;
     position: absolute;
-    bottom: -30px;
+    bottom: -5px;
     left: 0;
     width: 500%; /* Pour éviter les retours à la ligne intempestifs */
     text-align: left;
@@ -208,5 +208,9 @@
 
 .phrase-independante::before {
     content: "Indépendante";
+}
+
+.phrase-groupe_verbal::before {
+    content: "Groupe verbal";
 }
 

@@ -1,8 +1,9 @@
-import { affiche_phrase, installe_profondeur } from './affichage_phrase';
+import { affiche_phrase, dispose } from './affichage_phrase';
 import { GroupeEnchasse, Fonction, MotsPos, Phrase, PhraseCorrigee, PhraseEleve } from './phrase';
 import { assert, byID, non_null } from './util';
 import { fonctions_communes } from './fonctions_partagees';
 import './nouvelle_phrase.css';
+import contenus_possibles from "./contenus_possibles.json";
 
 // Nouvelle phrase: bouton ok
 let fonction_du_bouton_de_nouvelle_phrase = () => console.log("Problème: aucune fonction définie pour le bouton OK de la nouvelle phrase");
@@ -76,25 +77,32 @@ export class CreateurPhrase {
         "Noyau" : "noyau",
         "Verbe principal" : "verbe_principal",
         "Groupe verbal" : "groupe_verbal",
-        "COD" : "cod",
-        "COI" : "coi",
-        "Attribut du sujet" : "attribut_du_sujet",
-        "Attribut du COD" : "attribut_du_cod",
         "Complément d'agent" : "complement_d_agent",
         "Complément circonstanciel" : "complement_circonstanciel",
-        "Complément du verbe impersonnel" : "complement_du_verbe_impersonnel",
         "Modalisateur" : "modalisateur",
         "Fonction auto-énonciative" : "auto-enonciative",
         "Connecteur" : "connecteur",
         "Balise textuelle" : "balise_textuelle"
     };
     static liste_des_fonctions_niveau_2: { [nom: string] : Fonction } = {
+        "COD" : "cod",
+        "COI" : "coi",
+        "Attribut du sujet" : "attribut_du_sujet",
+        "Attribut du COD" : "attribut_du_cod",
+        "Complément du verbe impersonnel" : "complement_du_verbe_impersonnel",
         "Épithète" : "epithete",
         "Complément du nom" : "complement_du_nom",
         "Complément du pronom": "complement_du_pronom",
         "Apposition" : "apposition",
         "Complément de l'adjectif": "complement_de_l_adjectif"
     };
+
+    static contenus_possibles(f: Fonction): { [nom: string] : Fonction} {
+        /* Renvoie un objet de fonctions qui peuvent être contenues directement
+         * par f
+         */
+        return (contenus_possibles as any)[f as string];// oui, c'est mal
+    }
 
     constructor(texte: string) {
         this._phrase = new PhraseEleve(texte, new PhraseCorrigee(texte));
@@ -223,7 +231,7 @@ export class CreateurPhrase {
                 const menu = byID(`sous_menu-${parent.id_sous_menu}`);
                 menu.insertAdjacentElement("beforebegin", parent.html_node);
                 // suppression du sélecteur et du traceur
-                this.retirer_enfants(parent, [], true);// FIXME ne fonctionne pas pour le traceur
+                this.retirer_enfants(parent, [], true);
                 // suppression du sous-menu
                 menu.remove()
             }
@@ -242,10 +250,8 @@ export class CreateurPhrase {
         selecteur_courant.setAttribute("class","selecteur sous_menu_contenu");
         this.fonction_courante.html_node.insertAdjacentElement("afterend",selecteur_courant);
         let i = this._pos + 1;
-        Object.entries(CreateurPhrase.liste_des_fonctions_niveau_2)
-            .concat(Object.entries(CreateurPhrase.liste_des_fonctions_niveau_1))
+        Object.entries(CreateurPhrase.contenus_possibles(this.fonction_courante.fonction))
             .forEach(
-            // TODO améliorer pour ne sélectionner que les fonctions qui peuvent aller avec la fonction contenant
             elt => {
                 this.ajouter_fonction_tracee(i,elt[0], elt[1], syntagme, -1, parent);
                 i += 1;
@@ -285,7 +291,7 @@ export class CreateurPhrase {
         const fonction = this.fonction_courante.fonction;
         const syntagme = this.fonction_courante.syntagme;
         byID("phrase-analyse-paragraphe").innerHTML = affiche_phrase(this._phrase, syntagme.mots_pos);
-        installe_profondeur(byID("phrase-analyse-paragraphe"), this._phrase.profondeur);
+        dispose(byID("phrase-analyse-paragraphe"), this._phrase.profondeur+1);
         byID("consigne-container").innerHTML = `À renseigner : ${this.fonction_courante.arbre_genealogique}`;
 
 

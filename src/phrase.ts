@@ -126,10 +126,10 @@ class SyntagmeAbstrait {
         return copie;
     }
 
-    get profondeur(): number {
+    get profondeur(): number { // TEST
         /* Renvoie la profondeur, c'est-à-dire le nombre de groupes enchâssés
          * les uns dans les autres
-         * O correspond à un groupe qui ne contient aucun autre groupe
+         * 1 correspond à un groupe qui ne contient aucun autre groupe
          */
         if (this._groupes_enchasses.size === 0) {
             return 0;
@@ -290,6 +290,11 @@ export class Phrase extends SyntagmeAbstrait {
         copie.verbes = this.verbes;
         copie.contenu = this.contenu;
         return copie;
+    }
+
+    get profondeur(): number {
+        let p = super.profondeur;
+        return p > 0 ? p : this.verbes.length > 0 ? 1 : 0;
     }
 
     // http://choly.ca/post/typescript-json/#comment-2579491209

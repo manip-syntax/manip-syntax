@@ -1,0 +1,231 @@
+{
+	"independante" : {
+        "Sujet" : "sujet",
+        "Noyau" : "noyau",
+        "Verbe principal" : "verbe_principal",
+        "Groupe verbal" : "groupe_verbal",
+        "Complément d'agent" : "complement_d_agent",
+        "Complément circonstanciel" : "complement_circonstanciel",
+        "Modalisateur" : "modalisateur",
+        "Fonction auto-énonciative" : "auto-enonciative",
+        "Connecteur" : "connecteur",
+        "Balise textuelle" : "balise_textuelle"
+	},
+	
+	"sujet" : {
+        "Sujet" : "sujet",
+        "Noyau" : "noyau",
+        "Verbe principal" : "verbe_principal",
+        "Groupe verbal" : "groupe_verbal",
+	"Complément d'agent" : "complement_d_agent",
+        "Complément circonstanciel" : "complement_circonstanciel",
+        "Modalisateur" : "modalisateur",
+        "Fonction auto-énonciative" : "auto-enonciative",
+        "Connecteur" : "connecteur",
+        "Balise textuelle" : "balise_textuelle",
+        "Épithète" : "epithete",
+        "Complément du nom" : "complement_du_nom",
+        "Complément du pronom": "complement_du_pronom",
+        "Apposition" : "apposition"
+	},
+
+	"groupe_verbal" : {
+        "Noyau" : "noyau",
+        "Verbe principal" : "verbe_principal",
+        "Groupe verbal" : "groupe_verbal",
+        "COD" : "cod",
+        "COI" : "coi",
+        "Attribut du sujet" : "attribut_du_sujet",
+        "Attribut du COD" : "attribut_du_cod",
+        "Complément circonstanciel" : "complement_circonstanciel",
+        "Complément du verbe impersonnel" : "complement_du_verbe_impersonnel"
+	},
+
+	"cod" : {
+	"Épithète" : "epithete",
+        "Complément du nom" : "complement_du_nom",
+        "Complément du pronom": "complement_du_pronom",
+        "Apposition" : "apposition",
+        "Sujet" : "sujet",
+        "Noyau" : "noyau",
+        "Verbe principal" : "verbe_principal",
+        "Groupe verbal" : "groupe_verbal",
+	"Complément d'agent" : "complement_d_agent",
+        "Complément circonstanciel" : "complement_circonstanciel",
+        "Modalisateur" : "modalisateur",
+        "Fonction auto-énonciative" : "auto-enonciative",
+        "Connecteur" : "connecteur",
+        "Balise textuelle" : "balise_textuelle"
+	},
+
+	"coi" : {
+	"Épithète" : "epithete",
+        "Complément du nom" : "complement_du_nom",
+        "Complément du pronom": "complement_du_pronom",
+        "Apposition" : "apposition",
+        "Sujet" : "sujet",
+        "Noyau" : "noyau",
+        "Verbe principal" : "verbe_principal",
+        "Groupe verbal" : "groupe_verbal",
+	"Complément d'agent" : "complement_d_agent",
+        "Complément circonstanciel" : "complement_circonstanciel",
+        "Modalisateur" : "modalisateur",
+        "Fonction auto-énonciative" : "auto-enonciative",
+        "Connecteur" : "connecteur",
+        "Balise textuelle" : "balise_textuelle"
+	},
+
+	"attribut_du_sujet" : {
+	"Complément de l'adjectif": "complement_de_l_adjectif",
+	"Épithète" : "epithete",
+        "Complément du nom" : "complement_du_nom",
+        "Complément du pronom": "complement_du_pronom",
+        "Apposition" : "apposition",
+        "Sujet" : "sujet",
+        "Noyau" : "noyau",
+        "Verbe principal" : "verbe_principal",
+        "Groupe verbal" : "groupe_verbal",
+	"Complément d'agent" : "complement_d_agent",
+        "Complément circonstanciel" : "complement_circonstanciel",
+        "Modalisateur" : "modalisateur",
+        "Fonction auto-énonciative" : "auto-enonciative",
+        "Connecteur" : "connecteur",
+        "Balise textuelle" : "balise_textuelle"
+	},
+
+	"attribut_du_cod" : {
+	"Complément de l'adjectif": "complement_de_l_adjectif",
+	"Épithète" : "epithete",
+        "Complément du nom" : "complement_du_nom",
+        "Complément du pronom": "complement_du_pronom",
+        "Apposition" : "apposition",
+        "Sujet" : "sujet",
+        "Noyau" : "noyau",
+        "Verbe principal" : "verbe_principal",
+        "Groupe verbal" : "groupe_verbal",
+	"Complément d'agent" : "complement_d_agent",
+        "Complément circonstanciel" : "complement_circonstanciel",
+        "Modalisateur" : "modalisateur",
+        "Fonction auto-énonciative" : "auto-enonciative",
+        "Connecteur" : "connecteur",
+        "Balise textuelle" : "balise_textuelle"
+	},
+
+	"complement_d_agent" : {
+	"Épithète" : "epithete",
+        "Complément du nom" : "complement_du_nom",
+        "Complément du pronom": "complement_du_pronom",
+        "Apposition" : "apposition",
+        "Sujet" : "sujet",
+        "Noyau" : "noyau",
+        "Verbe principal" : "verbe_principal",
+        "Groupe verbal" : "groupe_verbal",
+	"Complément d'agent" : "complement_d_agent",
+        "Complément circonstanciel" : "complement_circonstanciel",
+        "Modalisateur" : "modalisateur",
+        "Fonction auto-énonciative" : "auto-enonciative",
+        "Connecteur" : "connecteur",
+        "Balise textuelle" : "balise_textuelle"
+	},
+
+	"complement_circonstanciel" : {
+	"Épithète" : "epithete",
+        "Complément du nom" : "complement_du_nom",
+        "Complément du pronom": "complement_du_pronom",
+        "Apposition" : "apposition",
+        "Sujet" : "sujet",
+        "Noyau" : "noyau",
+        "Verbe principal" : "verbe_principal",
+        "Groupe verbal" : "groupe_verbal",
+	"Complément d'agent" : "complement_d_agent",
+        "Complément circonstanciel" : "complement_circonstanciel",
+        "Modalisateur" : "modalisateur",
+        "Fonction auto-énonciative" : "auto-enonciative",
+        "Connecteur" : "connecteur",
+        "Balise textuelle" : "balise_textuelle"
+	},
+
+	"complement_du_verbe_impersonnel" : {
+        "Sujet" : "sujet",
+        "Noyau" : "noyau",
+        "Verbe principal" : "verbe_principal",
+        "Groupe verbal" : "groupe_verbal",
+	"Complément d'agent" : "complement_d_agent",
+        "Complément circonstanciel" : "complement_circonstanciel",
+        "Modalisateur" : "modalisateur",
+        "Fonction auto-énonciative" : "auto-enonciative",
+        "Connecteur" : "connecteur",
+        "Balise textuelle" : "balise_textuelle",
+        "Épithète" : "epithete",
+        "Complément du nom" : "complement_du_nom",
+        "Complément du pronom": "complement_du_pronom",
+        "Apposition" : "apposition"
+	},
+	
+	"epithete" : {	
+	"Complément de l'adjectif": "complement_de_l_adjectif",
+        "Noyau" : "noyau"
+	},
+
+	"complement_du_nom" : {
+	"Sujet" : "sujet",
+        "Noyau" : "noyau",
+        "Verbe principal" : "verbe_principal",
+        "Groupe verbal" : "groupe_verbal",
+	"Complément d'agent" : "complement_d_agent",
+        "Complément circonstanciel" : "complement_circonstanciel",
+        "Modalisateur" : "modalisateur",
+        "Fonction auto-énonciative" : "auto-enonciative",
+        "Connecteur" : "connecteur",
+        "Balise textuelle" : "balise_textuelle",
+        "Épithète" : "epithete",
+        "Complément du nom" : "complement_du_nom",
+        "Complément du pronom": "complement_du_pronom",
+        "Apposition" : "apposition"
+	},
+
+	"complement_du_pronom" : {
+	"Sujet" : "sujet",
+        "Noyau" : "noyau",
+        "Verbe principal" : "verbe_principal",
+        "Groupe verbal" : "groupe_verbal",
+	"Complément d'agent" : "complement_d_agent",
+        "Complément circonstanciel" : "complement_circonstanciel",
+        "Modalisateur" : "modalisateur",
+        "Fonction auto-énonciative" : "auto-enonciative",
+        "Connecteur" : "connecteur",
+        "Balise textuelle" : "balise_textuelle",
+        "Épithète" : "epithete",
+        "Complément du nom" : "complement_du_nom",
+        "Complément du pronom": "complement_du_pronom",
+        "Apposition" : "apposition"
+	},
+
+	"apposition" : {
+	"Complément de l'adjectif": "complement_de_l_adjectif",
+	"Sujet" : "sujet",
+        "Noyau" : "noyau",
+        "Verbe principal" : "verbe_principal",
+        "Groupe verbal" : "groupe_verbal",
+	"Complément d'agent" : "complement_d_agent",
+        "Complément circonstanciel" : "complement_circonstanciel",
+        "Modalisateur" : "modalisateur",
+        "Fonction auto-énonciative" : "auto-enonciative",
+        "Connecteur" : "connecteur",
+        "Balise textuelle" : "balise_textuelle",
+        "Épithète" : "epithete",
+        "Complément du nom" : "complement_du_nom",
+        "Complément du pronom": "complement_du_pronom",
+        "Apposition" : "apposition"	
+	},
+
+        "complement_de_l_adjectif" : {
+	"Noyau" : "noyau",
+        "Épithète" : "epithete",
+        "Complément du nom" : "complement_du_nom",
+        "Complément du pronom": "complement_du_pronom",
+        "Apposition" : "apposition"
+	}
+
+
+}

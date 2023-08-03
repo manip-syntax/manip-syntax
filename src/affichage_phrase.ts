@@ -81,16 +81,20 @@ export function affiche_phrase(phrase: PhraseEleve, mots_a_inclure: MotsPos = []
 
 }
 
+export function dispose(base: HTMLElement, profondeur_max: number) {
+    base.style.lineHeight = `${1.8 + profondeur_max /10}`;
+    installe_profondeur(base, profondeur_max);
+}
+
 export function installe_profondeur(racine: HTMLElement, profondeur_max: number) {
     /* Installe différents niveaux de profondeur selon la hiérarchie de la phrase
      */
     // TODO ajouter la hauteur de la ligne (lineHeight) en fonction de la profondeur
-    // TODO FIXME problème probable des verbes par rapport aux verbes conjugués
     assert(profondeur_max >= 0, `Erreur de profondeur, qui ne peut être inférieure à 0. Racine: ${racine}`);
     for (let i = 0; i < racine.children.length; i++) {
         let elt = racine.children[i] as HTMLElement;
         if (elt.hasAttribute("groupe")) {
-            elt.style.padding = `${profondeur_max * 10}px`;
+            elt.style.padding = `0px 0px ${profondeur_max * 10}px`;
             installe_profondeur(elt, profondeur_max - 1);
         }
     }
