@@ -1,7 +1,8 @@
 #phrase-analyse {
     font-size: 50px;
     text-align: center;
-    line-height: 50px;
+    /*line-height: 50px;*/
+    line-height: 1.8;
     padding: 20px;
     /* Empêcher la sélection de la phrase
      * pour personnaliser le comportement */
@@ -25,18 +26,20 @@
     position: relative;
 }
 
-.groupe-de-mots::after {
+.groupe-de-mots::before {
     font-size: 15px;
     position: absolute;
     bottom: -30px;
     left: 0;
+    width: 500%; /* Pour éviter les retours à la ligne intempestifs */
+    text-align: left;
 }
 
 .phrase-sujet {
     text-decoration: underline red;
 }
 
-.phrase-sujet::after {
+.phrase-sujet::before {
     content: "Sujet";
 }
 
@@ -44,7 +47,7 @@
     text-decoration: wavy underline green;
 }
 
-.phrase-verbe_principal::after {
+.phrase-verbe_principal::before {
     content: "Verbe principal";
 }
 
@@ -52,7 +55,7 @@
     text-decoration: dashed underline blue;
 }
 
-.phrase-cod::after {
+.phrase-cod::before {
     content: "COD";
 }
 
@@ -60,7 +63,7 @@
     text-decoration: dashed underline pink;
 }
 
-.phrase-coi::after {
+.phrase-coi::before {
     content: "COI";
 }
 
@@ -68,7 +71,7 @@
     text-decoration: dashed underline green;
 }
 
-.phrase-attribut_du_sujet::after {
+.phrase-attribut_du_sujet::before {
     content: "Attribut du sujet";
 }
 
@@ -76,7 +79,7 @@
     text-decoration: dashed underline cyan;
 }
 
-.phrase-attribut_du_cod::after {
+.phrase-attribut_du_cod::before {
     content: "Attribut du COD";
 }
 
@@ -84,7 +87,7 @@
     text-decoration: underline pink;
 }
 
-.phrase-complement_d_agent::after {
+.phrase-complement_d_agent::before {
     content: "CA";
 }
 
@@ -92,7 +95,7 @@
     text-decoration: underline green;
 }
 
-.phrase-complement_du_verbe_impersonnel::after {
+.phrase-complement_du_verbe_impersonnel::before {
     content: "Complément du verbe impersonnel";
 }
 
@@ -101,7 +104,7 @@
     border-color: red;
 }
 
-.phrase-complement_circonstanciel::after {
+.phrase-complement_circonstanciel::before {
     content: "Complément circonstanciel";
 }
 
@@ -109,7 +112,7 @@
     font-style: italic;
 }
 
-.phrase-verbes::after {
+.phrase-verbes::before {
     content: "Verbe";
 }
 
@@ -120,7 +123,7 @@
     border-radius: 40px;
 }
 
-.phrase-noyau::after {
+.phrase-noyau::before {
     content: "Noyau";
 }
 
@@ -129,7 +132,7 @@
     border-color: green;
 }
 
-.phrase-complement_du_nom::after {
+.phrase-complement_du_nom::before {
     content: "Complément du nom";
 }
 
@@ -138,7 +141,7 @@
     border-color: green;
 }
 
-.phrase-epithete::after {
+.phrase-epithete::before {
     content: "Épithète";
 }
 
@@ -147,7 +150,7 @@
     border-color: green;
 }
 
-.phrase-apposition::after {
+.phrase-apposition::before {
     content: "Apposition";
 }
 
@@ -156,7 +159,7 @@
     border-color: Tomato;
 }
 
-.phrase-complement_de_l_adjectif::after {
+.phrase-complement_de_l_adjectif::before {
     content: "Complément de l'adjectif";
 }
 
@@ -165,7 +168,7 @@
     border-color: green;
 }
 
-.phrase-modalisateur::after {
+.phrase-modalisateur::before {
     content: "Modalisateur";
 }
 
@@ -174,7 +177,7 @@
     border-color: blue;
 }
 
-.phrase-auto-enonciative::after {
+.phrase-auto-enonciative::before {
     content: "Auto-énonciative";
 }
 
@@ -183,7 +186,7 @@
     border-color: Tomato;
 }
 
-.phrase-connecteur::after {
+.phrase-connecteur::before {
     content: "Connecteur";
 }
 
@@ -192,7 +195,7 @@
     border-color: black ;
 }
 
-.phrase-balise_textuelle::after {
+.phrase-balise_textuelle::before {
     content: "Balise textuelle";
 }
 
@@ -203,7 +206,7 @@
     background-color: rgb(60, 179, 113, 0.5);
 }
 
-.phrase-independante::after {
+.phrase-independante::before {
     content: "Indépendante";
 }
 

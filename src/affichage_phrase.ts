@@ -84,6 +84,7 @@ export function affiche_phrase(phrase: PhraseEleve, mots_a_inclure: MotsPos = []
 export function installe_profondeur(racine: HTMLElement, profondeur_max: number) {
     /* Installe différents niveaux de profondeur selon la hiérarchie de la phrase
      */
+    // TODO ajouter la hauteur de la ligne (lineHeight) en fonction de la profondeur
     // TODO FIXME problème probable des verbes par rapport aux verbes conjugués
     assert(profondeur_max >= 0, `Erreur de profondeur, qui ne peut être inférieure à 0. Racine: ${racine}`);
     for (let i = 0; i < racine.children.length; i++) {
