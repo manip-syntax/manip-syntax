@@ -397,3 +397,17 @@ export function nouvelle_phrase() : void {
     };
     
 }
+
+export function retirer_elements_nouvelle_phrase() {
+    /* Retire les éléments mis en place pour la création d'une nouvelle phrase
+     */
+    byID("conseil").innerHTML = "";
+    const bouton_valider = byID("bouton-valider");
+    bouton_valider.style.width = "100%";
+    bouton_valider.innerHTML = "Valider";
+    // validation de la phrase
+    const valider_phrase = byID("bouton-valider-phrase");
+    valider_phrase.style.display = "none";
+    byID("nouvelle_phrase-fonctions-selection").innerHTML = "";
+
+}

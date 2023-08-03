@@ -3,7 +3,7 @@ import './choix_phrase.css';
 import './modal.css';
 import { anime_disparition_modal, byID, cree_html_element, non_null } from './util';
 import { affiche_phrase, dispose } from './affichage_phrase';
-import { add_events_listener, nouvelle_phrase } from './nouvelle_phrase';
+import { add_events_listener, nouvelle_phrase, retirer_elements_nouvelle_phrase } from './nouvelle_phrase';
 import { charge_phrases } from './charge_phrases';
 import { Fonction, GroupeEnchasseCorrige, GroupeEnchasseEleve, PhraseCorrigee, PhraseEleve } from './phrase';
 import { fonctions_communes } from './fonctions_partagees';
@@ -188,6 +188,7 @@ byID("analyse_fichier").addEventListener('click', () => {
     for (const modal of non_null(document.getElementsByClassName("modal")) as HTMLCollectionOf<HTMLElement>) {
         modal.style.display = "none";
     }
+    retirer_elements_nouvelle_phrase(); // peut être nécessaire dans certains cas
     byID("modal-analyse-fichier").style.display = "block";
 });
 
