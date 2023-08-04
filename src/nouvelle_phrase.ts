@@ -294,13 +294,13 @@ export class CreateurPhrase {
         }
         const fonction = this.fonction_courante.fonction;
         const syntagme = this.fonction_courante.syntagme;
-        byID("phrase-analyse-paragraphe").innerHTML = affiche_phrase(this._phrase, syntagme.mots_pos);
+        byID("phrase-analyse-paragraphe").innerHTML = affiche_phrase(this._phrase, syntagme.mots_sans_fonction);
         dispose(byID("phrase-analyse-paragraphe"), this._phrase.profondeur+1);
         byID("consigne-container").innerHTML = `À renseigner : ${this.fonction_courante.arbre_genealogique}`;
 
 
         // selection des mots précédemment sélectionnés
-        const mots_selectionnes = this._phrase.fonctionPos(fonction, this.fonction_courante.numero);
+        const mots_selectionnes = syntagme.fonctionPos(fonction, this.fonction_courante.numero);
         Array.from(document.getElementsByClassName("phrase-cliquable"))
             .forEach( elt => {
                 if (mots_selectionnes.includes(Number(elt.id.split('-')[2]))) {
