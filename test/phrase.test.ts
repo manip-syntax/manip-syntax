@@ -296,5 +296,16 @@ describe('Phrase class tests', () => {
       expect(g.profondeur).toBe(2);
       expect(g2.profondeur).toBe(1);
   });
+
+  test("Les mots sans fonction sont bien renvoyés à la demande", () => {
+      const base = [0,1,2,3,4,5,6];
+      let g = new GroupeEnchasse(base);
+      expect(g.mots_sans_fonction).toEqual(base);
+      g.declareFonction("sujet",[0,1,2,3]);
+      expect(g.mots_sans_fonction).toEqual([4,5,6]);
+      g.declareFonction("verbe_principal",[4,5]);
+      expect(g.mots_sans_fonction).toEqual([6]);
+
+  });
 });
 

@@ -50,9 +50,6 @@ function fin_balise(fe: FonctionEnchassee, pos: number): string {
 
 
 export function affiche_phrase(phrase: PhraseEleve, mots_a_inclure: MotsPos = []) : string {
-    if (mots_a_inclure.length === 0) {
-        mots_a_inclure = phrase.mots_pos;
-    }
     // découpage de la phrase en constituants
     // cette regex permet de conserver le séparateur
     const reg = new RegExp("(" + PhraseEleve.Separateur + ")");

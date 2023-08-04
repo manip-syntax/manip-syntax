@@ -52,7 +52,7 @@ function analyse_fonction_requise(etape: number, syntagme_eleve: PhraseEleve|Gro
         return analyse_suivante();
     }
     byID("consigne-container").innerHTML = `${consigne}`;
-    byID("phrase-analyse-paragraphe").innerHTML = affiche_phrase(phrase_eleve);
+    byID("phrase-analyse-paragraphe").innerHTML = affiche_phrase(phrase_eleve, phrase_eleve.mots_pos);
     dispose(byID("phrase-analyse-paragraphe"), phrase_eleve.profondeur+1);
 
 
@@ -192,6 +192,19 @@ byID("analyse_fichier").addEventListener('click', () => {
     byID("modal-analyse-fichier").style.display = "block";
 });
 
+function drag_n_drop() {
+    const drag_n_drop_possible = () => {
+      var div = document.createElement('div');
+      return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window;
+    };
+
+    if (drag_n_drop_possible()) {
+        byID("analyse_fichier_input_form").classList.add("has-advanced-upload");
+    }
+}
+
+
+
 // événement après chargement d'un fichier
 byID("analyse_fichier_input").addEventListener("change", e => {
     const target = e.target as HTMLInputElement;
@@ -237,5 +250,6 @@ byID("analyse_fichier_input").addEventListener("change", e => {
 add_events_listener();
 
 selectionne_phrase();
+drag_n_drop();
 
 
