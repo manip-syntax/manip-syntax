@@ -265,6 +265,10 @@ export class CreateurPhrase {
         sous_menu.addEventListener("mouseleave", () => {
             selecteur_courant.style.display = 'none';
         });
+
+        sous_menu.addEventListener("click", () => {
+            selecteur_courant.style.display = 'none';
+        });
     }
 
     valide_fonction(b: boolean): boolean {
