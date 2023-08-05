@@ -199,26 +199,46 @@ function drag_n_drop() {
     };
 
     if (drag_n_drop_possible()) {
-        byID("analyse_fichier_input_form").classList.add("has-advanced-upload");
+
+        const form = byID("analyse_fichier_input_form");
+        form.classList.add("has-advanced-upload");
+        byID("analyse_fichier_bouton").style.display = "none";
+
+        "drag dragstart dragend dragover dragenter dragleave drop".split(" ").forEach( event => {
+            form.addEventListener(event, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            })
+        });
+
+        ["dragover","dragenter"].forEach( e => {
+            form.addEventListener(e, () => form.classList.add("is-dragover"));
+        });
+        ["dragleave","dragend","drop"].forEach( e => {
+            form.addEventListener(e, () => form.classList.remove("is-dragover"));
+        });
+
+    }
+    else {
+        byID("analyse_fichier_input").classList.remove("box__file");
     }
 }
 
 
 
 // événement après chargement d'un fichier
-byID("analyse_fichier_input").addEventListener("change", e => {
-    const target = e.target as HTMLInputElement;
+function  charge_fichier (files: FileList) {
     const lecteur = new FileReader();
     const disparition_modal = () => {
         anime_disparition_modal(byID("modal-analyse-fichier-contenu"),byID("modal-analyse-fichier"));
     }
         
     // vérifications
-    if (target.files!.length == 0) {
+    if (files!.length == 0) {
         disparition_modal();
         return definit_message_modal("Pas de fichier chargé.","OK",() => {});
     } 
-    const fichier = target.files![0];
+    const fichier = files![0];
     if (!((fichier.type ? fichier.type : "Introuvable").includes("json"))) {
         disparition_modal();
         return definit_message_modal("Format invalide","OK",() => {});
@@ -245,6 +265,13 @@ byID("analyse_fichier_input").addEventListener("change", e => {
     });
     lecteur.readAsText(fichier);
 
+}
+byID("analyse_fichier_input").addEventListener("change", e => {
+    const target = e.target as HTMLInputElement;
+    charge_fichier(target.files as FileList);
+});
+byID("analyse_fichier_input_form").addEventListener("drop", e => {
+    charge_fichier(e.dataTransfer?.files as FileList);
 });
 
 add_events_listener();

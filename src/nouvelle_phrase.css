@@ -1,7 +1,51 @@
 /* Drop zone */
-#analyse_fichier_input {
-    width: 100%;
-    display: block;
+.box__file {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+#analyse_fichier_input + label {
+    font-size: 30px;
+    font-weight: 700;
+    color: black;
+    display: inline-block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    display: inline-block;
+    padding: 35px 70px;
+    cursor: pointer; /* "hand" cursor */
+    max-width: 80%;
+    text-align: center;
+}
+
+#analyse_fichier_input:focus + label,
+#analyse_fichier_input + label:hover {
+	outline: 1px dotted #000;
+	outline: -webkit-focus-ring-color auto 5px;
+}
+
+.box__dragndrop {
+  display: none;
+}
+
+#analyse_fichier_input_form.has-advanced-upload {
+  background-color: rgb(155, 183, 212, 0.5);
+  outline: 2px dashed black;
+  outline-offset: -10px;
+  height: 320px;
+  text-align: center;
+  padding: 90px;
+}
+#analyse_fichier_input_form.has-advanced-upload .box__dragndrop {
+  display: inline;
+}
+
+#analyse_fichier_input_form.is-dragover {
+  background-color: rgb(155, 183, 212, 0.2);
 }
 
 /* Nouvelle phrase

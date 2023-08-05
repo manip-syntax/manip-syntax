@@ -31,7 +31,7 @@
     position: absolute;
     bottom: -5px;
     left: 0;
-    width: 500%; /* Pour éviter les retours à la ligne intempestifs */
+    width: 200%; /* Pour éviter les retours à la ligne intempestifs */
     text-align: left;
 }
 
