@@ -4,7 +4,6 @@
 import './affichage_phrase.css';
 
 import { Fonction, FonctionEnchassee, MotsPos, PhraseEleve } from "./phrase";
-import { assert } from "./util";
 
 function renvoie_crochet(f: Fonction, est_crochet_ouvrant: boolean): string {
     /*
@@ -78,16 +77,29 @@ export function affiche_phrase(phrase: PhraseEleve, mots_a_inclure: MotsPos = []
 
 }
 
-export function dispose(base: HTMLElement, profondeur_max: number) {
+export function dispose(base: HTMLElement) {
+    const profondeur_max = profondeur(base);
     base.style.lineHeight = `${1.8 + profondeur_max /10}`;
     installe_profondeur(base, profondeur_max);
+    console.log("profondeur_max",profondeur_max);
+}
+
+function profondeur(racine: HTMLElement) : number {
+    /* Trouve la profondeur de la phrase affichée
+     */
+    let val = 1;
+    for (let i = 0; i < racine.children.length; i++) {
+        let elt = racine.children[i] as HTMLElement;
+        if (elt.hasAttribute("groupe")) {
+            val = Math.max(val, profondeur(elt) + 1);
+        }
+    }
+    return val;
 }
 
 export function installe_profondeur(racine: HTMLElement, profondeur_max: number) {
     /* Installe différents niveaux de profondeur selon la hiérarchie de la phrase
      */
-    // TODO ajouter la hauteur de la ligne (lineHeight) en fonction de la profondeur
-    assert(profondeur_max >= 0, `Erreur de profondeur, qui ne peut être inférieure à 0. Racine: ${racine}`);
     for (let i = 0; i < racine.children.length; i++) {
         let elt = racine.children[i] as HTMLElement;
         if (elt.hasAttribute("groupe")) {

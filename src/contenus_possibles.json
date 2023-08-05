@@ -32,7 +32,6 @@
 	"groupe_verbal" : {
         "Noyau" : "noyau",
         "Verbe principal" : "verbe_principal",
-        "Groupe verbal" : "groupe_verbal",
         "COD" : "cod",
         "COI" : "coi",
         "Attribut du sujet" : "attribut_du_sujet",

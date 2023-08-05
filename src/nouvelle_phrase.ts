@@ -295,7 +295,7 @@ export class CreateurPhrase {
         const fonction = this.fonction_courante.fonction;
         const syntagme = this.fonction_courante.syntagme;
         byID("phrase-analyse-paragraphe").innerHTML = affiche_phrase(this._phrase, syntagme.mots_sans_fonction);
-        dispose(byID("phrase-analyse-paragraphe"), this._phrase.profondeur+1);
+        dispose(byID("phrase-analyse-paragraphe"));
         byID("consigne-container").innerHTML = `À renseigner : ${this.fonction_courante.arbre_genealogique}`;
 
 

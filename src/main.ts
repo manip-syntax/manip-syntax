@@ -52,7 +52,7 @@ function analyse_fonction_requise(etape: number, syntagme_eleve: PhraseEleve|Gro
     }
     byID("consigne-container").innerHTML = `${consigne}`;
     byID("phrase-analyse-paragraphe").innerHTML = affiche_phrase(phrase_eleve, phrase_eleve.mots_pos);
-    dispose(byID("phrase-analyse-paragraphe"), phrase_eleve.profondeur+1);
+    dispose(byID("phrase-analyse-paragraphe"));
 
 
     fonctions_communes.fonction_de_validation = () => {
