@@ -36,7 +36,8 @@
 }
 
 .phrase-sujet {
-    text-decoration: underline red;
+    border-color: red;
+    border-style: solid;
 }
 
 .phrase-sujet::before {
@@ -52,7 +53,8 @@
 }
 
 .phrase-cod {
-    text-decoration: dashed underline blue;
+    border-style: dashed solid;
+    border-color: blue;
 }
 
 .phrase-cod::before {
@@ -60,7 +62,8 @@
 }
 
 .phrase-coi {
-    text-decoration: dashed underline pink;
+    border-style: dashed solid;
+    border-color: pink;
 }
 
 .phrase-coi::before {
@@ -68,7 +71,8 @@
 }
 
 .phrase-attribut_du_sujet {
-    text-decoration: dashed underline green;
+    border-style: dashed solid;
+    border-color: green;
 }
 
 .phrase-attribut_du_sujet::before {
@@ -76,7 +80,8 @@
 }
 
 .phrase-attribut_du_cod {
-    text-decoration: dashed underline cyan;
+    border-style: dashed solid;
+    border-color: cyan;
 }
 
 .phrase-attribut_du_cod::before {
@@ -84,7 +89,8 @@
 }
 
 .phrase-complement_d_agent {
-    text-decoration: underline pink;
+    border-style: solid;
+    border-color: pink;
 }
 
 .phrase-complement_d_agent::before {
@@ -92,7 +98,9 @@
 }
 
 .phrase-complement_du_verbe_impersonnel {
-    text-decoration: underline green;
+    border-style: solid;
+    border-color: green;
+
 }
 
 .phrase-complement_du_verbe_impersonnel::before {
@@ -117,14 +125,12 @@
 }
 
 .phrase-noyau {
-    border-style: solid;
-    border-color: black;
-    border-width: 8px;
-    border-radius: 40px;
+    color: orange;
 }
 
 .phrase-noyau::before {
     content: "Noyau";
+    color: black;
 }
 
 .phrase-complement_du_nom {
