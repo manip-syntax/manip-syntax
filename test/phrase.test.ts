@@ -281,7 +281,30 @@ describe('Phrase class tests', () => {
       expect(gp.fonctionPos("noyau")).toEqual([1]);
       expect(gp.fonctionPos("complement_du_nom",0)).toEqual([2,3]);
       expect(gp.aFonction("complement_du_nom")).toBe(true);
+  });
 
+  test("La profondeur est d'un groupe enchâssé est correcte", () => {
+      let g = new GroupeEnchasse([0,1,2,3,4]);
+      expect(g.profondeur).toBe(0);
+      let g2 = g.cree_groupe_enchasse([2,3,4], "cod",-1);
+      expect(g.profondeur).toBe(1);
+      expect(g2.profondeur).toBe(0);
+      let g22 = g.cree_groupe_enchasse([1],"sujet",-1);
+      expect(g22.profondeur).toBe(0);
+      expect(g.profondeur).toBe(1);
+      g2.cree_groupe_enchasse([3], "complement_du_nom",0);
+      expect(g.profondeur).toBe(2);
+      expect(g2.profondeur).toBe(1);
+  });
+
+  test("Les mots sans fonction sont bien renvoyés à la demande", () => {
+      const base = [0,1,2,3,4,5,6];
+      let g = new GroupeEnchasse(base);
+      expect(g.mots_sans_fonction).toEqual(base);
+      g.declareFonction("sujet",[0,1,2,3]);
+      expect(g.mots_sans_fonction).toEqual([4,5,6]);
+      g.declareFonction("verbe_principal",[4,5]);
+      expect(g.mots_sans_fonction).toEqual([6]);
 
   });
 });

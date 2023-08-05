@@ -44,7 +44,10 @@ class SyntagmeAbstrait {
     protected _fonctions_multiples: { [id: string] : MultiMotsPos } = {};
     protected _groupes_enchasses: Map<[Fonction, number], GroupeEnchasse> = new Map();
     public static Fonctions_multiples: Fonction[] = ["independante","complement_circonstanciel", "modalisateur","auto-enonciative","connecteur","balise_textuelle","epithete","complement_du_nom","complement_du_pronom","complement_de_l_adjectif","apposition"];
-    public static Fonctions_contenants: Fonction[] = ["independante","sujet","cod","coi","attribut_du_sujet","attribut_du_cod","complement_circonstanciel","complement_du_verbe_impersonnel","complement_du_nom","complement_du_pronom","epithete","apposition","complement_de_l_adjectif"];
+    public static Fonctions_contenants: Fonction[] = ["independante","sujet","cod","coi","attribut_du_sujet","attribut_du_cod","complement_circonstanciel","complement_du_verbe_impersonnel","complement_du_nom","complement_du_pronom","epithete","apposition","complement_de_l_adjectif","groupe_verbal"];
+
+    constructor(protected _mots_pos: MotsPos = []) {
+    }
 
     _fonction_enchassee = (f: Fonction, m: MotsPos) => {
         return [f, m[0], m.slice(-1)[0]] as FonctionEnchassee;
@@ -111,6 +114,12 @@ class SyntagmeAbstrait {
         return false;
     }
 
+    get mots_sans_fonction(): MotsPos {
+        /* Renvoie les mots qui n'ont pas de fonction
+         */
+        return this._mots_pos.filter( i => this.fonction(i).length === 0);
+    }
+
     fonctions_multiples_nombre(f: Fonction): number {
         /* renvoie le nombre de f dans un syntagme donné
          */
@@ -139,6 +148,19 @@ class SyntagmeAbstrait {
         );
         copie._groupes_enchasses = new Map([...this._groupes_enchasses.entries()].filter( g => !g[1].vide).map(g => [g[0],g[1].copie]));
         return copie;
+    }
+
+    get profondeur(): number { // TEST
+        /* Renvoie la profondeur, c'est-à-dire le nombre de groupes enchâssés
+         * les uns dans les autres
+         * 1 correspond à un groupe qui ne contient aucun autre groupe
+         */
+        if (this._groupes_enchasses.size === 0) {
+            return 0;
+        }
+        return Math.max( ...[...this._groupes_enchasses.entries()]
+                        .map( ([_,v]) => v.profondeur)
+                       ) + 1;
     }
 
     fonction(i: number) : Fonction[] { // TEST 
@@ -268,14 +290,19 @@ export class Phrase extends SyntagmeAbstrait {
         super();
         this.phrase = phrase;
         this._cassePhrase();
+        this._mots_pos = [...Array(this._phrase_cassee.length).keys()];
     }
 
     get contenu(): string {
         return this.phrase;
     }
 
+    get mots_sans_fonction(): MotsPos {
+        return super.mots_sans_fonction.concat(this.verbes);
+    }
+
     get mots_pos(): MotsPos {
-        return [...Array(this._phrase_cassee.length).keys()];
+        return this._mots_pos;
     }
 
     set contenu(phrase: string) {
@@ -292,6 +319,11 @@ export class Phrase extends SyntagmeAbstrait {
         copie.verbes = this.verbes;
         copie.contenu = this.contenu;
         return copie;
+    }
+
+    get profondeur(): number {
+        let p = super.profondeur;
+        return p > 0 ? p : this.verbes.length > 0 ? 1 : 0;
     }
 
     // http://choly.ca/post/typescript-json/#comment-2579491209
@@ -479,7 +511,7 @@ export class GroupeEnchasse extends SyntagmeAbstrait {
      */
 
     constructor(protected _contenu: MotsPos) {
-        super();
+        super(_contenu);
     }
 
     get copie(): GroupeEnchasse {

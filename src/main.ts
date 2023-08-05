@@ -2,8 +2,8 @@ import './general.css';
 import './choix_phrase.css';
 import './modal.css';
 import { anime_disparition_modal, byID, cree_html_element, non_null } from './util';
-import { affiche_phrase } from './affichage_phrase';
-import { add_events_listener, nouvelle_phrase } from './nouvelle_phrase';
+import { affiche_phrase, dispose } from './affichage_phrase';
+import { add_events_listener, nouvelle_phrase, retirer_elements_nouvelle_phrase } from './nouvelle_phrase';
 import { charge_phrases } from './charge_phrases';
 import { Fonction, GroupeEnchasseCorrige, GroupeEnchasseEleve, PhraseCorrigee, PhraseEleve } from './phrase';
 import { fonctions_communes } from './fonctions_partagees';
@@ -51,7 +51,9 @@ function analyse_fonction_requise(etape: number, syntagme_eleve: PhraseEleve|Gro
         return analyse_suivante();
     }
     byID("consigne-container").innerHTML = `${consigne}`;
-    byID("phrase-analyse-paragraphe").innerHTML = affiche_phrase(phrase_eleve);
+    byID("phrase-analyse-paragraphe").innerHTML = affiche_phrase(phrase_eleve, phrase_eleve.mots_pos);
+    dispose(byID("phrase-analyse-paragraphe"), phrase_eleve.profondeur+1);
+
 
     fonctions_communes.fonction_de_validation = () => {
         const mots_selectionnes = Array.from(document.getElementsByClassName("phrase-selectionne"))
@@ -185,23 +187,57 @@ byID("analyse_fichier").addEventListener('click', () => {
     for (const modal of non_null(document.getElementsByClassName("modal")) as HTMLCollectionOf<HTMLElement>) {
         modal.style.display = "none";
     }
+    retirer_elements_nouvelle_phrase(); // peut être nécessaire dans certains cas
     byID("modal-analyse-fichier").style.display = "block";
 });
 
+function drag_n_drop() {
+    const drag_n_drop_possible = () => {
+      var div = document.createElement('div');
+      return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window;
+    };
+
+    if (drag_n_drop_possible()) {
+
+        const form = byID("analyse_fichier_input_form");
+        form.classList.add("has-advanced-upload");
+        byID("analyse_fichier_bouton").style.display = "none";
+
+        "drag dragstart dragend dragover dragenter dragleave drop".split(" ").forEach( event => {
+            form.addEventListener(event, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            })
+        });
+
+        ["dragover","dragenter"].forEach( e => {
+            form.addEventListener(e, () => form.classList.add("is-dragover"));
+        });
+        ["dragleave","dragend","drop"].forEach( e => {
+            form.addEventListener(e, () => form.classList.remove("is-dragover"));
+        });
+
+    }
+    else {
+        byID("analyse_fichier_input").classList.remove("box__file");
+    }
+}
+
+
+
 // événement après chargement d'un fichier
-byID("analyse_fichier_input").addEventListener("change", e => {
-    const target = e.target as HTMLInputElement;
+function  charge_fichier (files: FileList) {
     const lecteur = new FileReader();
     const disparition_modal = () => {
         anime_disparition_modal(byID("modal-analyse-fichier-contenu"),byID("modal-analyse-fichier"));
     }
         
     // vérifications
-    if (target.files!.length == 0) {
+    if (files!.length == 0) {
         disparition_modal();
         return definit_message_modal("Pas de fichier chargé.","OK",() => {});
     } 
-    const fichier = target.files![0];
+    const fichier = files![0];
     if (!((fichier.type ? fichier.type : "Introuvable").includes("json"))) {
         disparition_modal();
         return definit_message_modal("Format invalide","OK",() => {});
@@ -228,10 +264,18 @@ byID("analyse_fichier_input").addEventListener("change", e => {
     });
     lecteur.readAsText(fichier);
 
+}
+byID("analyse_fichier_input").addEventListener("change", e => {
+    const target = e.target as HTMLInputElement;
+    charge_fichier(target.files as FileList);
+});
+byID("analyse_fichier_input_form").addEventListener("drop", e => {
+    charge_fichier(e.dataTransfer?.files as FileList);
 });
 
 add_events_listener();
 
 selectionne_phrase();
+drag_n_drop();
 
 

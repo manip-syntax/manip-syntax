@@ -4,6 +4,7 @@
 import './affichage_phrase.css';
 
 import { Fonction, FonctionEnchassee, MotsPos, PhraseEleve } from "./phrase";
+import { assert } from "./util";
 
 function renvoie_crochet(f: Fonction, est_crochet_ouvrant: boolean): string {
     /*
@@ -29,7 +30,7 @@ function debut_balise(fe: FonctionEnchassee, pos: number): string {
     // ne sont pas forcément les uns à côté des autres
     if (pos == fe[1] || fe[0] === "verbes") {
         const crochet = renvoie_crochet(fe[0], true);
-        return `${crochet}<span class="phrase-${fe[0]}">`;
+        return `${crochet}<span groupe class="groupe-de-mots phrase-${fe[0]}">`;
     }
     return "";
 }
@@ -49,9 +50,6 @@ function fin_balise(fe: FonctionEnchassee, pos: number): string {
 
 
 export function affiche_phrase(phrase: PhraseEleve, mots_a_inclure: MotsPos = []) : string {
-    if (mots_a_inclure.length === 0) {
-        mots_a_inclure = phrase.mots_pos;
-    }
     // découpage de la phrase en constituants
     // cette regex permet de conserver le séparateur
     const reg = new RegExp("(" + PhraseEleve.Separateur + ")");
@@ -77,5 +75,25 @@ export function affiche_phrase(phrase: PhraseEleve, mots_a_inclure: MotsPos = []
         i+=1;
     }
     return rv_array.join("");
+
+}
+
+export function dispose(base: HTMLElement, profondeur_max: number) {
+    base.style.lineHeight = `${1.8 + profondeur_max /10}`;
+    installe_profondeur(base, profondeur_max);
+}
+
+export function installe_profondeur(racine: HTMLElement, profondeur_max: number) {
+    /* Installe différents niveaux de profondeur selon la hiérarchie de la phrase
+     */
+    // TODO ajouter la hauteur de la ligne (lineHeight) en fonction de la profondeur
+    assert(profondeur_max >= 0, `Erreur de profondeur, qui ne peut être inférieure à 0. Racine: ${racine}`);
+    for (let i = 0; i < racine.children.length; i++) {
+        let elt = racine.children[i] as HTMLElement;
+        if (elt.hasAttribute("groupe")) {
+            elt.style.padding = `0px 0px ${profondeur_max * 10}px`;
+            installe_profondeur(elt, profondeur_max - 1);
+        }
+    }
 
 }
