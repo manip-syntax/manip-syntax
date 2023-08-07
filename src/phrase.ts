@@ -44,6 +44,7 @@ class SyntagmeAbstrait {
     protected _fonctions_uniques: { [id: string] : MotsPos } = {};
     protected _fonctions_multiples: { [id: string] : MultiMotsPos } = {};
     protected _groupes_enchasses: Map<[Fonction, number], GroupeEnchasse> = new Map();
+    protected _manipulations: { [id: string] : ManipulationSujet } = {};
     public static Fonctions_multiples: Fonction[] = ["independante","complement_circonstanciel", "modalisateur","auto-enonciative","connecteur","balise_textuelle","epithete","complement_du_nom","complement_du_pronom","complement_de_l_adjectif","apposition"];
     public static Fonctions_contenants: Fonction[] = ["independante","sujet","cod","coi","attribut_du_sujet","attribut_du_cod","complement_circonstanciel","complement_du_verbe_impersonnel","complement_du_nom","complement_du_pronom","epithete","apposition","complement_de_l_adjectif","groupe_verbal"];
 
@@ -80,7 +81,11 @@ class SyntagmeAbstrait {
         return (Object.keys(this._fonctions_uniques).length === 0 && Object.keys(this._fonctions_multiples).length === 0);
     }
 
-    get est_attributif(): boolean {
+    ajoute_infos_de_manipulation(f: Fonction, infos: ManipulationSujet) {
+        this._manipulations[f] = infos;
+    }
+
+    get est_attributif(): boolean { // TEST
         /* Vrai si le groupe contient un sujet et un attribut du sujet.
          * Faux dans tous les autres cas
          */
@@ -155,6 +160,7 @@ class SyntagmeAbstrait {
             }
         );
         copie._groupes_enchasses = new Map([...this._groupes_enchasses.entries()].filter( g => !g[1].vide).map(g => [g[0],g[1].copie]));
+        copie._manipulations = this._manipulations;
         return copie;
     }
 
@@ -761,4 +767,10 @@ interface GroupeEnchasseJSON {
     _groupes_enchasses?: Map<[Fonction, number], GroupeEnchasse>;
 }
 
+// TODO probablement à déplacer
+
+interface ManipulationSujet {
+    est_anime: boolean;
+    pronominalisation: string | null;
+}
 

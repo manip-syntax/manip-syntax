@@ -81,7 +81,6 @@ export function dispose(base: HTMLElement) {
     const profondeur_max = profondeur(base);
     base.style.lineHeight = `${1.8 + profondeur_max /10}`;
     installe_profondeur(base, profondeur_max);
-    console.log("profondeur_max",profondeur_max);
 }
 
 function profondeur(racine: HTMLElement) : number {

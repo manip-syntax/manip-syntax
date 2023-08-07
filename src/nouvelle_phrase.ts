@@ -15,6 +15,8 @@ let enregistre_fonction = () => {
     return new CreateurPhrase("vide");
 }
 
+let fonction_du_bouton_des_ajouts_de_manipulations = () => console.log("Problème: aucune fonction définie pour le bouton OK des ajouts de manipulations");
+
 export function add_events_listener () {
     byID("modal-nouvelle_phrase-bouton").addEventListener('click', () => {
         fonction_du_bouton_de_nouvelle_phrase();
@@ -25,6 +27,10 @@ export function add_events_listener () {
     });
     byID("nouvelle_phrase-fonctions-selection").addEventListener('click', e => {
         fonction_du_selecteur_nouvelle_phrase(e);
+    });
+    byID("ajout-manipulations-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        fonction_du_bouton_des_ajouts_de_manipulations();
     });
 }
 
@@ -324,6 +330,7 @@ export class CreateurPhrase {
             syntagme.declareFonction(fonction, mots_selectionnes, this.fonction_courante.numero);
             const est_valide = this.valide_fonction(mots_selectionnes.length > 0);
             this.gere_groupe_enchasse(est_valide, mots_selectionnes, this.fonction_courante);
+            this.elements_de_manipulation(est_valide);
             return this;
         }
 
@@ -350,7 +357,47 @@ export class CreateurPhrase {
             enregistre_fonction();
             this.analyse_de_fonction(pos + 1);
         };
-}
+
+
+    }
+
+    elements_de_manipulation(est_valide: boolean) {
+        if (! est_valide) {
+            return;
+        }
+        if (this.fonction_courante.fonction === "sujet") {
+            byID("modal-ajout-manipulations").style.display = "block";
+            const mots_selectionnes = Array.from(document.getElementsByClassName("phrase-selectionne"))
+                .map(elt => elt.innerHTML).join(" ");
+            const pronoms = "je tu il elle nous vous ils elles".split(" ");
+            const pronoms_html = pronoms.includes(mots_selectionnes) ? 
+                '<input type="hidden" id="pronom-inutile" name="sujet-pronoms" value="null">'
+                : '<fieldset><legend>Par quoi le sujet peut-il être pronominalisé ?</legend>' +
+                    pronoms.map(elt => `<input type="radio" class="pronoms" id="pronom-${elt}" name="sujet-pronoms" value="${elt}" required>` +
+                                      `<label for="pronom-${elt}">${elt}</label>`)
+                .join(" ") +
+                '</fieldset>';
+            byID("modal-ajout-manipulations-titre").innerHTML = `Renseignements nécessaires à la manipulation du sujet : ${mots_selectionnes}`;
+            byID("ajout-manipulations-form-contenu").innerHTML = '<input type="radio" id="est-anime" value="true" name="sujet-anime" required>' +
+                '<label for="est-anime">Le référent du sujet est animé.</label>' +
+                '<input type="radio" id="est-non-anime" value="false" name="sujet-anime" required>' +
+                '<label for="est-non-anime">Le référent du sujet est non animé.</label>' +
+                pronoms_html;
+            let fonction_courante = this.fonction_courante; // ce n'est pas inutile: au moment où on va appeler fonction_du_bouton_des_ajouts_de_manipulations, ce ne sera plus la fonction courante
+
+            fonction_du_bouton_des_ajouts_de_manipulations = () => {
+                const est_anime = (document.getElementsByName("sujet-anime")[0] as HTMLInputElement).checked;
+                let pronom: string | null = Array.from(document.getElementsByName("sujet-pronoms")).filter( elt => (elt as HTMLInputElement).checked)[0].getAttribute("value");
+                if (pronom === "null") {
+                    pronom = null;
+                }
+
+                fonction_courante.syntagme.ajoute_infos_de_manipulation("sujet",{est_anime: est_anime, pronominalisation: pronom});
+                byID("modal-ajout-manipulations").style.display = "none";
+            };
+
+        }
+    }
 }
 
 export function nouvelle_phrase() : void {
