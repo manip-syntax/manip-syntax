@@ -7,6 +7,7 @@ import { add_events_listener, nouvelle_phrase, retirer_elements_nouvelle_phrase 
 import { charge_phrases } from './charge_phrases';
 import { Fonction, GroupeEnchasseCorrige, GroupeEnchasseEleve, PhraseCorrigee, PhraseEleve } from './phrase';
 import { fonctions_communes } from './fonctions_partagees';
+import { manipulation_sujet } from './manipulation';
 import consignes from './consignes.json';
 
 function analyse_phrase(phrase_corrigee: PhraseCorrigee): void {
@@ -58,29 +59,51 @@ function analyse_fonction_requise(etape: number, syntagme_eleve: PhraseEleve|Gro
     fonctions_communes.fonction_de_validation = () => {
         const mots_selectionnes = Array.from(document.getElementsByClassName("phrase-selectionne"))
                               .map(elt => Number(elt.id.split('-')[2]));
-        
-        let reponse_correcte = (mots_selectionnes.length === 0) ? 
-            !syntagme_eleve.corrige.aFonction(fonction) :
-            syntagme_eleve.declare(fonction, mots_selectionnes, fm_index);
-        if (!reponse_correcte) {
-            const modal_message = byID("modal-message-contenu");
-            modal_message.classList.add("modal-message-erreur");
-            // TODO on pourrait peut-être être plus précis et dire s'il manque des mots, par exemple, ou si tous les mots sont faux
-            definit_message_modal("Il y a une erreur dans ton analyse !", "Reprendre l'analyse", () => {
-                analyse_fonction_requise(etape, syntagme_eleve, phrase_eleve, groupes_enchasses_gen, fm_index);
-                modal_message.classList.remove("modal-message-erreur");
-                // préselection des mots précédemment choisis
-                Array.from(document.getElementsByClassName("phrase-cliquable"))
-                    .forEach( elt => {
-                        if (mots_selectionnes.includes(Number(elt.id.split('-')[2]))) {
-                            elt.classList.add("phrase-selectionne");
-                        }
-                    });
+
+        const suite_validation = () => {
+            let reponse_correcte = (mots_selectionnes.length === 0) ? 
+                !syntagme_eleve.corrige.aFonction(fonction) :
+                syntagme_eleve.declare(fonction, mots_selectionnes, fm_index);
+            if (!reponse_correcte) {
+                const modal_message = byID("modal-message-contenu");
+                modal_message.classList.add("modal-message-erreur");
+                // TODO on pourrait peut-être être plus précis et dire s'il manque des mots, par exemple, ou si tous les mots sont faux
+                definit_message_modal("Il y a une erreur dans ton analyse !", "Reprendre l'analyse", () => {
+                    analyse_fonction_requise(etape, syntagme_eleve, phrase_eleve, groupes_enchasses_gen, fm_index);
+                    modal_message.classList.remove("modal-message-erreur");
+                    // préselection des mots précédemment choisis
+                    Array.from(document.getElementsByClassName("phrase-cliquable"))
+                        .forEach( elt => {
+                            if (mots_selectionnes.includes(Number(elt.id.split('-')[2]))) {
+                                elt.classList.add("phrase-selectionne");
+                            }
+                        });
+                });
+            } else {
+                analyse_suivante();
+            }
+        };
+
+        if (fonction === "sujet") {
+            const promesse_manipulation = new Promise<void>( (valider, annuler) => {
+                manipulation_sujet(syntagme_eleve, phrase_eleve);
+                byID("manipulations-form").addEventListener("submit", e => {
+                    byID("modal-manipulations").style.display = "none";
+                    e.preventDefault();
+                    valider();
+                }, {once: true});
+                byID("modal-manipulations-annuler").addEventListener("click", () => {
+                    byID("modal-manipulations").style.display = "none";
+                    annuler();
+                }, {once: true});
             });
+            promesse_manipulation.then(suite_validation, () => console.log("echec"));
         } else {
-            analyse_suivante();
+            suite_validation();
         }
+        
     };
+    fonctions_communes.ok = fonctions_communes.fonction_de_validation;
 
 }
 
@@ -103,6 +126,7 @@ function definit_message_modal(texte: string, bouton: string, fonction: () => vo
 
         fonction();
     };
+    fonctions_communes.ok = fonction_du_bouton_de_message;
 
 }
 
@@ -168,7 +192,7 @@ byID("bouton-valider").addEventListener('click', () => {
 // TODO si un modal avec un bouton "ok" est en place, appuyer sur ce bouton à la place
 document.onkeyup = function (e) {
     if (e.which === 13) {
-        fonctions_communes.fonction_de_validation();
+        fonctions_communes.ok();
     }
 };
 // bouton du modal de message: même chose

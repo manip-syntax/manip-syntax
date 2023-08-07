@@ -297,6 +297,7 @@ class SyntagmeAbstrait {
 export class Phrase extends SyntagmeAbstrait {
     protected verbes: MotsPos = [];
     private _phrase_cassee: string[] = [];
+    protected _mots_offset : Map<number, number> = new Map();
     public static Separateur = "[ ,;?!.'-]";
     private static _separateur = new RegExp(Phrase.Separateur);
     
@@ -338,6 +339,14 @@ export class Phrase extends SyntagmeAbstrait {
     get profondeur(): number {
         let p = super.profondeur;
         return p > 0 ? p : this.verbes.length > 0 ? 1 : 0;
+    }
+
+    _remplit_mots_offset() {
+        let courant = [0, 0];
+        for (let i=0; i<this.phrase.length; i++) {
+
+
+        }
     }
 
     // http://choly.ca/post/typescript-json/#comment-2579491209
@@ -430,6 +439,12 @@ export class Phrase extends SyntagmeAbstrait {
         } else {
             super.declareFonction(f, mots, numero_de_fonction);
         }
+    }
+
+    texte_pos(mots: MotsPos): string {
+        /* Renvoie le contenu (signes de ponctuation compris)
+         * correspondant aux mots
+         */
     }
 
     private _cassePhrase() { // TEST

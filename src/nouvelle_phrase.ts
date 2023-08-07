@@ -357,6 +357,7 @@ export class CreateurPhrase {
             enregistre_fonction();
             this.analyse_de_fonction(pos + 1);
         };
+        fonctions_communes.ok = fonctions_communes.fonction_de_validation;
 
 
     }
@@ -395,6 +396,7 @@ export class CreateurPhrase {
                 fonction_courante.syntagme.ajoute_infos_de_manipulation("sujet",{est_anime: est_anime, pronominalisation: pronom});
                 byID("modal-ajout-manipulations").style.display = "none";
             };
+            fonctions_communes.ok = fonction_du_bouton_des_ajouts_de_manipulations;
 
         }
     }
@@ -424,6 +426,7 @@ export function nouvelle_phrase() : void {
             // rien n'a été entré
             return;
         }
+        nouveau_texte = nouveau_texte.replace("\n",'');
         let nouvelle_phrase = new CreateurPhrase(nouveau_texte);
         modal_nouvelle_phrase.style.display = 'none';
         nouvelle_phrase.analyse_de_fonction(0);
@@ -445,6 +448,7 @@ export function nouvelle_phrase() : void {
             nouvelle_phrase.analyse_de_fonction(val());
         };
     };
+    fonctions_communes.ok = fonction_du_bouton_de_nouvelle_phrase;
     
 }
 

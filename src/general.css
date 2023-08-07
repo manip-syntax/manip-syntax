@@ -104,21 +104,34 @@ body {
 }
 
 .boutons-analyse-valider {
-    background-color: #f44336;
+    background-color: #04AA6D;
     width: 100%;
     float: left;
 }
 .boutons-analyse-valider:hover {
+    background-color: #05c780;
+}
+.boutons-analyse-annuler:hover {
     background-color: #da190b;
 }
 
+.boutons-analyse-annuler {
+    background-color: #f44336;
+    width: 50%;
+    float: right;
+}
+
 .boutons-valider-phrase {
-    background-color: #04AA6D;
+    background-color: #8200ad; 
     width: 50%;
     float: right;
 }
 .boutons-valider-phrase:hover {
-    background-color: #05c780;
+    background-color: #ac00e6;
+}
+
+#modal-manipulations-OK {
+    width: 50%;
 }
 
 
