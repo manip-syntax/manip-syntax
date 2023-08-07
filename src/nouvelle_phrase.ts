@@ -74,15 +74,18 @@ export class CreateurPhrase {
         "Indépendante" : "independante",
         "Sujet" : "sujet",
         "Verbes" : "verbes",
-        "Noyau" : "noyau",
-        "Verbe noyau" : "verbe_noyau",
         "Groupe verbal" : "groupe_verbal",
         "Complément d'agent" : "complement_d_agent",
         "Complément circonstanciel" : "complement_circonstanciel",
         "Modalisateur" : "modalisateur",
         "Fonction auto-énonciative" : "auto-enonciative",
         "Connecteur" : "connecteur",
-        "Balise textuelle" : "balise_textuelle"
+        "Balise textuelle" : "balise_textuelle",
+        "Noyau" : "noyau",
+        "Épithète" : "epithete",
+        "Complément du nom" : "complement_du_nom",
+        "Complément du pronom": "complement_du_pronom",
+        "Apposition" : "apposition"
     };
     static liste_des_fonctions_niveau_2: { [nom: string] : Fonction } = {
         "COD" : "cod",
@@ -90,10 +93,6 @@ export class CreateurPhrase {
         "Attribut du sujet" : "attribut_du_sujet",
         "Attribut du COD" : "attribut_du_cod",
         "Complément du verbe impersonnel" : "complement_du_verbe_impersonnel",
-        "Épithète" : "epithete",
-        "Complément du nom" : "complement_du_nom",
-        "Complément du pronom": "complement_du_pronom",
-        "Apposition" : "apposition",
         "Complément de l'adjectif": "complement_de_l_adjectif"
     };
 

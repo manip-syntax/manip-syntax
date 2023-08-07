@@ -1,7 +1,6 @@
 {
 	"independante" : {
         "Sujet" : "sujet",
-        "Noyau" : "noyau",
         "Verbe noyau" : "verbe_noyau",
         "Groupe verbal" : "groupe_verbal",
         "Complément d'agent" : "complement_d_agent",
@@ -13,6 +12,10 @@
 	},
 	
 	"sujet" : {
+        "Épithète" : "epithete",
+        "Complément du nom" : "complement_du_nom",
+        "Complément du pronom": "complement_du_pronom",
+        "Apposition" : "apposition",
         "Sujet" : "sujet",
         "Noyau" : "noyau",
         "Verbe noyau" : "verbe_noyau",
@@ -22,21 +25,15 @@
         "Modalisateur" : "modalisateur",
         "Fonction auto-énonciative" : "auto-enonciative",
         "Connecteur" : "connecteur",
-        "Balise textuelle" : "balise_textuelle",
-        "Épithète" : "epithete",
-        "Complément du nom" : "complement_du_nom",
-        "Complément du pronom": "complement_du_pronom",
-        "Apposition" : "apposition"
+        "Balise textuelle" : "balise_textuelle"
 	},
 
 	"groupe_verbal" : {
-        "Noyau" : "noyau",
         "Verbe noyau" : "verbe_noyau",
         "COD" : "cod",
         "COI" : "coi",
         "Attribut du sujet" : "attribut_du_sujet",
         "Attribut du COD" : "attribut_du_cod",
-        "Complément circonstanciel" : "complement_circonstanciel",
         "Complément du verbe impersonnel" : "complement_du_verbe_impersonnel"
 	},
 
