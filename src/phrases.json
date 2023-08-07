@@ -3,7 +3,7 @@
         "phrase":"Le chat mange la souris.",
         "verbes":[2],
         "_fonctions_uniques":{
-            "verbe_principal":[2],
+            "verbe_noyau":[2],
             "sujet":[0,1],
             "cod":[3,4],
             "groupe_verbal": [2,3,4]
@@ -13,7 +13,7 @@
         "phrase":"Marie donne du lait au chat.",
         "verbes":[1],
         "_fonctions_uniques":{
-            "verbe_principal":[1],
+            "verbe_noyau":[1],
             "sujet":[0],
             "cod":[2,3],
             "coi":[4,5],
@@ -24,7 +24,7 @@
         "phrase":"Un véritable amant ne connaît point d'amis.",
         "verbes":[4],
         "_fonctions_uniques":{
-            "verbe_principal":[4],
+            "verbe_noyau":[4],
             "sujet":[0,1,2],
             "coi":[6,7],
             "groupe_verbal":[3, 4, 5, 6, 7]
@@ -34,7 +34,7 @@
         "phrase":"L'amour rend tout permis.",
         "verbes":[2],
         "_fonctions_uniques":{
-            "verbe_principal":[2],
+            "verbe_noyau":[2],
             "sujet":[0,1],
             "cod":[3],
             "attribut_du_cod":[4],
@@ -45,7 +45,7 @@
         "phrase":"Vous êtes son rival ?",
         "verbes":[1],
         "_fonctions_uniques":{
-            "verbe_principal":[1],
+            "verbe_noyau":[1],
             "sujet":[0],
             "attribut_du_sujet":[2,3],
             "groupe_verbal":[1,2,3]
@@ -55,7 +55,7 @@
         "phrase":"Il est adoré d'elle.",
         "verbes":[1,2],
         "_fonctions_uniques":{
-            "verbe_principal":[1,2],
+            "verbe_noyau":[1,2],
             "sujet":[0],
             "complément_d_agent":[3,4],
             "groupe_verbal":[1,2,3,4]

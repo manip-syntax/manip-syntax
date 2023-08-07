@@ -2,7 +2,7 @@ import {assert, compare} from "./util";
 export type Fonction =
 // dans la phrase
     "verbes" |
-    "verbe_principal" |
+    "verbe_noyau" |
     "noyau" |
     "groupe_verbal" |
     "sujet" |

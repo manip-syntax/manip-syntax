@@ -1,7 +1,7 @@
 [
     ["verbes" , "Sélectionne les verbes."],
     ["independante", "Sélectionne une indépendante"],
-    ["verbe_principal" , "Sélectionne le verbe principal"],
+    ["verbe_noyau" , "Sélectionne le verbe noyau"],
     ["groupe_verbal","Sélectionne le groupe verbal"],
     ["sujet" , "Sélectionne le groupe sujet"],
     ["cod","Sélectionne le Complément d'objet direct (COD)."],

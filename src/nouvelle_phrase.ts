@@ -75,7 +75,7 @@ export class CreateurPhrase {
         "Sujet" : "sujet",
         "Verbes" : "verbes",
         "Noyau" : "noyau",
-        "Verbe principal" : "verbe_principal",
+        "Verbe noyau" : "verbe_noyau",
         "Groupe verbal" : "groupe_verbal",
         "Complément d'agent" : "complement_d_agent",
         "Complément circonstanciel" : "complement_circonstanciel",

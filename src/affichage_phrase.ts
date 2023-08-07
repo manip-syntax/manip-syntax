@@ -24,7 +24,7 @@ function debut_balise(fe: FonctionEnchassee, pos: number): string {
      * est au début ou à la fin de 'fe'
      * Ajoute un crochet en début de groupe si nécessaire
      */
-    // si la fonction est un verbe (pas un verbe principal),
+    // si la fonction est un verbe (pas un verbe noyau),
     // alors il faut forcément renvoyer la balise: en effet, les différents verbes
     // ne sont pas forcément les uns à côté des autres
     if (pos == fe[1] || fe[0] === "verbes") {

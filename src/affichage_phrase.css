@@ -44,12 +44,12 @@
     content: "Sujet";
 }
 
-.phrase-verbe_principal {
+.phrase-verbe_noyau {
     text-decoration: wavy underline green;
 }
 
-.phrase-verbe_principal::before {
-    content: "Verbe principal";
+.phrase-verbe_noyau::before {
+    content: "Verbe noyau";
 }
 
 .phrase-cod {
