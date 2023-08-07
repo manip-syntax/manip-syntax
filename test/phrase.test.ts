@@ -307,5 +307,15 @@ describe('Phrase class tests', () => {
       expect(g.mots_sans_fonction).toEqual([6]);
 
   });
+
+  test("Un syntagme quelconque est bien reconnu attributif ou non selon le cas", () => {
+      let g = new GroupeEnchasse([0,1,2,3]);
+      expect(g.est_attributif).toBe(false);
+      g.declareFonction("sujet",[0]);
+      expect(g.est_attributif).toBe(false);
+      g.declareFonction("attribut_du_sujet",[2]);
+      expect(g.est_attributif).toBe(true);
+
+  });
 });
 

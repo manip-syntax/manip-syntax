@@ -1,3 +1,4 @@
+// TODO FIXME refactoring necessary
 import {assert, compare} from "./util";
 export type Fonction =
 // dans la phrase
@@ -77,6 +78,13 @@ class SyntagmeAbstrait {
             }
         }
         return (Object.keys(this._fonctions_uniques).length === 0 && Object.keys(this._fonctions_multiples).length === 0);
+    }
+
+    get est_attributif(): boolean {
+        /* Vrai si le groupe contient un sujet et un attribut du sujet.
+         * Faux dans tous les autres cas
+         */
+        return "sujet" in this._fonctions_uniques && "attribut_du_sujet" in this._fonctions_uniques;
     }
 
     cree_groupe_enchasse(contenu: MotsPos, f: Fonction, numero:number): GroupeEnchasse { // TEST
