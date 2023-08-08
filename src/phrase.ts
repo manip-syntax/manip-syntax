@@ -36,20 +36,72 @@ type MultiMotsPos = MotsPos[];
 export type FonctionEnchassee = [ Fonction, number, number];
 
 
-class SyntagmeAbstrait {
-    /* Représente la base de toute les classes de groupes de mots
-     */
+class Syntagme {
     // id ne peut être qu'une valeur de type Fonction, mais TS ne veut pas que je mette autre chose qu'une string...
     // Pour être sûr qu'il s'agisse bien du type Fonction, des accesseurs sont en place.
+    private _phrase_cassee: string[] = [];
+
+    protected verbes: MotsPos = [];
+    protected _mots_offset : Map<number, number> = new Map();
+    
     protected _fonctions_uniques: { [id: string] : MotsPos } = {};
     protected _fonctions_multiples: { [id: string] : MultiMotsPos } = {};
-    protected _groupes_enchasses: Map<[Fonction, number], GroupeEnchasse> = new Map();
+    protected _groupes_enchasses: Map<[Fonction, number], Syntagme> = new Map();
     protected _manipulations: { [id: string] : ManipulationSujet } = {};
+
+    public static Separateur = "[ ,;?!.'-]";
+    private static _separateur = new RegExp(Syntagme.Separateur);
     public static Fonctions_multiples: Fonction[] = ["independante","complement_circonstanciel", "modalisateur","auto-enonciative","connecteur","balise_textuelle","epithete","complement_du_nom","complement_du_pronom","complement_de_l_adjectif","apposition"];
     public static Fonctions_contenants: Fonction[] = ["independante","sujet","cod","coi","attribut_du_sujet","attribut_du_cod","complement_circonstanciel","complement_du_verbe_impersonnel","complement_du_nom","complement_du_pronom","epithete","apposition","complement_de_l_adjectif","groupe_verbal"];
 
-    constructor(protected _mots_pos: MotsPos = []) {
+    constructor(protected phrase: string, protected _mots_pos: MotsPos = []) {
+        this.phrase = phrase;
+        this._casseSyntagme();
+        this._mots_pos = compare(_mots_pos, []) ? [...Array(this._phrase_cassee.length).keys()] : _mots_pos;
     }
+
+    get contenu(): string {
+        return this.phrase;
+    }
+    get mots_sans_fonction(): MotsPos {
+        /* Renvoie les mots qui n'ont pas de fonction
+         */
+        return this._mots_pos.filter( i => this.fonction(i).length === 0);
+    }
+
+    get mots_pos(): MotsPos {
+        return this._mots_pos;
+    }
+
+    set contenu(phrase: string) {
+        /* Met à jour le contenu de la phrase
+         */
+        this.phrase = phrase;
+    }
+
+    _remplit_mots_offset() {
+        let courant = [0, 0];
+        for (let i=0; i<this.phrase.length; i++) {
+            const c = this.phrase[i];
+        }
+    }
+    
+    get phraseCassee(): string[] { // TEST
+        return this._phrase_cassee;
+    }
+
+    get longueur(): number { // TEST
+        /* Renvoie le nombre de mots,
+         * pas le nombre de caractères.
+         */
+        return this._phrase_cassee.length;
+    }
+
+    static get separateur(): RegExp {
+        return this._separateur;
+    }
+
+
 
     _fonction_enchassee = (f: Fonction, m: MotsPos) => {
         return [f, m[0], m.slice(-1)[0]] as FonctionEnchassee;
@@ -92,8 +144,8 @@ class SyntagmeAbstrait {
         return "sujet" in this._fonctions_uniques && "attribut_du_sujet" in this._fonctions_uniques;
     }
 
-    cree_groupe_enchasse(contenu: MotsPos, f: Fonction, numero:number): GroupeEnchasse { // TEST
-        const n = new GroupeEnchasse(contenu);
+    cree_groupe_enchasse(mots_pos: MotsPos, f: Fonction, numero:number): Syntagme { // TEST
+        const n = new Syntagme(this.contenu, mots_pos);
         this._groupes_enchasses.set([f,numero], n);
         return n;
     }
@@ -102,7 +154,7 @@ class SyntagmeAbstrait {
         return this._groupes_enchasses.size;
     }
 
-    groupe_enchasse(f: Fonction, numero:number): GroupeEnchasse { // TEST
+    groupe_enchasse(f: Fonction, numero:number): Syntagme { // TEST
         let val = undefined;
         for (const [k,v] of this._groupes_enchasses) {
             if (k[0] === f && k[1] === numero) {
@@ -127,12 +179,6 @@ class SyntagmeAbstrait {
         return false;
     }
 
-    get mots_sans_fonction(): MotsPos {
-        /* Renvoie les mots qui n'ont pas de fonction
-         */
-        return this._mots_pos.filter( i => this.fonction(i).length === 0);
-    }
-
     fonctions_multiples_nombre(f: Fonction): number {
         /* renvoie le nombre de f dans un syntagme donné
          */
@@ -140,8 +186,8 @@ class SyntagmeAbstrait {
         return f in m ? m[f].length : 0;
     }
 
-     get copie(): SyntagmeAbstrait { // TEST
-        let copie = new SyntagmeAbstrait();
+     get copie(): Syntagme { // TEST TODO test à faire
+        let copie = new Syntagme(this.contenu, this._mots_pos);
         Object.entries(this._fonctions_uniques)
             .forEach( ([n,f,]) => {
                 if (f.length > 0) {
@@ -161,7 +207,18 @@ class SyntagmeAbstrait {
         );
         copie._groupes_enchasses = new Map([...this._groupes_enchasses.entries()].filter( g => !g[1].vide).map(g => [g[0],g[1].copie]));
         copie._manipulations = this._manipulations;
+
+        copie.verbes = this.verbes;
         return copie;
+    }
+
+    // http://choly.ca/post/typescript-json/#comment-2579491209
+    toJSON(): SyntagmeJSON {  // TODO TEST À FAIRE
+        // une copie pour garder le strict nécessaire: les données
+        const copie = this.copie;
+        let copie_obj = Object.assign(copie);
+        copie_obj._groupes_enchasses = Array.from(copie_obj._groupes_enchasses.entries());
+        return copie_obj;
     }
 
     get profondeur(): number { // TEST
@@ -182,6 +239,10 @@ class SyntagmeAbstrait {
          */
 
         let rv:Fonction[] = [];
+
+        if (this.verbes.includes(i)) {
+            rv.push("verbes");
+        }
 
         for (const key in this._fonctions_uniques) {
             if (this._fonctions_uniques[key].includes(i)) {
@@ -216,6 +277,11 @@ class SyntagmeAbstrait {
          */
         let rv: FonctionEnchassee[] = [];
 
+        if (this.verbes.includes(i)) {
+            rv.push(this._fonction_enchassee("verbes",this.verbes));
+        }
+
+
         for (const key in this._fonctions_uniques) {
             if (this._fonctions_uniques[key].includes(i)) {
                 rv.push(this._fonction_enchassee(key as Fonction, this._fonctions_uniques[key]));
@@ -245,10 +311,13 @@ class SyntagmeAbstrait {
          * Cette fonction renvoie un tableau vide en cas d'erreur
          */
         if (numero_de_fonction >= 0) { 
-            assert(SyntagmeAbstrait.Fonctions_multiples.includes(f),`fonctionPos:  ${f} n'est pas une fonction multiple`);
+            assert(Syntagme.Fonctions_multiples.includes(f),`fonctionPos:  ${f} n'est pas une fonction multiple`);
+        }
+        if (f == "verbes") { 
+            return this.verbes;
         }
 
-        if (SyntagmeAbstrait.Fonctions_multiples.includes(f)) { 
+        if (Syntagme.Fonctions_multiples.includes(f)) { 
             assert(numero_de_fonction > -1,`fonctionPos: numero_de_fonction doit être supérieur à -1 pour les fonctions multiples comme ${f}`);
 
             if (! (f in this._fonctions_multiples) || numero_de_fonction >= this._fonctions_multiples[f].length) {
@@ -271,10 +340,16 @@ class SyntagmeAbstrait {
          * Pour ajouter une fonction à un groupe enchâssé, il faut le déclarer directement dans ce groupe
          * On peut utiliser cette méthode pour supprimer une fonction: il suffit que mots soit un array vide
          */
+        assert(this.mots_valides(mots),`declareFonction: ${mots} ne correspond pas à une liste de mots valides.`);
         mots = mots.sort(
                 (a,b) => a -b
             );
-        if (SyntagmeAbstrait.Fonctions_multiples.includes(f)) { 
+        if (f === "verbes") {
+            this.verbes = mots;
+            return;
+        } 
+
+        if (Syntagme.Fonctions_multiples.includes(f)) { 
             let fm = this._fonctions_multiples;
             if (! (f in fm)) {
                 assert(numero_de_fonction <= 0, `declareFonction: ${numero_de_fonction} introuvable pour ${f}`);
@@ -292,123 +367,12 @@ class SyntagmeAbstrait {
         }
     }
 
-}
-
-export class Phrase extends SyntagmeAbstrait {
-    protected verbes: MotsPos = [];
-    private _phrase_cassee: string[] = [];
-    protected _mots_offset : Map<number, number> = new Map();
-    public static Separateur = "[ ,;?!.'-]";
-    private static _separateur = new RegExp(Phrase.Separateur);
-    
-    constructor(protected phrase: string) {
-        super();
-        this.phrase = phrase;
-        this._cassePhrase();
-        this._mots_pos = [...Array(this._phrase_cassee.length).keys()];
-    }
-
-    get contenu(): string {
-        return this.phrase;
-    }
-
-    get mots_sans_fonction(): MotsPos {
-        return super.mots_sans_fonction.concat(this.verbes);
-    }
-
-    get mots_pos(): MotsPos {
-        return this._mots_pos;
-    }
-
-    set contenu(phrase: string) {
-        /* Met à jour le contenu de la phrase
-         */
-        this.phrase = phrase;
-    }
-
-    get copie(): Phrase { // TODO test à faire
-        /* Copie le contenu de la phrase
-         */
-        let copie = super.copie as Phrase;
-        // pour des raisons pratiques, on garde les verbes dans tous les cas
-        copie.verbes = this.verbes;
-        copie.contenu = this.contenu;
-        return copie;
-    }
-
-    get profondeur(): number {
-        let p = super.profondeur;
-        return p > 0 ? p : this.verbes.length > 0 ? 1 : 0;
-    }
-
-    _remplit_mots_offset() {
-        let courant = [0, 0];
-        for (let i=0; i<this.phrase.length; i++) {
-
-
-        }
-    }
-
-    // http://choly.ca/post/typescript-json/#comment-2579491209
-    toJSON(): PhraseJSON {  // TODO TEST À FAIRE
-        // une copie pour garder le strict nécessaire: les données
-        const copie = this.copie;
-        let copie_obj = Object.assign(copie);
-        copie_obj._groupes_enchasses = Array.from(copie_obj._groupes_enchasses.entries());
-        return copie_obj;
-    }
-
-    
-    get phraseCassee(): string[] { // TEST
-        return this._phrase_cassee;
-    }
-
-    get longueur(): number { // TEST
-        /* Renvoie le nombre de mots,
-         * pas le nombre de caractères.
-         */
-        return this._phrase_cassee.length;
-    }
-
-    static get separateur(): RegExp {
-        return this._separateur;
-    }
-
-    fonction(i: number) : Fonction[] { // TEST 
-        /* Renvoie la ou les fonctions déclarées pour tel mot.
-         */
-        let rv:Fonction[] = super.fonction(i);
-        if (this.verbes.includes(i)) {
-            rv.push("verbes");
-        }
-        return rv;
-    }
-
-    fonction_detaillee(i: number): FonctionEnchassee[] {
-        let rv = super.fonction_detaillee(i);
-        if (this.verbes.includes(i)) {
-            rv.push(this._fonction_enchassee("verbes",this.verbes));
-        }
-        return rv;
-    }
-
-    fonctionPos(f: Fonction, numero_de_fonction: number = -1): MotsPos { // TEST 
-        /* Renvoie les index correspondant à la fonction
-         * s'ils existent
-         * numero_de_fonction ne s'applique que s'il y a plusieurs fonctions dans la même phrase (par exemple des compléments circonstanciels)
-         */
-        if (f == "verbes") { 
-            return this.verbes;
-        }
-        return super.fonctionPos(f, numero_de_fonction);
-    }
-    
     fonctionMots(f: Fonction, numero_de_fonction: number = -1): string { // TEST 
         /* Similaire à fonctionPos
          * mais renvoie les mots correspondants
          */
         if (numero_de_fonction >= 0) { 
-            assert(SyntagmeAbstrait.Fonctions_multiples.includes(f),`fonctionMots: ${f} n'est pas une fonction multiple`);
+            assert(Syntagme.Fonctions_multiples.includes(f),`fonctionMots: ${f} n'est pas une fonction multiple`);
             assert(f in this._fonctions_multiples,`fonctionMots: ${f} n'a pas été créé.`);
             assert(numero_de_fonction < this._fonctions_multiples[f].length, `fonctionMots: ${numero_de_fonction} introuvable pour ${f}`);
         }
@@ -421,66 +385,56 @@ export class Phrase extends SyntagmeAbstrait {
     mots_valides(mots: MotsPos): boolean {
         if (mots.length > 0) {
             // les mots rentrés sont-ils dans les bornes ? Le problème ne se pose pas si on veut supprimer la fonction
-            return mots[0] >= 0 && mots[mots.length -1] < this.longueur;
+            for (const m of mots) {
+                if (!this._mots_pos.includes(m)) {
+                    return false;
+                }
+            }
         }
         return true;
-    }
-
-    declareFonction(f: Fonction, mots: MotsPos, numero_de_fonction: number = -1): void { // TEST 
-        /* Déclare une fonction contenant les mots correspondants
-         * si numero_de_fonction est précisé, la fonction correspondante sera modifiée.
-         * S'il s'agit d'une fonction multiple et qu'il n'y a pas de numero_de_fonction,
-         * la fonction sera ajoutée
-         */
-        assert(this.mots_valides(mots),
-               `declareFonction: ${mots} ne correspond pas à une liste de mots valides. La longueur est de ${this.longueur}`);
-        if (f === "verbes") {
-            this.verbes = mots;
-        } else {
-            super.declareFonction(f, mots, numero_de_fonction);
-        }
     }
 
     texte_pos(mots: MotsPos): string {
         /* Renvoie le contenu (signes de ponctuation compris)
          * correspondant aux mots
          */
+        console.log("error", mots);
+        return "stirng";
     }
 
-    private _cassePhrase() { // TEST
+    private _casseSyntagme() { // TEST
         /* Casse la phrase en mots en utilisant _separateur
          * pour séparer les mots
          */
         this._phrase_cassee = this.phrase
-            .split(Phrase._separateur)
+            .split(Syntagme._separateur)
             .filter(n=>n); // retire chaines vides
     }
 
 }
 
-export class PhraseCorrigee extends Phrase {
+export class SyntagmeCorrige extends Syntagme {
     /* Cette classe est utilisée pour la correction
      * d'une phrase.
      */
 
-    constructor(phrase: string) {
-        super(phrase);
+    constructor(phrase: string, mots_pos: MotsPos) {
+        super(phrase, mots_pos);
     }
 
     static reviver(key: string, value: any): any {
-        return key === "" ? PhraseCorrigee.fromJSON(value) : value;
+        return key === "" ? SyntagmeCorrige.fromJSON(value) : value;
     }
 
-    static fromJSON(json: PhraseJSON|string): PhraseCorrigee { // TEST
+    static fromJSON(json: SyntagmeJSON|string): SyntagmeCorrige { // TEST
         if (typeof json === 'string') {
-            return JSON.parse(json, PhraseCorrigee.reviver);
+            return JSON.parse(json, SyntagmeCorrige.reviver);
         } else {
-            let phrase = Object.create(PhraseCorrigee.prototype);
-            const groupes_enchasses: Map<[Fonction, number], GroupeEnchasseCorrige> = typeof json._groupes_enchasses === "undefined" ? new Map() : new Map(Object.entries(json._groupes_enchasses)
+            let phrase = Object.create(SyntagmeCorrige.prototype);
+            const groupes_enchasses: Map<[Fonction, number], SyntagmeCorrige> = typeof json._groupes_enchasses === "undefined" ? new Map() : new Map(Object.entries(json._groupes_enchasses)
                                     .map( elt => {
-                                        return [elt[1][0],GroupeEnchasseCorrige.fromJSON(elt[1][1])];
-                                    })
-                                                                                                          );
+                                        return [elt[1][0],SyntagmeCorrige.fromJSON(elt[1][1])];
+                                    }));
             let o = Object.assign(phrase, json, {
                 _groupes_enchasses: groupes_enchasses,
             });
@@ -489,22 +443,22 @@ export class PhraseCorrigee extends Phrase {
         }
     }
 
-    cree_groupe_enchasse(contenu: MotsPos, f: Fonction, numero:number): GroupeEnchasse { 
-        const n = new GroupeEnchasseCorrige(contenu);
+    cree_groupe_enchasse(mots_pos: MotsPos, f: Fonction, numero:number): Syntagme { 
+        const n = new SyntagmeCorrige(this.contenu, mots_pos);
         this._groupes_enchasses.set([f,numero], n);
         return n;
     }
 
-    groupe_enchasse(f: Fonction, n:number): GroupeEnchasseCorrige {
+    groupe_enchasse(f: Fonction, n:number): SyntagmeCorrige {
         // on sait que les groupes enchassés de cette classe sont corrigés
-        return super.groupe_enchasse(f,n) as GroupeEnchasseCorrige;
+        return super.groupe_enchasse(f,n) as SyntagmeCorrige;
     }
 
     aFonction(f: Fonction): boolean { // TEST
         /* Vrai si cette phrase contient cette fonction
          * d'après le corrigé.
          */
-        if (SyntagmeAbstrait.Fonctions_multiples.includes(f)) { // À TESTER TODO 
+        if (Syntagme.Fonctions_multiples.includes(f)) { // À TESTER TODO 
             if (f in this._fonctions_multiples) {
                 return this._fonctions_multiples[f].filter(e => !compare(e, [])).length > 0;
             }
@@ -514,123 +468,13 @@ export class PhraseCorrigee extends Phrase {
         return !compare(pos,[]);
     }
 
-    estFonction(f:Fonction, mots:MotsPos): boolean { // TEST 
-        /*Vrai si mot a cette fonction d'après le corrigé
-         */
-        mots = mots.sort();
-        if (SyntagmeAbstrait.Fonctions_multiples.includes(f)) {
-            if  (f in this._fonctions_multiples) {
-                return this._fonctions_multiples[f].filter(e => compare(e,mots)).length > 0;
-            }
-            return false;
-        }
-        return compare(this.fonctionPos(f),mots.sort());
-    }
 
-    * groupes_enchasses() {
-        for (const elt of this._groupes_enchasses) {
-            yield elt as [[Fonction, number], GroupeEnchasseCorrige];
-        }
-    }
-
-}
-
-export class GroupeEnchasse extends SyntagmeAbstrait {
-    /* Représente un groupe de mots enchâssés dans une phrase
-     */
-
-    constructor(protected _contenu: MotsPos) {
-        super(_contenu);
-    }
-
-    get copie(): GroupeEnchasse {
-        let copie = super.copie as GroupeEnchasse;
-        copie._contenu = this._contenu;
-        return copie;
-    }
-
-    get mots_pos(): MotsPos { // TEST
-        return this._contenu;
-    }
-
-
-    toJSON(): GroupeEnchasseJSON {
-        let copie = this.copie;
-        let copie_obj = Object.assign(copie);
-        copie_obj._groupes_enchasses = Array.from(copie_obj._groupes_enchasses.entries());
-        return copie_obj;
-    }
-
-    mots_valides(mots: MotsPos): boolean {
-        if (mots.length > 0) {
-            // les mots rentrés sont-ils dans les bornes ? Le problème ne se pose pas si on veut supprimer la fonction
-            for (const m of mots) {
-                if (!this._contenu.includes(m)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    declareFonction(f: Fonction, mots: MotsPos, numero_de_fonction: number = -1): void {
-        assert(this.mots_valides(mots),
-               `declareFonction: ${mots} ne correspond pas à une liste de mots valides.`);
-        super.declareFonction(f, mots, numero_de_fonction);
-    }
-
-}
-
-export class GroupeEnchasseCorrige extends GroupeEnchasse {
-    /* Classe utilisée à l'intérieur d'un groupe enchassé élève comme correction
-     * TODO essayer de supprimer la duplication de aFonction, groupes_enchasses et estFonction avec PhraseCorrigee
-     */
-    static reviver(key: string, value: any): any {
-        return key === "" ? GroupeEnchasseCorrige.fromJSON(value) : value;
-    }
-
-    static fromJSON(json: GroupeEnchasseJSON|string): GroupeEnchasseCorrige { 
-        if (typeof json === 'string') {
-            return JSON.parse(json, GroupeEnchasseCorrige.reviver);
-        } else {
-            let groupe = Object.create(GroupeEnchasseCorrige.prototype);
-            const groupes_enchasses = typeof json._groupes_enchasses === "undefined" ? new Map() : new Map(Object.entries(json._groupes_enchasses)
-                                    .map( elt => {
-                                        return [elt[1][0],GroupeEnchasseCorrige.fromJSON(elt[1][1])];
-                                    }));
-            let o = Object.assign(groupe, json, {
-                _groupes_enchasses: groupes_enchasses,
-            });
-            o._remplit_les_vides();
-            return o;
-        }
-    }
-
-    cree_groupe_enchasse(contenu: MotsPos, f: Fonction, numero:number): GroupeEnchasseCorrige { 
-        const n = new GroupeEnchasseCorrige(contenu);
-        this._groupes_enchasses.set([f,numero], n);
-        return n;
-    }
-
-    aFonction(f: Fonction): boolean { // TEST
-        /* Vrai si cette phrase contient cette fonction
-         * d'après le corrigé.
-         */
-        if (SyntagmeAbstrait.Fonctions_multiples.includes(f)) { // À TESTER TODO 
-            if (f in this._fonctions_multiples) {
-                return this._fonctions_multiples[f].filter(e => !compare(e, [])).length > 0;
-            }
-            return false;
-        }
-        const pos = this.fonctionPos(f);
-        return !compare(pos,[]);
-    }
 
     estFonction(f:Fonction, mots:MotsPos): boolean { // TEST 
         /*Vrai si mot a cette fonction d'après le corrigé
          */
         mots = mots.sort();
-        if (SyntagmeAbstrait.Fonctions_multiples.includes(f)) {
+        if (Syntagme.Fonctions_multiples.includes(f)) {
             if  (f in this._fonctions_multiples) {
                 return this._fonctions_multiples[f].filter(e => compare(e,mots)).length > 0;
             }
@@ -641,25 +485,31 @@ export class GroupeEnchasseCorrige extends GroupeEnchasse {
     
     * groupes_enchasses() {
         for (let elt of this._groupes_enchasses) {
-            yield elt as [[Fonction, number], GroupeEnchasseCorrige]; // TODO FIXME le as ... est sans doute de trop
+            yield elt as [[Fonction, number], SyntagmeCorrige]; // TODO FIXME le as ... est sans doute de trop
         }
     }
 }
 
-export class GroupeEnchasseEleve extends GroupeEnchasse {
-    constructor(protected gec: GroupeEnchasseCorrige) {
-        super(gec.mots_pos);
+export class SyntagmeEleve extends Syntagme {
+    /* Cette classe
+     * contient la phrase sélectionnée par l'utilisateur,
+     * ainsi que toutes les fonctions de la phrase trouvées
+     * par l'utilisateur.
+     * Elle contient en outre la correction.
+     */
+    constructor(phrase: string, private _corrige: SyntagmeCorrige) {
+        super(phrase, _corrige.mots_pos);
+        this._corrige = _corrige;
     }
 
-    cree_groupe_enchasse_eleve(corrige: GroupeEnchasseCorrige, f: Fonction, numero:number): GroupeEnchasseEleve { 
-        // double de PhraseEleve
-        const n = new GroupeEnchasseEleve(corrige);
+    cree_groupe_enchasse_eleve(corrige: SyntagmeCorrige, f: Fonction, numero:number): SyntagmeEleve { 
+        const n = new SyntagmeEleve(this.contenu, corrige);
         this._groupes_enchasses.set([f,numero], n);
         return n;
     }
 
-    get corrige (): GroupeEnchasseCorrige {
-        return this.gec;
+    get corrige (): SyntagmeCorrige {
+        return this._corrige;
     }
 
     est_complet(f: Fonction): boolean { // TODO
@@ -684,6 +534,7 @@ export class GroupeEnchasseEleve extends GroupeEnchasse {
         }
         return true;
     }
+
     declare(f: Fonction, elt: MotsPos, n:number = -1): boolean { // TEST
         /* Enregistre une fonction pour cette phrase.
          * Vrai si elt a bien cette fonction
@@ -691,7 +542,7 @@ export class GroupeEnchasseEleve extends GroupeEnchasse {
          * Si la fonction est multiple, renvoie false
          * si la fonction a déjà été déclarée
          */
-        if (SyntagmeAbstrait.Fonctions_multiples.includes(f) && f in this._fonctions_multiples) {
+        if (Syntagme.Fonctions_multiples.includes(f) && f in this._fonctions_multiples) {
             if (this._fonctions_multiples[f].filter(e => compare(e, elt)).length !== 0) {
                 return false;
             }
@@ -700,87 +551,18 @@ export class GroupeEnchasseEleve extends GroupeEnchasse {
         return this.corrige.estFonction(f, elt);
     }
 
-}
-
-export class PhraseEleve extends Phrase {
-    /* Cette classe
-     * contient la phrase sélectionnée par l'utilisateur,
-     * ainsi que toutes les fonctions de la phrase trouvées
-     * par l'utilisateur.
-     * Elle contient en outre la correction.
-     */
-
-    constructor(phrase: string, private _corrige: PhraseCorrigee) {
-        super(phrase);
-        this._corrige = _corrige;
-    }
-
-    get corrige (): PhraseCorrigee {
-        return this._corrige;
-    }
-
-    cree_groupe_enchasse_eleve (corrige: GroupeEnchasseCorrige, f: Fonction, numero:number): GroupeEnchasseEleve {  // TEST 
-        const n = new GroupeEnchasseEleve(corrige);
-        this._groupes_enchasses.set([f,numero], n);
-        return n;
-    }
-
-    declare(f: Fonction, elt: MotsPos, n:number = -1): boolean { // TEST
-        /* Enregistre une fonction pour cette phrase.
-         * Vrai si elt a bien cette fonction
-         * d'après le corrigé
-         * Si la fonction est multiple, renvoie false
-         * si la fonction a déjà été déclarée
-         */
-        if (SyntagmeAbstrait.Fonctions_multiples.includes(f) && f in this._fonctions_multiples) {
-            if (this._fonctions_multiples[f].filter(e => compare(e, elt)).length !== 0) {
-                return false;
-            }
-        }
-        this.declareFonction(f, elt, n);
-        return this._corrige.estFonction(f, elt);
-    }
-
-    est_complet(f: Fonction): boolean { // TODO
-        /* vrai si f, qui est une fonction multiple,
-         * correspond exactement au corrigé
-         */
-        // TODO ajouter un assert pour les fonctions multiples ?
-
-        const corrige_nombre = this._corrige.fonctions_multiples_nombre(f);
-        if (corrige_nombre !== this.fonctions_multiples_nombre(f)) {
-            return false;
-        }
-
-        const fp = this._fonctions_multiples[f];
-
-        for (let i = 0; i < corrige_nombre; i++) {
-            const mp = this._corrige.fonctionPos(f,i);
-            const r = fp.filter(e => compare(e, mp)).length;
-            if (r === 0) {
-                return false;
-            }
-        }
-        return true;
-    }
-
 
 }
 
-interface PhraseJSON {
+interface SyntagmeJSON {
     phrase: string;
+    _mots_pos: MotsPos;
     _fonctions_uniques: { [id: string] : MotsPos|undefined};
     _fonctions_multiples?: { [id: string] : MultiMotsPos|undefined};
-    _groupes_enchasses?: Map<[Fonction, number], GroupeEnchasse>;
+    _groupes_enchasses?: Map<[Fonction, number], Syntagme>;
     verbes: MotsPos;
 }
 
-interface GroupeEnchasseJSON {
-    _contenu: MotsPos;
-    _fonctions_uniques?: { [id: string] : MotsPos|undefined};
-    _fonctions_multiples?: { [id: string] : MultiMotsPos|undefined};
-    _groupes_enchasses?: Map<[Fonction, number], GroupeEnchasse>;
-}
 
 // TODO probablement à déplacer
 
