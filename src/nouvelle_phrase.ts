@@ -1,5 +1,5 @@
 import { affiche_phrase, dispose } from './affichage_phrase';
-import { GroupeEnchasse, Fonction, MotsPos, Phrase, PhraseCorrigee, PhraseEleve } from './phrase';
+import { Syntagme, Fonction, MotsPos, SyntagmeCorrige, SyntagmeEleve } from './phrase';
 import { assert, byID, non_null } from './util';
 import { fonctions_communes } from './fonctions_partagees';
 import './nouvelle_phrase.css';
@@ -40,7 +40,7 @@ class FonctionTracee {
     constructor(public nom_de_base: string,
                 public fonction: Fonction,
                 public html_node: HTMLElement,
-                public syntagme: Phrase | GroupeEnchasse,
+                public syntagme: Syntagme,
                 public numero: number = -1,
                 public parent?: FonctionTracee) {
         this.est_multiple = numero > -1;
@@ -72,7 +72,7 @@ class FonctionTracee {
 
 export class CreateurPhrase {
 
-    private _phrase: PhraseEleve;
+    private _phrase: SyntagmeEleve;
     private _traceur: FonctionTracee[] = [];
     private _pos: number = 0;
     private _selecteur: HTMLElement = byID("nouvelle_phrase-fonctions-selection") as HTMLElement;
@@ -110,7 +110,7 @@ export class CreateurPhrase {
     }
 
     constructor(texte: string) {
-        this._phrase = new PhraseEleve(texte, new PhraseCorrigee(texte));
+        this._phrase = new SyntagmeEleve(texte, new SyntagmeCorrige(texte));
         this._selecteur.innerHTML = ''; // réinitialisation du sélecteur
         Object.entries(CreateurPhrase.liste_des_fonctions_niveau_1).forEach(
             elt => this.ajouter_fonction_tracee(this._traceur.length, elt[0], elt[1])
@@ -179,11 +179,11 @@ export class CreateurPhrase {
     }
         
 
-    ajouter_fonction_tracee(pos: number, nom: string, fonction: Fonction, syntagme: Phrase|GroupeEnchasse = this._phrase, numero:number = -1, parent?: FonctionTracee) {
+    ajouter_fonction_tracee(pos: number, nom: string, fonction: Fonction, syntagme: Syntagme = this._phrase, numero:number = -1, parent?: FonctionTracee) {
         /* Ajouter une fonction dans le traceur et dans le selecteur
          * pos correspond à l'emplacement dans la liste
          */
-        if (PhraseEleve.Fonctions_multiples.includes(fonction) && numero === -1) {
+        if (SyntagmeEleve.Fonctions_multiples.includes(fonction) && numero === -1) {
             numero = 0;
         }
         assert(pos <= this._traceur.length,`${pos} est plus grand que la longueur du traceur`);
@@ -226,7 +226,7 @@ export class CreateurPhrase {
         /* Crée un groupe enchâssé si b est vrai
          * détruit un groupe enchâssé si b est faux
          */
-        if (!PhraseEleve.Fonctions_contenants.includes(this.fonction_courante.fonction)) {
+        if (!SyntagmeEleve.Fonctions_contenants.includes(this.fonction_courante.fonction)) {
             return;
         }
         if (!b) {

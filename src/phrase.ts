@@ -36,7 +36,7 @@ type MultiMotsPos = MotsPos[];
 export type FonctionEnchassee = [ Fonction, number, number];
 
 
-class Syntagme {
+export class Syntagme {
     // id ne peut être qu'une valeur de type Fonction, mais TS ne veut pas que je mette autre chose qu'une string...
     // Pour être sûr qu'il s'agisse bien du type Fonction, des accesseurs sont en place.
     private _phrase_cassee: string[] = [];
@@ -418,7 +418,7 @@ export class SyntagmeCorrige extends Syntagme {
      * d'une phrase.
      */
 
-    constructor(phrase: string, mots_pos: MotsPos) {
+    constructor(phrase: string, mots_pos: MotsPos = []) {
         super(phrase, mots_pos);
     }
 
@@ -555,12 +555,12 @@ export class SyntagmeEleve extends Syntagme {
 }
 
 interface SyntagmeJSON {
-    phrase: string;
-    _mots_pos: MotsPos;
+    phrase?: string;
+    _mots_pos?: MotsPos;
+    verbes?: MotsPos;
     _fonctions_uniques: { [id: string] : MotsPos|undefined};
     _fonctions_multiples?: { [id: string] : MultiMotsPos|undefined};
     _groupes_enchasses?: Map<[Fonction, number], Syntagme>;
-    verbes: MotsPos;
 }
 
 

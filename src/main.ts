@@ -5,22 +5,22 @@ import { anime_disparition_modal, byID, cree_html_element, non_null } from './ut
 import { affiche_phrase, dispose } from './affichage_phrase';
 import { add_events_listener, nouvelle_phrase, retirer_elements_nouvelle_phrase } from './nouvelle_phrase';
 import { charge_phrases } from './charge_phrases';
-import { Fonction, GroupeEnchasseCorrige, GroupeEnchasseEleve, PhraseCorrigee, PhraseEleve } from './phrase';
+import { Fonction, SyntagmeCorrige, SyntagmeEleve } from './phrase';
 import { fonctions_communes } from './fonctions_partagees';
 import { manipulation_sujet } from './manipulation';
 import consignes from './consignes.json';
 
-function analyse_phrase(phrase_corrigee: PhraseCorrigee): void {
-    let phrase_eleve = new PhraseEleve(phrase_corrigee.contenu, phrase_corrigee);
+function analyse_phrase(phrase_corrigee: SyntagmeCorrige): void {
+    let phrase_eleve = new SyntagmeEleve(phrase_corrigee.contenu, phrase_corrigee);
 
     analyse_fonction_requise(0, phrase_eleve, phrase_eleve, []);
 
 }
 
-function analyse_fonction_requise(etape: number, syntagme_eleve: PhraseEleve|GroupeEnchasseEleve, phrase_eleve: PhraseEleve, groupes_enchasses_gen:Generator<[[Fonction, number], GroupeEnchasseCorrige], void, unknown>[], fm_index = -1): void {
+function analyse_fonction_requise(etape: number, syntagme_eleve: SyntagmeEleve|SyntagmeEleve, phrase_eleve: SyntagmeEleve, groupes_enchasses_gen:Generator<[[Fonction, number], SyntagmeCorrige], void, unknown>[], fm_index = -1): void {
     const fonction: Fonction = consignes[etape][0] as Fonction;
 
-    if (PhraseEleve.Fonctions_multiples.includes(fonction) && fm_index === -1) {
+    if (SyntagmeEleve.Fonctions_multiples.includes(fonction) && fm_index === -1) {
         fm_index = 0;
     }
 
@@ -42,7 +42,7 @@ function analyse_fonction_requise(etape: number, syntagme_eleve: PhraseEleve|Gro
             }
             return analyse_finie();
         } else {
-            const j = PhraseEleve.Fonctions_multiples.includes(fonction) && !syntagme_eleve.est_complet(fonction) ? 0 : 1;
+            const j = SyntagmeEleve.Fonctions_multiples.includes(fonction) && !syntagme_eleve.est_complet(fonction) ? 0 : 1;
             fm_index = j === 0 ? fm_index + 1 : -1;
             return analyse_fonction_requise(etape + j, syntagme_eleve, phrase_eleve, groupes_enchasses_gen, fm_index);
         }
@@ -60,6 +60,16 @@ function analyse_fonction_requise(etape: number, syntagme_eleve: PhraseEleve|Gro
         const mots_selectionnes = Array.from(document.getElementsByClassName("phrase-selectionne"))
                               .map(elt => Number(elt.id.split('-')[2]));
 
+        const recommence_analyse = () => {
+            analyse_fonction_requise(etape, syntagme_eleve, phrase_eleve, groupes_enchasses_gen, fm_index);
+            // préselection des mots précédemment choisis
+            Array.from(document.getElementsByClassName("phrase-cliquable"))
+                .forEach( elt => {
+                    if (mots_selectionnes.includes(Number(elt.id.split('-')[2]))) {
+                        elt.classList.add("phrase-selectionne");
+                    }
+                });
+        };
         const suite_validation = () => {
             let reponse_correcte = (mots_selectionnes.length === 0) ? 
                 !syntagme_eleve.corrige.aFonction(fonction) :
@@ -69,16 +79,8 @@ function analyse_fonction_requise(etape: number, syntagme_eleve: PhraseEleve|Gro
                 modal_message.classList.add("modal-message-erreur");
                 // TODO on pourrait peut-être être plus précis et dire s'il manque des mots, par exemple, ou si tous les mots sont faux
                 definit_message_modal("Il y a une erreur dans ton analyse !", "Reprendre l'analyse", () => {
-                    analyse_fonction_requise(etape, syntagme_eleve, phrase_eleve, groupes_enchasses_gen, fm_index);
                     modal_message.classList.remove("modal-message-erreur");
-                    // préselection des mots précédemment choisis
-                    Array.from(document.getElementsByClassName("phrase-cliquable"))
-                        .forEach( elt => {
-                            if (mots_selectionnes.includes(Number(elt.id.split('-')[2]))) {
-                                elt.classList.add("phrase-selectionne");
-                            }
-                        });
-                });
+                    recommence_analyse;});
             } else {
                 analyse_suivante();
             }
@@ -97,7 +99,7 @@ function analyse_fonction_requise(etape: number, syntagme_eleve: PhraseEleve|Gro
                     annuler();
                 }, {once: true});
             });
-            promesse_manipulation.then(suite_validation, () => console.log("echec"));
+            promesse_manipulation.then(suite_validation, recommence_analyse);
         } else {
             suite_validation();
         }
@@ -275,7 +277,7 @@ function  charge_fichier (files: FileList) {
         }
 
         try {
-            analyse_phrase(PhraseCorrigee.fromJSON(json_contenu));
+            analyse_phrase(SyntagmeCorrige.fromJSON(json_contenu));
         } catch (e) {
             console.log(e);
             disparition_modal();
