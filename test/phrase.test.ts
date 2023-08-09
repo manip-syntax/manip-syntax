@@ -317,5 +317,20 @@ describe('Syntagme class tests', () => {
       expect(g.est_attributif).toBe(true);
 
   });
+
+  test("Mots offset et texte_pos fonctionnent correctement", () => {
+      let s = new Syntagme("Le chat, noir et blanc, mange dans la cuisine : il ronronne.");
+      expect(s._remplit_mots_offset()).toEqual([
+      [ 0, 2 ],   [ 3, 7 ],
+      [ 9, 13 ],  [ 14, 16 ],
+      [ 17, 22 ], [ 24, 29 ],
+      [ 30, 34 ], [ 35, 37 ],
+      [ 38, 45 ], [ 46, 47 ],
+      [ 48, 50 ], [ 51, 59 ]
+    ]);
+    expect(s.texte_pos([0,1])).toEqual("Le chat");
+    expect(s.texte_pos([0,1,2,3,4])).toEqual("Le chat, noir et blanc");
+    expect(s.texte_pos([0,1,5])).toEqual("Le chat mange");
+  });
 });
 

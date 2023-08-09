@@ -42,7 +42,7 @@ export class Syntagme {
     private _phrase_cassee: string[] = [];
 
     protected verbes: MotsPos = [];
-    protected _mots_offset : Map<number, number> = new Map();
+    protected _mots_offset : number[][] = [];
     
     protected _fonctions_uniques: { [id: string] : MotsPos } = {};
     protected _fonctions_multiples: { [id: string] : MultiMotsPos } = {};
@@ -58,6 +58,7 @@ export class Syntagme {
         this.phrase = phrase;
         this._casseSyntagme();
         this._mots_pos = compare(_mots_pos, []) ? [...Array(this._phrase_cassee.length).keys()] : _mots_pos;
+        this._remplit_mots_offset();
     }
 
     get contenu(): string {
@@ -79,12 +80,52 @@ export class Syntagme {
         this.phrase = phrase;
     }
 
-    _remplit_mots_offset() {
-        let courant = [0, 0];
-        for (let i=0; i<this.phrase.length; i++) {
-            const c = this.phrase[i];
+    _remplit_mots_offset() {  // TEST
+        // TODO améliorer la précision: on pourrait attacher certains signes au mot qui précède (comme ,;) ou qui suit ("[, etc)
+        let regex = new RegExp(Syntagme.Separateur,"g");
+        const indices = [];
+        let dernier_index = 0;
+        let match;
+        while ((match = regex.exec(this.contenu)) !== null) {
+            if (match.index > dernier_index) {
+                 indices.push([dernier_index, match.index]);
+            }
+            dernier_index = match.index + match[0].length;
         }
+        if (dernier_index < this.contenu.length) {
+            indices.push([dernier_index, this.contenu.length]);
+        }
+        this._mots_offset = indices;
+        return indices;
     }
+
+    texte_pos(mots: MotsPos): string { // TEST
+        /* Renvoie le contenu (signes de ponctuation compris)
+         * correspondant aux mots
+         */
+        let res = "";
+        for (let i=0, debut=0, fin=0, precedent=-1; i<this._mots_offset.length; i++) {
+            if (mots.includes(i)) {
+                if (precedent === (i-1)) {
+                    fin = this._mots_offset[i][1];
+                    if (i === this._mots_offset.length -1) {
+                        res += this.contenu.slice(debut, fin);
+                    }
+                } else {
+                    [debut, fin] = this._mots_offset[i];
+                    res += " ";
+                }
+                precedent = i;
+            } else {
+                if (fin > 0 && precedent === i-1) {
+                    res += this.contenu.slice(debut, fin);
+                }
+            }
+        }
+        return res;
+    }
+
+
     
     get phraseCassee(): string[] { // TEST
         return this._phrase_cassee;
@@ -100,8 +141,6 @@ export class Syntagme {
     static get separateur(): RegExp {
         return this._separateur;
     }
-
-
 
     _fonction_enchassee = (f: Fonction, m: MotsPos) => {
         return [f, m[0], m.slice(-1)[0]] as FonctionEnchassee;
@@ -394,14 +433,6 @@ export class Syntagme {
         return true;
     }
 
-    texte_pos(mots: MotsPos): string {
-        /* Renvoie le contenu (signes de ponctuation compris)
-         * correspondant aux mots
-         */
-        console.log("error", mots);
-        return "stirng";
-    }
-
     private _casseSyntagme() { // TEST
         /* Casse la phrase en mots en utilisant _separateur
          * pour séparer les mots
@@ -551,7 +582,6 @@ export class SyntagmeEleve extends Syntagme {
         return this.corrige.estFonction(f, elt);
     }
 
-
 }
 
 interface SyntagmeJSON {
@@ -563,11 +593,8 @@ interface SyntagmeJSON {
     _groupes_enchasses?: Map<[Fonction, number], Syntagme>;
 }
 
-
 // TODO probablement à déplacer
-
 interface ManipulationSujet {
     est_anime: boolean;
     pronominalisation: string | null;
 }
-
