@@ -28,15 +28,6 @@
         "Balise textuelle" : "balise_textuelle"
 	},
 
-	"groupe_verbal" : {
-        "Verbe noyau" : "verbe_noyau",
-        "COD" : "cod",
-        "COI" : "coi",
-        "Attribut du sujet" : "attribut_du_sujet",
-        "Attribut du COD" : "attribut_du_cod",
-        "Complément du verbe impersonnel" : "complement_du_verbe_impersonnel"
-	},
-
 	"cod" : {
 	"Épithète" : "epithete",
         "Complément du nom" : "complement_du_nom",

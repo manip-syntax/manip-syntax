@@ -76,12 +76,18 @@ export class CreateurPhrase {
     private _traceur: FonctionTracee[] = [];
     private _pos: number = 0;
     private _selecteur: HTMLElement = byID("nouvelle_phrase-fonctions-selection") as HTMLElement;
-    static liste_des_fonctions_niveau_1: { [nom: string] : Fonction } = {
+    static liste_des_fonctions: { [nom: string] : Fonction } = {
         "Indépendante" : "independante",
-        "Sujet" : "sujet",
         "Verbes" : "verbes",
-        "Groupe verbal" : "groupe_verbal",
+        "Verbe noyau" : "verbe_noyau",
+        "Sujet" : "sujet",
+        "COD" : "cod",
+        "COI" : "coi",
+        "Attribut du sujet" : "attribut_du_sujet",
+        "Attribut du COD" : "attribut_du_cod",
+        "Complément du verbe impersonnel" : "complement_du_verbe_impersonnel",
         "Complément d'agent" : "complement_d_agent",
+        "Groupe verbal" : "groupe_verbal",
         "Complément circonstanciel" : "complement_circonstanciel",
         "Modalisateur" : "modalisateur",
         "Fonction auto-énonciative" : "auto-enonciative",
@@ -91,14 +97,7 @@ export class CreateurPhrase {
         "Épithète" : "epithete",
         "Complément du nom" : "complement_du_nom",
         "Complément du pronom": "complement_du_pronom",
-        "Apposition" : "apposition"
-    };
-    static liste_des_fonctions_niveau_2: { [nom: string] : Fonction } = {
-        "COD" : "cod",
-        "COI" : "coi",
-        "Attribut du sujet" : "attribut_du_sujet",
-        "Attribut du COD" : "attribut_du_cod",
-        "Complément du verbe impersonnel" : "complement_du_verbe_impersonnel",
+        "Apposition" : "apposition",
         "Complément de l'adjectif": "complement_de_l_adjectif"
     };
 
@@ -112,7 +111,7 @@ export class CreateurPhrase {
     constructor(texte: string) {
         this._phrase = new SyntagmeEleve(texte, new SyntagmeCorrige(texte));
         this._selecteur.innerHTML = ''; // réinitialisation du sélecteur
-        Object.entries(CreateurPhrase.liste_des_fonctions_niveau_1).forEach(
+        Object.entries(CreateurPhrase.liste_des_fonctions).forEach(
             elt => this.ajouter_fonction_tracee(this._traceur.length, elt[0], elt[1])
         );
         this._selecteur.style.display = 'block';
@@ -299,7 +298,24 @@ export class CreateurPhrase {
         }
         const fonction = this.fonction_courante.fonction;
         const syntagme = this.fonction_courante.syntagme;
-        byID("phrase-analyse-paragraphe").innerHTML = affiche_phrase(this._phrase, syntagme.mots_sans_fonction);
+        const a_inclure = () => { // TODO à vérifier
+            const compatibilite : { [id: string] : string[]} = {
+                groupe_verbal: "verbes verbe_noyau cod coi attribut_du_sujet attribut_du_cod complement_du_verbe_impersonnel".split(" "),
+                verbes: "verbe_noyau groupe_verbal".split(" "),
+                verbe_noyau: "verbes groupe_verbal".split(" "),
+                cod: ["groupe_verbal", "verbes"],
+                coi: ["groupe_verbal","verbes"],
+                attribut_du_sujet: ["groupe_verbal", "verbes"],
+                attribut_du_cod: ["groupe_verbal", "verbes"],
+                complement_du_verbe_impersonnel: ["groupe_verbal", "verbes"]
+            };
+            if (fonction in compatibilite) {
+                return compatibilite[fonction].map(elt => syntagme.fonctionPos(elt as Fonction)).flat().concat(syntagme.mots_sans_fonction);
+            } else {
+                return syntagme.mots_sans_fonction;
+            }
+        };
+        byID("phrase-analyse-paragraphe").innerHTML = affiche_phrase(this._phrase, a_inclure());
         dispose(byID("phrase-analyse-paragraphe"));
         byID("consigne-container").innerHTML = `À renseigner : ${this.fonction_courante.arbre_genealogique}`;
 

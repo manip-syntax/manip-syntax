@@ -88,7 +88,7 @@ function analyse_fonction_requise(etape: number, syntagme_eleve: SyntagmeEleve|S
 
         if (fonction === "sujet") {
             const promesse_manipulation = new Promise<void>( (valider, annuler) => {
-                manipulation_sujet(syntagme_eleve, phrase_eleve);
+                manipulation_sujet(syntagme_eleve, mots_selectionnes);
                 byID("manipulations-form").addEventListener("submit", e => {
                     byID("modal-manipulations").style.display = "none";
                     e.preventDefault();

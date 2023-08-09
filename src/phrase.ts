@@ -52,7 +52,8 @@ export class Syntagme {
     public static Separateur = "[ ,;?!.'-]";
     private static _separateur = new RegExp(Syntagme.Separateur);
     public static Fonctions_multiples: Fonction[] = ["independante","complement_circonstanciel", "modalisateur","auto-enonciative","connecteur","balise_textuelle","epithete","complement_du_nom","complement_du_pronom","complement_de_l_adjectif","apposition"];
-    public static Fonctions_contenants: Fonction[] = ["independante","sujet","cod","coi","attribut_du_sujet","attribut_du_cod","complement_circonstanciel","complement_du_verbe_impersonnel","complement_du_nom","complement_du_pronom","epithete","apposition","complement_de_l_adjectif","groupe_verbal"];
+    public static Fonctions_contenants: Fonction[] = ["independante","sujet","cod","coi","attribut_du_sujet","attribut_du_cod","complement_circonstanciel","complement_du_verbe_impersonnel","complement_du_nom","complement_du_pronom","epithete","apposition","complement_de_l_adjectif"];
+    // on ne met pas le groupe verbal dans cette liste pour des raisons pratiques en rapport  avec la logique de l'analyse
 
     constructor(protected phrase: string, protected _mots_pos: MotsPos = []) {
         this.phrase = phrase;
@@ -125,6 +126,9 @@ export class Syntagme {
         return res;
     }
 
+    fonction_texte_pos(f: Fonction, numero_de_fonction: number = -1): string {
+        return this.texte_pos(this.fonctionPos(f, numero_de_fonction));
+    }
 
     
     get phraseCassee(): string[] { // TEST
@@ -174,6 +178,11 @@ export class Syntagme {
 
     ajoute_infos_de_manipulation(f: Fonction, infos: ManipulationSujet) {
         this._manipulations[f] = infos;
+    }
+
+    infos_de_manipulation(f: Fonction) {
+        assert(f in this._manipulations, `${f} n'est pas enregistré dans les données de manipulation`);
+        return this._manipulations[f];
     }
 
     get est_attributif(): boolean { // TEST
@@ -252,7 +261,7 @@ export class Syntagme {
     }
 
     // http://choly.ca/post/typescript-json/#comment-2579491209
-    toJSON(): SyntagmeJSON {  // TODO TEST À FAIRE
+    toJSON(): SyntagmeJSON {  // TODO TEST À FAIRE -> ne fonctionne pas, tout est copié
         // une copie pour garder le strict nécessaire: les données
         const copie = this.copie;
         let copie_obj = Object.assign(copie);
