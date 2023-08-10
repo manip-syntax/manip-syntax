@@ -234,7 +234,7 @@ export class Syntagme {
         return f in m ? m[f].length : 0;
     }
 
-     get copie(): Syntagme { // TEST TODO test à faire
+     get copie(): Syntagme { // TEST TODO test à faire; IL faut supprimer vraiment l'inutile car ça crée une erreur en chargeant les phrases
         let copie = new Syntagme(this.contenu, this._mots_pos);
         Object.entries(this._fonctions_uniques)
             .forEach( ([n,f,]) => {
@@ -599,7 +599,8 @@ interface SyntagmeJSON {
     verbes?: MotsPos;
     _fonctions_uniques: { [id: string] : MotsPos|undefined};
     _fonctions_multiples?: { [id: string] : MultiMotsPos|undefined};
-    _groupes_enchasses?: Map<[Fonction, number], Syntagme>;
+    _groupes_enchasses?: Map<[string, number], Syntagme>;
+    _manipulations?: { [id: string] : ManipulationSujet };
 }
 
 // TODO probablement à déplacer

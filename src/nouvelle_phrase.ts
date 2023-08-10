@@ -387,8 +387,8 @@ export class CreateurPhrase {
             const mots_selectionnes = Array.from(document.getElementsByClassName("phrase-selectionne"))
                 .map(elt => elt.innerHTML).join(" ");
             const pronoms = "je tu il elle nous vous ils elles".split(" ");
-            const pronoms_html = pronoms.includes(mots_selectionnes) ? 
-                '<input type="hidden" id="pronom-inutile" name="sujet-pronoms" value="null">'
+            const pronoms_html = pronoms.includes(mots_selectionnes.toLowerCase()) ? 
+                '<input type="hidden" id="pronom-inutile" name="sujet-pronoms" value="null" checked="true">'
                 : '<fieldset class="ajout-manipulations-cadre"><legend class="ajout-manipulations-cadre-titre">Par quoi le sujet peut-il être pronominalisé ?</legend>' +
                     pronoms.map(elt => `<label class="ajout-manipulations-label" for="pronom-${elt}">${elt}` +
                                 `<input type="radio" class="pronoms" id="pronom-${elt}" name="sujet-pronoms" value="${elt}" required><span class="ajout-manipulations-radio"></span></label class="ajout-manipulations-label">` 

@@ -1,65 +1,7 @@
 [
-    {
-        "phrase":"Le chat mange la souris.",
-        "verbes":[2],
-        "_fonctions_uniques":{
-            "verbe_noyau":[2],
-            "sujet":[0,1],
-            "cod":[3,4],
-            "groupe_verbal": [2,3,4]
-        }
-    },
-    {
-        "phrase":"Marie donne du lait au chat.",
-        "verbes":[1],
-        "_fonctions_uniques":{
-            "verbe_noyau":[1],
-            "sujet":[0],
-            "cod":[2,3],
-            "coi":[4,5],
-            "groupe_verbal":[1,2,3,4,5]
-        }
-    },
-    {
-        "phrase":"Un véritable amant ne connaît point d'amis.",
-        "verbes":[4],
-        "_fonctions_uniques":{
-            "verbe_noyau":[4],
-            "sujet":[0,1,2],
-            "coi":[6,7],
-            "groupe_verbal":[3, 4, 5, 6, 7]
-        }
-    },
-    {
-        "phrase":"L'amour rend tout permis.",
-        "verbes":[2],
-        "_fonctions_uniques":{
-            "verbe_noyau":[2],
-            "sujet":[0,1],
-            "cod":[3],
-            "attribut_du_cod":[4],
-            "groupe_verbal" : [2,3,4]
-        }
-    },
-    {
-        "phrase":"Vous êtes son rival ?",
-        "verbes":[1],
-        "_fonctions_uniques":{
-            "verbe_noyau":[1],
-            "sujet":[0],
-            "attribut_du_sujet":[2,3],
-            "groupe_verbal":[1,2,3]
-        }
-    },
-    {
-        "phrase":"Il est adoré d'elle.",
-        "verbes":[1,2],
-        "_fonctions_uniques":{
-            "verbe_noyau":[1,2],
-            "sujet":[0],
-            "complément_d_agent":[3,4],
-            "groupe_verbal":[1,2,3,4]
-        }
-    }
-
+    {"_phrase_cassee":["L","amour","rend","tout","permis"],"verbes":[2],"_mots_offset":[[0,1],[2,7],[8,12],[13,17],[18,24]],"_fonctions_uniques":{"verbe_noyau":[2],"sujet":[0,1],"cod":[3],"attribut_du_cod":[4],"groupe_verbal":[2,3,4]},"_fonctions_multiples":{},"_groupes_enchasses":[],"_manipulations":{"sujet":{"est_anime":false,"pronominalisation":"il"}},"phrase":"L'amour rend tout permis.","_mots_pos":[0,1,2,3,4]}, 
+{"_phrase_cassee":["Le","petit","chat","de","ma","voisine","mange","ses","croquettes"],"verbes":[6],"_mots_offset":[[0,2],[3,8],[9,13],[14,16],[17,19],[20,27],[28,33],[34,37],[38,48]],"_fonctions_uniques":{"verbe_noyau":[6],"sujet":[0,1,2,3,4,5],"cod":[7,8],"groupe_verbal":[6,7,8]},"_fonctions_multiples":{},"_groupes_enchasses":[[["sujet",-1],{"_phrase_cassee":["Le","petit","chat","de","ma","voisine","mange","ses","croquettes"],"verbes":[],"_mots_offset":[[0,2],[3,8],[9,13],[14,16],[17,19],[20,27],[28,33],[34,37],[38,48]],"_fonctions_uniques":{"noyau":[2]},"_fonctions_multiples":{"epithete":[[1]],"complement_du_nom":[[3,4,5]]},"_groupes_enchasses":[],"_manipulations":{},"phrase":"Le petit chat de ma voisine mange ses croquettes.","_mots_pos":[0,1,2,3,4,5]}]],"_manipulations":{"sujet":{"est_anime":true,"pronominalisation":"il"}},"phrase":"Le petit chat de ma voisine mange ses croquettes.","_mots_pos":[0,1,2,3,4,5,6,7,8]}, 
+{"_phrase_cassee":["Marie","donne","du","lait","au","chat"],"verbes":[1],"_mots_offset":[[0,5],[6,11],[12,14],[15,19],[20,22],[23,27]],"_fonctions_uniques":{"verbe_noyau":[1],"sujet":[0],"cod":[2,3],"coi":[4,5],"groupe_verbal":[1,2,3,4,5]},"_fonctions_multiples":{},"_groupes_enchasses":[],"_manipulations":{"sujet":{"est_anime":true,"pronominalisation":"elle"}},"phrase":"Marie donne du lait au chat.","_mots_pos":[0,1,2,3,4,5]}, 
+{"_phrase_cassee":["Un","véritable","amant","ne","connaît","point","d","ami"],"verbes":[4],"_mots_offset":[[0,2],[3,12],[13,18],[19,21],[22,29],[30,35],[36,37],[38,41]],"_fonctions_uniques":{"verbe_noyau":[4],"sujet":[0,1,2],"coi":[6,7],"groupe_verbal":[3,4,5,6,7]},"_fonctions_multiples":{},"_groupes_enchasses":[[["sujet",-1],{"_phrase_cassee":["Un","véritable","amant","ne","connaît","point","d","ami"],"verbes":[],"_mots_offset":[[0,2],[3,12],[13,18],[19,21],[22,29],[30,35],[36,37],[38,41]],"_fonctions_uniques":{"noyau":[2]},"_fonctions_multiples":{"epithete":[[1]]},"_groupes_enchasses":[],"_manipulations":{},"phrase":"Un véritable amant ne connaît point d'ami.","_mots_pos":[0,1,2]}]],"_manipulations":{"sujet":{"est_anime":true,"pronominalisation":"il"}},"phrase":"Un véritable amant ne connaît point d'ami.","_mots_pos":[0,1,2,3,4,5,6,7]}, 
+{"_phrase_cassee":["Vous","êtes","son","rival"],"verbes":[1],"_mots_offset":[[0,4],[5,9],[10,13],[14,19]],"_fonctions_uniques":{"verbe_noyau":[1],"sujet":[0],"attribut_du_sujet":[2,3],"groupe_verbal":[1,2,3]},"_fonctions_multiples":{},"_groupes_enchasses":[],"_manipulations":{"sujet":{"est_anime":true,"pronominalisation":null}},"phrase":"Vous êtes son rival ?","_mots_pos":[0,1,2,3]}
 ]
