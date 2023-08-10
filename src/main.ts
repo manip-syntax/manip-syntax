@@ -59,6 +59,9 @@ function analyse_fonction_requise(etape: number, syntagme_eleve: SyntagmeEleve|S
     fonctions_communes.fonction_de_validation = () => {
         const mots_selectionnes = Array.from(document.getElementsByClassName("phrase-selectionne"))
                               .map(elt => Number(elt.id.split('-')[2]));
+        if (mots_selectionnes.length === 0) {
+            return;
+        }
 
         const recommence_analyse = () => {
             analyse_fonction_requise(etape, syntagme_eleve, phrase_eleve, groupes_enchasses_gen, fm_index);

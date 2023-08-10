@@ -389,16 +389,18 @@ export class CreateurPhrase {
             const pronoms = "je tu il elle nous vous ils elles".split(" ");
             const pronoms_html = pronoms.includes(mots_selectionnes) ? 
                 '<input type="hidden" id="pronom-inutile" name="sujet-pronoms" value="null">'
-                : '<fieldset><legend>Par quoi le sujet peut-il être pronominalisé ?</legend>' +
-                    pronoms.map(elt => `<input type="radio" class="pronoms" id="pronom-${elt}" name="sujet-pronoms" value="${elt}" required>` +
-                                      `<label for="pronom-${elt}">${elt}</label>`)
-                .join(" ") +
+                : '<fieldset class="ajout-manipulations-cadre"><legend class="ajout-manipulations-cadre-titre">Par quoi le sujet peut-il être pronominalisé ?</legend>' +
+                    pronoms.map(elt => `<label class="ajout-manipulations-label" for="pronom-${elt}">${elt}` +
+                                `<input type="radio" class="pronoms" id="pronom-${elt}" name="sujet-pronoms" value="${elt}" required><span class="ajout-manipulations-radio"></span></label class="ajout-manipulations-label">` 
+                               ).join(" ") +
                 '</fieldset>';
             byID("modal-ajout-manipulations-titre").innerHTML = `Renseignements nécessaires à la manipulation du sujet : ${mots_selectionnes}`;
-            byID("ajout-manipulations-form-contenu").innerHTML = '<input type="radio" id="est-anime" value="true" name="sujet-anime" required>' +
-                '<label for="est-anime">Le référent du sujet est animé.</label>' +
-                '<input type="radio" id="est-non-anime" value="false" name="sujet-anime" required>' +
-                '<label for="est-non-anime">Le référent du sujet est non animé.</label>' +
+            byID("ajout-manipulations-form-contenu").innerHTML = '<fieldset class="ajout-manipulations-cadre"><legend class="ajout-manipulations-cadre-titre">Animé ou non-animé ?</legend>' +
+                '<label class="ajout-manipulations-label" for="est-anime">Le référent du sujet est animé.' +
+                '<input type="radio" id="est-anime" value="true" name="sujet-anime" required><span class="ajout-manipulations-radio"></span></label class="ajout-manipulations-label">' +
+                '<label class="ajout-manipulations-label" for="est-non-anime">Le référent du sujet est non animé.' +
+                '<input type="radio" id="est-non-anime" value="false" name="sujet-anime" required><span class="ajout-manipulations-radio"></span></label class="ajout-manipulations-label">' +
+                '</fieldset>' +
                 pronoms_html;
             let fonction_courante = this.fonction_courante; // ce n'est pas inutile: au moment où on va appeler fonction_du_bouton_des_ajouts_de_manipulations, ce ne sera plus la fonction courante
 

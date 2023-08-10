@@ -1,0 +1,156 @@
+#manipulable {
+    font-size: 40px;
+    border-style: dashed;
+    border-color: red;
+    border-width: 5px;
+    display: inline-block;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+.manipulable-deplace {
+    border-style: dashed;
+    border-color: red;
+    color: black;
+}
+
+#manipulable:hover {
+    background-color: WhiteSmoke;
+    cursor: grab;
+}
+
+#manipulable-bloc {
+    text-align: center;
+}
+#manipulations-form::after {
+    /* Truc pour que les boutons soient intégrés dans le modal*/
+    content: "";
+    clear: both;
+    display: table;
+}
+
+.ajout-manipulations-cadre, 
+.manipulation-element {
+    font-size: 30px;
+    border-style: solid;
+    border-color: grey;
+    border-radius: 5px;
+    border-width: 1px;
+    margin-top: 5px;
+    margin-bottom: 25px;
+    padding-bottom: 40px;
+    background-color: WhiteSmoke;
+}
+
+.ajout-manipulations-cadre-titre, 
+.manipulation-element-titre {
+    /*
+    position: relative;
+    background-color: white;
+    margin-left: 5px;
+    top: -23px;
+    */
+    font-style: italic;
+}
+.manipulation-element-titre::after,
+.ajout-manipulations-cadre-titre::after {
+    content: " ";
+}
+
+.manipulation-element-titre::before, 
+.ajout-manipulations-cadre-titre::before {
+    content: " ";
+}
+
+.manipulation-drop-zone {
+    border-style: dashed;
+    border-color: grey;
+    border-width: 5px;
+    color: grey;
+}
+
+.manipulation-element-contenu {
+    position: relative;
+    display: block;
+    text-align: center;
+}
+
+.ajout-manipulations-label{
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  padding-right: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 22px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  float: left;
+}
+
+.ajout-manipulations-label input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+/* Create a custom radio button */
+.ajout-manipulations-radio {
+  position: absolute;
+  bottom: 2px;
+  left: 0;
+  height: 22px;
+  width: 22px;
+  background-color: white;
+  border-radius: 50%;
+  border-color: black;
+  border-style: solid;
+  border-width: 1px;
+}
+
+/* On mouse-over, add a grey background color */
+.ajout-manipulations-label:hover input ~ .ajout-manipulations-radio {
+  background-color: #ccc;
+}
+
+/* When the radio button is checked, add a blue background */
+.ajout-manipulations-label input:checked ~ .ajout-manipulations-radio {
+  background-color: #9BB7D4;
+}
+
+/* Create the indicator (the dot/circle - hidden when not checked) */
+.ajout-manipulations-radio:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the indicator (dot/circle) when checked */
+.ajout-manipulations-label input:checked ~ .ajout-manipulations-radio:after {
+  display: block;
+  top: 6px;
+  left: 6px;
+}
+
+/* Style the indicator (dot/circle) */
+.ajout-manipulations-label .ajout-manipulations-radio:after {
+  top: 9px;
+  left: 9px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: white;
+}
+
+
+select[name="pronoms"] {
+    font-size: 30px;
+    background-color: white;
+    border-style: solid;
+    border-color: grey;
+    border-radius: 5px;
+    border-width: 1px;
+}
