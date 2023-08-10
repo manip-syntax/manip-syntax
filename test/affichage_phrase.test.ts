@@ -10,12 +10,17 @@ document.body.innerHTML = '<div id="base_profondeur">' +
 describe('Affichage Phrase class tests', () => {
   test('installe_profondeur fonctionne correctement', () => {
       let base = document.getElementById("base_profondeur") as HTMLElement;
-      installe_profondeur(base, 3);
-      expect((base.children[0] as HTMLElement).style.margin).toBe("5px");
-      expect((base.children[1] as HTMLElement).style.margin).toBe("5px");
-      expect(((base.children[1] as HTMLElement).children[0] as HTMLElement).style.margin).toBe("4px");
-      expect((base.children[2] as HTMLElement).style.margin).toBe("5px");
-      expect(((base.children[2] as HTMLElement).children[0] as HTMLElement).style.margin).toBe("4px");
-      expect((((base.children[2] as HTMLElement).children[0] as HTMLElement).children[0] as HTMLElement).style.margin).toBe("3px");
+      const profondeur = 3;
+      installe_profondeur(base, profondeur);
+      const _gen = (p: number) => {
+          const profondeur = 3, facteur = 10;
+          return `0px 0px ${(profondeur -p)* facteur}px`;
+      }
+      expect((base.children[0] as HTMLElement).style.padding).toBe(_gen(0));
+      expect((base.children[1] as HTMLElement).style.padding).toBe(_gen(0));
+      expect(((base.children[1] as HTMLElement).children[0] as HTMLElement).style.padding).toBe(_gen(1));
+      expect((base.children[2] as HTMLElement).style.padding).toBe(_gen(0));
+      expect(((base.children[2] as HTMLElement).children[0] as HTMLElement).style.padding).toBe(_gen(1));
+      expect((((base.children[2] as HTMLElement).children[0] as HTMLElement).children[0] as HTMLElement).style.padding).toBe(_gen(2));
   });
 });
