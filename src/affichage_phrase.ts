@@ -106,5 +106,45 @@ export function installe_profondeur(racine: HTMLElement, profondeur_max: number)
             installe_profondeur(elt, profondeur_max - 1);
         }
     }
+}
 
+export function affiche_consigne(base: string, syntagme: SyntagmeEleve): string {
+    const arbre = syntagme.arbre_genealogique;
+    console.log(arbre);
+    if (arbre.length === 1) {
+        // Dans ce cas, on est dans le cadre de la phrase, pas d'un groupe enchâssé
+        return base;
+    }
+
+    const fonctions_presentables: { [id: string]: string} = {
+      independante: 'Indépendante',
+      verbes: 'Verbes',
+      verbe_noyau: 'Verbe noyau',
+      sujet: 'Sujet',
+      cod: 'COD',
+      coi: 'COI',
+      attribut_du_sujet: 'Attribut du sujet',
+      attribut_du_cod: 'Attribut du COD',
+      complement_du_verbe_impersonnel: 'Complément du verbe impersonnel',
+      complement_d_agent: "Complément d'agent",
+      groupe_verbal: 'Groupe verbal',
+      complement_circonstanciel: 'Complément circonstanciel',
+      modalisateur: 'Modalisateur',
+      'auto-enonciative': 'Fonction auto-énonciative',
+      connecteur: 'Connecteur',
+      balise_textuelle: 'Balise textuelle',
+      noyau: 'Noyau',
+      epithete: 'Épithète',
+      complement_du_nom: 'Complément du nom',
+      complement_du_pronom: 'Complément du pronom',
+      apposition: 'Apposition',
+      complement_de_l_adjectif: "Complément de l'adjectif"
+    };
+
+    // on retire le premier membre : la phrase
+    return arbre
+        .slice(1)
+        .map(elt => "Dans le " + (elt[1] === -1 ? fonctions_presentables[elt[0]] : `${fonctions_presentables[elt[0]]}-${elt[1]}`))
+        .join(" > ")
+        + " : " + base;
 }

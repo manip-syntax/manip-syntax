@@ -34,11 +34,14 @@ export type MotsPos = number[];
 type MultiMotsPos = MotsPos[];
 // voir la fonction fonction_detaillee pour le détail de cet type
 export type FonctionEnchassee = [ Fonction, number, number];
+export type Denomination = [Fonction|"phrase", number];
 
 
 export class Syntagme {
     // id ne peut être qu'une valeur de type Fonction, mais TS ne veut pas que je mette autre chose qu'une string...
     // Pour être sûr qu'il s'agisse bien du type Fonction, des accesseurs sont en place.
+    protected _denomination: Denomination =  ["phrase", -1];
+    protected _parent: Syntagme|null = null;
     private _phrase_cassee: string[] = [];
 
     protected verbes: MotsPos = [];
@@ -65,6 +68,16 @@ export class Syntagme {
     get contenu(): string {
         return this.phrase;
     }
+    get arbre_genealogique(): Denomination[] {
+        if (this._parent === null) {
+            return [this._denomination];
+        }
+        let ar = this._parent.arbre_genealogique;
+        ar.push(this._denomination);
+        console.log(ar, this._denomination);
+        return ar;
+    }
+
     get mots_sans_fonction(): MotsPos {
         /* Renvoie les mots qui n'ont pas de fonction
          */
@@ -195,6 +208,8 @@ export class Syntagme {
     cree_groupe_enchasse(mots_pos: MotsPos, f: Fonction, numero:number): Syntagme { // TEST
         const n = new Syntagme(this.contenu, mots_pos);
         this._groupes_enchasses.set([f,numero], n);
+        n._denomination = [f, numero];
+        n._parent = this;
         return n;
     }
 
@@ -483,12 +498,6 @@ export class SyntagmeCorrige extends Syntagme {
         }
     }
 
-    cree_groupe_enchasse(mots_pos: MotsPos, f: Fonction, numero:number): Syntagme { 
-        const n = new SyntagmeCorrige(this.contenu, mots_pos);
-        this._groupes_enchasses.set([f,numero], n);
-        return n;
-    }
-
     groupe_enchasse(f: Fonction, n:number): SyntagmeCorrige {
         // on sait que les groupes enchassés de cette classe sont corrigés
         return super.groupe_enchasse(f,n) as SyntagmeCorrige;
@@ -545,6 +554,8 @@ export class SyntagmeEleve extends Syntagme {
     cree_groupe_enchasse_eleve(corrige: SyntagmeCorrige, f: Fonction, numero:number): SyntagmeEleve { 
         const n = new SyntagmeEleve(this.contenu, corrige);
         this._groupes_enchasses.set([f,numero], n);
+        n._denomination = [f, numero];
+        n._parent = this;
         return n;
     }
 
