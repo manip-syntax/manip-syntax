@@ -2,7 +2,7 @@ import './general.css';
 import './choix_phrase.css';
 import './modal.css';
 import { anime_disparition_modal, byID, cree_html_element, non_null } from './util';
-import { affiche_phrase, dispose } from './affichage_phrase';
+import { affiche_phrase, affiche_consigne, dispose } from './affichage_phrase';
 import { add_events_listener, nouvelle_phrase, retirer_elements_nouvelle_phrase } from './nouvelle_phrase';
 import { charge_phrases } from './charge_phrases';
 import { Fonction, SyntagmeCorrige, SyntagmeEleve } from './phrase';
@@ -51,7 +51,7 @@ function analyse_fonction_requise(etape: number, syntagme_eleve: SyntagmeEleve|S
     if (!syntagme_eleve.corrige.aFonction(fonction)) {
         return analyse_suivante();
     }
-    byID("consigne-container").innerHTML = `${consigne}`;
+    byID("consigne-container").innerHTML = affiche_consigne(consigne, syntagme_eleve);
     byID("phrase-analyse-paragraphe").innerHTML = affiche_phrase(phrase_eleve, phrase_eleve.mots_pos);
     dispose(byID("phrase-analyse-paragraphe"));
 
