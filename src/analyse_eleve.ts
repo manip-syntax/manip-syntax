@@ -21,6 +21,8 @@ class Analyseur {
     private _groupes_enchasses_generateur: Generator<[[Fonction, number], SyntagmeCorrige], void, unknown>;
     private _corrige: SyntagmeCorrige;
     private _id: number;
+    private _fonction_courante: Fonction = "sujet";
+    private _mots_selectionnes: MotsPos = [];
     static current_id: number = 0;
 
     constructor(private _syntagme: SyntagmeEleve) {
@@ -45,13 +47,14 @@ class Analyseur {
     }
 
     analyse_fonction(): void {
-        const fonction: Fonction = consignes[this._consignes_etape][0] as Fonction;
-        if (!this._corrige.aFonction(fonction)) {
-            this.analyse_suivante(fonction);
+        this._fonction_courante = consignes[this._consignes_etape][0] as Fonction;
+        if (!this._corrige.aFonction(this._fonction_courante)) {
+            this.analyse_suivante();
             return;
         }
+        this.preselection();
 
-        if (SyntagmeEleve.Fonctions_multiples.includes(fonction) && this._fonctions_multiples_index === -1) {
+        if (SyntagmeEleve.Fonctions_multiples.includes(this._fonction_courante) && this._fonctions_multiples_index === -1) {
             this._fonctions_multiples_index = 0;
         }
         const consigne = consignes[this._consignes_etape][1] + (this._fonctions_multiples_index >= 0 ? ` (${this._fonctions_multiples_index + 1})` : "");
@@ -63,28 +66,28 @@ class Analyseur {
 
         // validation
         fonctions_communes.fonction_de_validation = () => {
-            const mots_selectionnes = Array.from(document.getElementsByClassName("phrase-selectionne"))
+            this._mots_selectionnes = Array.from(document.getElementsByClassName("phrase-selectionne"))
                                   .map(elt => Number(elt.id.split('-')[2]));
-            if (mots_selectionnes.length === 0) {
+            if (this._mots_selectionnes.length === 0) {
                 return;
             }
-            this.valider_fonction(mots_selectionnes, fonction);
+            this._syntagme.declare(this._fonction_courante, this._mots_selectionnes, this._fonctions_multiples_index);
+            this.manipule_fonction();
         }
         fonctions_communes.ok = fonctions_communes.fonction_de_validation;
     }
 
-    recommence_analyse (mots_selectionnes: MotsPos) {
-        this.analyse_fonction();
-        // préselection des mots précédemment choisis
+    preselection() {
         Array.from(document.getElementsByClassName("phrase-cliquable"))
-            .forEach( elt => {
-                if (mots_selectionnes.includes(Number(elt.id.split('-')[2]))) {
+            .forEach( (elt, i) => {
+                if (this._syntagme.fonctionPos(this._fonction_courante, this._fonctions_multiples_index).includes(i)) {
                     elt.classList.add("phrase-selectionne");
                 }
             });
     }
 
-    async analyse_suivante (fonction: Fonction) {
+
+    async analyse_suivante () {
         if (this._consignes_etape === consignes.length -1) {
             // on passe aux groupes enchâssés
             for (let [[f, n], groupe_enchasse] of this._groupes_enchasses_generateur) {
@@ -99,25 +102,85 @@ class Analyseur {
             }
             return this.analyse_finie();
         } else {
-            const j = SyntagmeEleve.Fonctions_multiples.includes(fonction) && !this._syntagme.est_complet(fonction) ? 0 : 1;
+            const j = SyntagmeEleve.Fonctions_multiples.includes(this._fonction_courante) && !this._syntagme.est_complet(this._fonction_courante) ? 0 : 1;
             this._fonctions_multiples_index = j === 0 ? this._fonctions_multiples_index + 1 : -1;
             this._consignes_etape++;
             return this.analyse_fonction();
         }
     }
 
-    valider_fonction(mots_selectionnes: MotsPos, fonction: Fonction) {
-        let reponse_correcte = this._syntagme.declare(fonction, mots_selectionnes, this._fonctions_multiples_index);
+    affiche_erreur() {
+        const modal_message = byID("modal-message-contenu");
+        modal_message.classList.add("modal-message-erreur");
+        // TODO on pourrait peut-être être plus précis et dire s'il manque des mots, par exemple, ou si tous les mots sont faux
+        definit_message_modal("Il y a une erreur dans ton analyse !", "Reprendre l'analyse", () => {
+            modal_message.classList.remove("modal-message-erreur");
+            this.analyse_suivante;});
+    }
+
+    soumettre_fonction(f: Fonction, nf: number) {
+        let reponse_correcte = this._syntagme.est_correct(f, nf);
         if (!reponse_correcte) {
-            const modal_message = byID("modal-message-contenu");
-            modal_message.classList.add("modal-message-erreur");
-            // TODO on pourrait peut-être être plus précis et dire s'il manque des mots, par exemple, ou si tous les mots sont faux
-            definit_message_modal("Il y a une erreur dans ton analyse !", "Reprendre l'analyse", () => {
-                modal_message.classList.remove("modal-message-erreur");
-                this.recommence_analyse;});
+            this.affiche_erreur();
         } else {
-            this.analyse_suivante(fonction);
+            this.analyse_suivante();
         }
+    }
+
+    prepare_manipulation(f: Fonction) {
+            return new Promise<void>( (valider, annuler) => {
+                manipulation_fonction(f, this._syntagme, this._mots_selectionnes);
+                byID("manipulations-form").addEventListener("submit", e => {
+                    byID("modal-manipulations").style.display = "none";
+                    e.preventDefault();
+                    valider();
+                }, {once: true});
+                byID("modal-manipulations-annuler").addEventListener("click", () => {
+                    byID("modal-manipulations").style.display = "none";
+                    annuler();
+                }, {once: true});
+            });
+    }
+
+    manipule_fonction() {
+        if (this._fonction_courante === "sujet") {
+            if (!this._corrige.est_attributif) {
+                const promesse = this.prepare_manipulation(this._fonction_courante);
+                promesse.then( () => {});
+                              
+            }
+            // si attribut, on attend l'attribut avant de manipuler et on ne vérifie pas
+        }
+
+        else if (this._fonction_courante === "attribut_du_sujet") {
+            this.prepare_manipulation("sujet")
+            .then( () => {
+                return this.prepare_manipulation("attribut_du_sujet");
+            },
+            () => {
+                // sale...
+                this._consignes_etape = consignes.map( (e, i) => [e[0], i]).filter( e => e[0] === "sujet")[0][1] as number;
+                this.analyse_suivante();
+            })
+            .then ( () => {
+                // vérification des deux fonctions
+                if (!this._syntagme.est_correct("sujet")) {
+                    this._consignes_etape = consignes.map( (e, i) => [e[0], i]).filter( e => e[0] === "sujet")[0][1] as number;
+                    this.affiche_erreur();
+                } else if (!this._syntagme.est_correct("attribut_du_sujet")) {
+                    this._consignes_etape = consignes.map( (e, i) => [e[0], i]).filter( e => e[0] === "attribut_du_sujet")[0][1] as number;
+                    this.affiche_erreur();
+                } else {
+                    this.analyse_suivante();
+                }
+            },
+            () => {
+                this._consignes_etape = consignes.map( (e, i) => [e[0], i]).filter( e => e[0] === "attribut_du_sujet")[0][1] as number;
+                this.analyse_suivante();
+            });
+            return;
+        }
+        this.soumettre_fonction(this._fonction_courante, this._fonctions_multiples_index);
     }
 }
 
@@ -133,19 +196,6 @@ class Analyseur {
         }
 
         if (fonction === "sujet") {
-            const promesse_manipulation = new Promise<void>( (valider, annuler) => {
-                manipulation_fonction(fonction, syntagme_eleve, mots_selectionnes);
-                byID("manipulations-form").addEventListener("submit", e => {
-                    byID("modal-manipulations").style.display = "none";
-                    e.preventDefault();
-                    valider();
-                }, {once: true});
-                byID("modal-manipulations-annuler").addEventListener("click", () => {
-                    byID("modal-manipulations").style.display = "none";
-                    annuler();
-                }, {once: true});
-            });
-            promesse_manipulation.then(suite_validation, recommence_analyse);
         } else {
             suite_validation();
         }

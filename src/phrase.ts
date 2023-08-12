@@ -622,12 +622,27 @@ export class SyntagmeEleve extends Syntagme {
         return true;
     }
 
-    declare(f: Fonction, elt: MotsPos, n:number = -1): boolean { // TEST
+    est_correct(f: Fonction, n: number = -1): boolean {
+        /* vrai si la fonction correspond au corrigé.
+         */
+        if (Syntagme.Fonctions_multiples.includes(f)) {
+            assert(f in this._fonctions_multiples, `${f} n'a jamais été enregistré dans ce syntagme`);
+            assert(n < this._fonctions_multiples[f].length, `Pas de numero ${n} pour la fonction ${f} dans ce syntagme`);
+            return this.corrige.estFonction(f, this._fonctions_multiples[f][n]);
+        }
+        if (f === "verbes") {
+            return this.corrige.estFonction(f, this.verbes)
+        }
+        assert(f in this._fonctions_uniques, `${f} n'a pas été enregistré dans ce syntagme`);
+        return this.corrige.estFonction(f, this._fonctions_uniques[f]);
+    }
+
+    declare(f: Fonction, elt: MotsPos, n:number = -1): boolean { // TEST TODO à vérifier pour les fonctions multiples
         /* Enregistre une fonction pour cette phrase.
          * Vrai si elt a bien cette fonction
          * d'après le corrigé
          * Si la fonction est multiple, renvoie false
-         * si la fonction a déjà été déclarée
+         * si la fonction a déjà été déclarée correctement
          */
         if (Syntagme.Fonctions_multiples.includes(f) && f in this._fonctions_multiples) {
             if (this._fonctions_multiples[f].filter(e => compare(e, elt)).length !== 0) {
