@@ -379,6 +379,7 @@ export class CreateurPhrase {
     }
 
     elements_de_manipulation(est_valide: boolean) {
+        // TODO pour l'attribut, ajouter la possibilité de rentrer si c'est un adjectif, afin de pouvoir suivre les directives du guide et poser soit la question comment, soit quoi
         if (! est_valide) {
             return;
         }

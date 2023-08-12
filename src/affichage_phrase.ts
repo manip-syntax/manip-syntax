@@ -48,7 +48,8 @@ function fin_balise(fe: FonctionEnchassee, pos: number): string {
 }
 
 
-export function affiche_phrase(phrase: SyntagmeEleve, mots_a_inclure: MotsPos = []) : string {
+export function affiche_phrase(s: SyntagmeEleve, mots_a_inclure: MotsPos = []) : string {
+    const phrase = s.ancetre;
     // découpage de la phrase en constituants
     // cette regex permet de conserver le séparateur
     const reg = new RegExp("(" + SyntagmeEleve.Separateur + ")");
@@ -110,7 +111,6 @@ export function installe_profondeur(racine: HTMLElement, profondeur_max: number)
 
 export function affiche_consigne(base: string, syntagme: SyntagmeEleve): string {
     const arbre = syntagme.arbre_genealogique;
-    console.log(arbre);
     if (arbre.length === 1) {
         // Dans ce cas, on est dans le cadre de la phrase, pas d'un groupe enchâssé
         return base;

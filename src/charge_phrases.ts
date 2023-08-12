@@ -8,7 +8,7 @@ import {SyntagmeCorrige} from "./phrase";
 //let liste_phrases = SyntagmeCorrige[];
 // TODO implémentation temporaire pour des raisons de test
 import __phrases from "./phrases.json"
-const phrases = __phrases.map(x=> SyntagmeCorrige.fromJSON(x));
+const phrases = __phrases.map(x=> SyntagmeCorrige.fromJSON(x as any)); // TODO FIXME ce 'any' est là parce que les phrases ont été mal enregistrées : il faut corriger l'enregistrement défectueux des phrases et les changer
 
 export function charge_phrases(max: number, debut: number = 0): SyntagmeCorrige[] {
     /* Renvoie une liste contenant au maximum max SyntagmeCorrige.

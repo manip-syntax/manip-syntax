@@ -154,3 +154,18 @@ select[name="pronoms"] {
     border-radius: 5px;
     border-width: 1px;
 }
+
+.manipulation-supprimable:hover {
+    cursor: url("./delete-button.svg"), pointer;
+}
+
+.manipulation-supprimable {
+    font-weight: bold;
+    font-size: 40px;
+
+}
+
+.manipulation-supprime {
+    font-size: 0px;
+    transition: 0.8s;
+}

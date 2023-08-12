@@ -65,6 +65,19 @@ export class Syntagme {
         this._remplit_mots_offset();
     }
 
+    get ancetre() : Syntagme {
+        if (this._denomination[0] === "phrase") {
+            return this;
+        }
+        if (this._parent === null) {
+            assert(this._parent !== null,"Pas de parent enregistré");
+            throw Error;
+        }
+            
+        return this._parent.ancetre;
+    }
+
+
     get contenu(): string {
         return this.phrase;
     }
@@ -74,7 +87,6 @@ export class Syntagme {
         }
         let ar = this._parent.arbre_genealogique;
         ar.push(this._denomination);
-        console.log(ar, this._denomination);
         return ar;
     }
 
@@ -111,6 +123,30 @@ export class Syntagme {
         }
         this._mots_offset = indices;
         return indices;
+    }
+
+    offset_pos(mots: MotsPos): number[][] {
+        /* Renvoie un array contenant les offsets des mots rentrés, en fusionnant ceux qui sont ensemble
+         */
+        let res = [] 
+        for (let i=0, debut=0, fin=0, precedent=-1; i<this._mots_offset.length; i++) {
+            if (mots.includes(i)) {
+                if (precedent === (i-1)) {
+                    fin = this._mots_offset[i][1];
+                    if (i === this._mots_offset.length -1) {
+                        res.push([debut, fin]);
+                    }
+                } else {
+                    [debut, fin] = this._mots_offset[i];
+                }
+                precedent = i;
+            } else {
+                if (fin > 0 && precedent === i-1) {
+                    res.push([debut, fin]);
+                }
+            }
+        }
+        return res;
     }
 
     texte_pos(mots: MotsPos): string { // TEST
