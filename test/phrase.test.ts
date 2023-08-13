@@ -325,12 +325,20 @@ describe('Syntagme class tests', () => {
       [ 9, 13 ],  [ 14, 16 ],
       [ 17, 22 ], [ 24, 29 ],
       [ 30, 34 ], [ 35, 37 ],
-      [ 38, 45 ], [ 46, 47 ],
-      [ 48, 50 ], [ 51, 59 ]
+      [ 38, 45 ], [ 48, 50 ],
+      [ 51, 59 ]
     ]);
     expect(s.texte_pos([0,1])).toEqual("Le chat");
     expect(s.texte_pos([0,1,2,3,4])).toEqual("Le chat, noir et blanc");
     expect(s.texte_pos([0,1,5])).toEqual("Le chat mange");
+    expect(s.texte_pos([1,2])).toEqual("chat, noir");
+    expect(s.texte_pos([2,3])).toEqual("noir et");
+    expect(s.texte_pos([9,10])).toEqual("il ronronne");
+
+    let s2 = new Syntagme("Vous êtes son rival ?");
+    expect(s2.texte_pos([2])).toEqual("son");
+    expect(s2.texte_pos([3])).toEqual("rival");
+    expect(s2.offset_pos([3])).toEqual([14, 19]);
   });
 });
 

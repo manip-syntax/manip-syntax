@@ -52,7 +52,6 @@ class Analyseur {
             this.analyse_suivante();
             return;
         }
-        this.preselection();
 
         if (SyntagmeEleve.Fonctions_multiples.includes(this._fonction_courante) && this._fonctions_multiples_index === -1) {
             this._fonctions_multiples_index = 0;
@@ -75,12 +74,14 @@ class Analyseur {
             this.manipule_fonction();
         }
         fonctions_communes.ok = fonctions_communes.fonction_de_validation;
+        this.preselection();
     }
 
     preselection() {
+        const indices = this._syntagme.fonctionPos(this._fonction_courante, this._fonctions_multiples_index);
         Array.from(document.getElementsByClassName("phrase-cliquable"))
             .forEach( (elt, i) => {
-                if (this._syntagme.fonctionPos(this._fonction_courante, this._fonctions_multiples_index).includes(i)) {
+                if (indices.includes(i)) {
                     elt.classList.add("phrase-selectionne");
                 }
             });
@@ -128,56 +129,69 @@ class Analyseur {
     }
 
     prepare_manipulation(f: Fonction) {
-            return new Promise<void>( (valider, annuler) => {
-                manipulation_fonction(f, this._syntagme, this._mots_selectionnes);
-                byID("manipulations-form").addEventListener("submit", e => {
-                    byID("modal-manipulations").style.display = "none";
-                    e.preventDefault();
-                    valider();
-                }, {once: true});
-                byID("modal-manipulations-annuler").addEventListener("click", () => {
-                    byID("modal-manipulations").style.display = "none";
-                    annuler();
-                }, {once: true});
-            });
+        const analyseur = this; // pour éviter les problèmes liés à this
+
+        return new Promise<void>( (valider, annuler) => {
+            manipulation_fonction(f, analyseur._syntagme, analyseur._syntagme.fonctionPos(f));
+            byID("modal-manipulations-OK").addEventListener("click", () => {
+                byID("modal-manipulations").style.display = "none";
+                valider();
+            }, {once: true});
+            byID("modal-manipulations-annuler").addEventListener("click", () => {
+                byID("modal-manipulations").style.display = "none";
+                annuler();
+            }, {once: true});
+        });
     }
 
     manipule_fonction() {
+        const analyseur = this; // pour éviter les problèmes liés à this
+        // sale...
+        const numero_d_etape = (f: Fonction) => consignes.map( (e, i) => [e[0], i]).filter( e => e[0] === f)[0][1] as number;
+
         if (this._fonction_courante === "sujet") {
             if (!this._corrige.est_attributif) {
-                const promesse = this.prepare_manipulation(this._fonction_courante);
-                promesse.then( () => {});
-                              
+                this.prepare_manipulation(this._fonction_courante)
+                .then( () => {
+                    analyseur.soumettre_fonction(analyseur._fonction_courante, analyseur._fonctions_multiples_index);
+                },
+                     () => {
+                         analyseur.analyse_fonction();
+                });
+                return;
             }
+            this.analyse_suivante();
+            return;
             // si attribut, on attend l'attribut avant de manipuler et on ne vérifie pas
         }
 
         else if (this._fonction_courante === "attribut_du_sujet") {
             this.prepare_manipulation("sujet")
             .then( () => {
-                return this.prepare_manipulation("attribut_du_sujet");
+                return analyseur.prepare_manipulation("attribut_du_sujet");
             },
             () => {
-                // sale...
-                this._consignes_etape = consignes.map( (e, i) => [e[0], i]).filter( e => e[0] === "sujet")[0][1] as number;
-                this.analyse_suivante();
-            })
+                analyseur._consignes_etape = numero_d_etape("sujet");
+                analyseur.analyse_suivante();
+            }) /*
             .then ( () => {
+                console.log("soumission des fonctions");
                 // vérification des deux fonctions
-                if (!this._syntagme.est_correct("sujet")) {
-                    this._consignes_etape = consignes.map( (e, i) => [e[0], i]).filter( e => e[0] === "sujet")[0][1] as number;
-                    this.affiche_erreur();
-                } else if (!this._syntagme.est_correct("attribut_du_sujet")) {
-                    this._consignes_etape = consignes.map( (e, i) => [e[0], i]).filter( e => e[0] === "attribut_du_sujet")[0][1] as number;
-                    this.affiche_erreur();
+                if (!analyseur._syntagme.est_correct("sujet")) {
+                    analyseur._consignes_etape = numero_d_etape("sujet");
+                    analyseur.soumettre_fonction("sujet",-1);
+                } else if (!analyseur._syntagme.est_correct("attribut_du_sujet")) {
+                    analyseur._consignes_etape = numero_d_etape("attribut_du_sujet");
+                    analyseur.soumettre_fonction("attribut_du_sujet",-1);
                 } else {
-                    this.analyse_suivante();
+                    analyseur.analyse_suivante();
                 }
             },
             () => {
-                this._consignes_etape = consignes.map( (e, i) => [e[0], i]).filter( e => e[0] === "attribut_du_sujet")[0][1] as number;
-                this.analyse_suivante();
+                analyseur._consignes_etape = numero_d_etape("attribut_du_sujet");
+                analyseur.analyse_suivante();
             });
+            */;
             return;
         }
         this.soumettre_fonction(this._fonction_courante, this._fonctions_multiples_index);
@@ -185,23 +199,6 @@ class Analyseur {
 }
 
 
-
-
-
-/*
-    fonctions_communes.fonction_de_validation = () => {
-
-        if (fonction === "attribut_du_sujet") {
-            manipulation_fonction(fonction, syntagme_eleve, mots_selectionnes);
-        }
-
-        if (fonction === "sujet") {
-        } else {
-            suite_validation();
-        }
-
-    };
-    */
 
 
 export function selectionne_phrase() {

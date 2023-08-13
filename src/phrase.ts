@@ -52,7 +52,7 @@ export class Syntagme {
     protected _groupes_enchasses: Map<[Fonction, number], Syntagme> = new Map();
     protected _manipulations: { [id: string] : ManipulationSujet } = {};
 
-    public static Separateur = "[ ,;?!.'-]";
+    public static Separateur = "[ ,;:?!.'-]";
     private static _separateur = new RegExp(Syntagme.Separateur);
     public static Fonctions_multiples: Fonction[] = ["independante","complement_circonstanciel", "modalisateur","auto-enonciative","connecteur","balise_textuelle","epithete","complement_du_nom","complement_du_pronom","complement_de_l_adjectif","apposition"];
     public static Fonctions_contenants: Fonction[] = ["independante","sujet","cod","coi","attribut_du_sujet","attribut_du_cod","complement_circonstanciel","complement_du_verbe_impersonnel","complement_du_nom","complement_du_pronom","epithete","apposition","complement_de_l_adjectif"];
@@ -138,6 +138,9 @@ export class Syntagme {
                     }
                 } else {
                     [debut, fin] = this._mots_offset[i];
+                    if (i === this._mots_offset.length -1) {
+                        res.push([debut, fin]);
+                    }
                 }
                 precedent = i;
             } else {
@@ -163,7 +166,12 @@ export class Syntagme {
                     }
                 } else {
                     [debut, fin] = this._mots_offset[i];
-                    res += " ";
+                    if (res.length > 0) {
+                        res += " ";
+                    }
+                    if (i === this._mots_offset.length -1) {
+                        res += this.contenu.slice(debut, fin);
+                    }
                 }
                 precedent = i;
             } else {
@@ -533,6 +541,14 @@ export class SyntagmeCorrige extends Syntagme {
             return o;
         }
     }
+    cree_groupe_enchasse(mots_pos: MotsPos, f: Fonction, numero:number): SyntagmeCorrige { // TEST
+        const n = new SyntagmeCorrige(this.contenu, mots_pos);
+        this._groupes_enchasses.set([f,numero], n);
+        n._denomination = [f, numero];
+        n._parent = this;
+        return n;
+    }
+
 
     groupe_enchasse(f: Fonction, n:number): SyntagmeCorrige {
         // on sait que les groupes enchassés de cette classe sont corrigés
