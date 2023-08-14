@@ -198,13 +198,12 @@ class Analyseur {
             .catch ( (e) => {
                 if (e === "sujet") {
                     analyseur._consignes_etape = numero_d_etape("sujet");
-                    analyseur.analyse_fonction();
                 } else if (e === "attribut_du_sujet") {
                     analyseur._consignes_etape = numero_d_etape("attribut_du_sujet");
-                    analyseur.analyse_fonction();
                 } else {
                     throw e;
                 }
+                analyseur.analyse_fonction();
 
             });
             return;
