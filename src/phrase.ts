@@ -50,7 +50,7 @@ export class Syntagme {
     protected _fonctions_uniques: { [id: string] : MotsPos } = {};
     protected _fonctions_multiples: { [id: string] : MultiMotsPos } = {};
     protected _groupes_enchasses: Map<[Fonction, number], Syntagme> = new Map();
-    protected _manipulations: { [id: string] : ManipulationSujet } = {};
+    protected _manipulations: { [id: string] : ManipulationSujet|ManipulationCOD } = {};
 
     public static Separateur = "[ ,;:?!.'-]";
     private static _separateur = new RegExp(Syntagme.Separateur);
@@ -233,7 +233,7 @@ export class Syntagme {
         return (Object.keys(this._fonctions_uniques).length === 0 && Object.keys(this._fonctions_multiples).length === 0);
     }
 
-    ajoute_infos_de_manipulation(f: Fonction, infos: ManipulationSujet) {
+    ajoute_infos_de_manipulation(f: Fonction, infos: ManipulationSujet|ManipulationCOD) {
         this._manipulations[f] = infos;
     }
 
@@ -569,7 +569,16 @@ export class SyntagmeCorrige extends Syntagme {
         return !compare(pos,[]);
     }
 
-
+    aFonctions(fonctions: Fonction[]): boolean {
+        /* vrai uniquement si toutes les fonctions sont présentes
+         */
+        for (let f of fonctions) {
+            if (!this.aFonction(f)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     estFonction(f:Fonction, mots:MotsPos): boolean { // TEST 
         /*Vrai si mot a cette fonction d'après le corrigé
@@ -678,7 +687,7 @@ interface SyntagmeJSON {
     _fonctions_uniques: { [id: string] : MotsPos|undefined};
     _fonctions_multiples?: { [id: string] : MultiMotsPos|undefined};
     _groupes_enchasses?: Map<[string, number], Syntagme>;
-    _manipulations?: { [id: string] : ManipulationSujet };
+    _manipulations?: { [id: string] : ManipulationSujet|ManipulationCOD };
 }
 
 // TODO probablement à déplacer
@@ -686,3 +695,5 @@ interface ManipulationSujet {
     est_anime: boolean;
     pronominalisation: string | null;
 }
+
+export type ManipulationCOD = ManipulationSujet;

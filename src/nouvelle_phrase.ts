@@ -383,36 +383,37 @@ export class CreateurPhrase {
         if (! est_valide) {
             return;
         }
-        if (this.fonction_courante.fonction === "sujet") {
+        if ("sujet cod".split(" ").includes(this.fonction_courante.fonction)) {
+            const fonction_nom = this.fonction_courante.fonction === "sujet" ? "sujet" : "COD";
             byID("modal-ajout-manipulations").style.display = "block";
             const mots_selectionnes = Array.from(document.getElementsByClassName("phrase-selectionne"))
                 .map(elt => elt.innerHTML).join(" ");
-            const pronoms = "je tu il elle nous vous ils elles".split(" ");
+            const pronoms = (fonction_nom === "sujet" ?"je tu il elle nous vous ils elles" : "le la les").split(" ");
             const pronoms_html = pronoms.includes(mots_selectionnes.toLowerCase()) ? 
-                '<input type="hidden" id="pronom-inutile" name="sujet-pronoms" value="null" checked="true">'
-                : '<fieldset class="ajout-manipulations-cadre"><legend class="ajout-manipulations-cadre-titre">Par quoi le sujet peut-il être pronominalisé ?</legend>' +
+                `<input type="hidden" id="pronom-inutile" name="${fonction_nom}-pronoms" value="null" checked="true">`
+                : `<fieldset class="ajout-manipulations-cadre"><legend class="ajout-manipulations-cadre-titre">Par quoi le ${fonction_nom} peut-il être pronominalisé ?</legend>` +
                     pronoms.map(elt => `<label class="ajout-manipulations-label" for="pronom-${elt}">${elt}` +
-                                `<input type="radio" class="pronoms" id="pronom-${elt}" name="sujet-pronoms" value="${elt}" required><span class="ajout-manipulations-radio"></span></label class="ajout-manipulations-label">` 
+                                `<input type="radio" class="pronoms" id="pronom-${elt}" name="${fonction_nom}-pronoms" value="${elt}" required><span class="ajout-manipulations-radio"></span></label class="ajout-manipulations-label">` 
                                ).join(" ") +
                 '</fieldset>';
-            byID("modal-ajout-manipulations-titre").innerHTML = `Renseignements nécessaires à la manipulation du sujet : ${mots_selectionnes}`;
+            byID("modal-ajout-manipulations-titre").innerHTML = `Renseignements nécessaires à la manipulation du ${fonction_nom} : ${mots_selectionnes}`;
             byID("ajout-manipulations-form-contenu").innerHTML = '<fieldset class="ajout-manipulations-cadre"><legend class="ajout-manipulations-cadre-titre">Animé ou non-animé ?</legend>' +
-                '<label class="ajout-manipulations-label" for="est-anime">Le référent du sujet est animé.' +
-                '<input type="radio" id="est-anime" value="true" name="sujet-anime" required><span class="ajout-manipulations-radio"></span></label class="ajout-manipulations-label">' +
-                '<label class="ajout-manipulations-label" for="est-non-anime">Le référent du sujet est non animé.' +
-                '<input type="radio" id="est-non-anime" value="false" name="sujet-anime" required><span class="ajout-manipulations-radio"></span></label class="ajout-manipulations-label">' +
+                `<label class="ajout-manipulations-label" for="est-anime">Le référent du ${fonction_nom} est animé.` +
+                `<input type="radio" id="est-anime" value="true" name="${fonction_nom}-anime" required><span class="ajout-manipulations-radio"></span></label class="ajout-manipulations-label">` +
+                `<label class="ajout-manipulations-label" for="est-non-anime">Le référent du ${fonction_nom} est non animé.` +
+                `<input type="radio" id="est-non-anime" value="false" name="${fonction_nom}-anime" required><span class="ajout-manipulations-radio"></span></label class="ajout-manipulations-label">` +
                 '</fieldset>' +
                 pronoms_html;
             let fonction_courante = this.fonction_courante; // ce n'est pas inutile: au moment où on va appeler fonction_du_bouton_des_ajouts_de_manipulations, ce ne sera plus la fonction courante
 
             fonction_du_bouton_des_ajouts_de_manipulations = () => {
-                const est_anime = (document.getElementsByName("sujet-anime")[0] as HTMLInputElement).checked;
-                let pronom: string | null = Array.from(document.getElementsByName("sujet-pronoms")).filter( elt => (elt as HTMLInputElement).checked)[0].getAttribute("value");
+                const est_anime = (document.getElementsByName(`${fonction_nom}-anime`)[0] as HTMLInputElement).checked;
+                let pronom: string | null = Array.from(document.getElementsByName(`${fonction_nom}-pronoms`)).filter( elt => (elt as HTMLInputElement).checked)[0].getAttribute("value");
                 if (pronom === "null") {
                     pronom = null;
                 }
 
-                fonction_courante.syntagme.ajoute_infos_de_manipulation("sujet",{est_anime: est_anime, pronominalisation: pronom});
+                fonction_courante.syntagme.ajoute_infos_de_manipulation(this.fonction_courante.fonction,{est_anime: est_anime, pronominalisation: pronom});
                 byID("modal-ajout-manipulations").style.display = "none";
             };
             fonctions_communes.ok = fonction_du_bouton_des_ajouts_de_manipulations;
