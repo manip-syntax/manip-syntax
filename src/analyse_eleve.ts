@@ -173,26 +173,39 @@ class Analyseur {
                 return analyseur.prepare_manipulation("attribut_du_sujet");
             },
             () => {
-                analyseur._consignes_etape = numero_d_etape("sujet");
-                analyseur.analyse_suivante();
+                throw "sujet";
             })
             .then ( () => {
                 // vérification des deux fonctions
                 if (!analyseur._syntagme.est_correct("sujet")) {
+                    analyseur.affiche_erreur();
                     analyseur._consignes_etape = numero_d_etape("sujet");
-                    analyseur.soumettre_fonction("sujet",-1);
                     analyseur.analyse_fonction();
                 } else if (!analyseur._syntagme.est_correct("attribut_du_sujet")) {
+                    analyseur.affiche_erreur();
                     analyseur._consignes_etape = numero_d_etape("attribut_du_sujet");
-                    analyseur.soumettre_fonction("attribut_du_sujet",-1);
                     analyseur.analyse_fonction();
                 } else {
                     analyseur.analyse_suivante();
                 }
             },
-            () => {
-                analyseur._consignes_etape = numero_d_etape("attribut_du_sujet");
-                analyseur.analyse_suivante();
+            (e) => {
+                if (e !== "sujet") {
+                    throw "attribut_du_sujet";
+                }
+                throw e;
+            })
+            .catch ( (e) => {
+                if (e === "sujet") {
+                    analyseur._consignes_etape = numero_d_etape("sujet");
+                    analyseur.analyse_fonction();
+                } else if (e === "attribut_du_sujet") {
+                    analyseur._consignes_etape = numero_d_etape("attribut_du_sujet");
+                    analyseur.analyse_fonction();
+                } else {
+                    throw e;
+                }
+
             });
             return;
         }
