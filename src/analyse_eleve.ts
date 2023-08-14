@@ -116,7 +116,7 @@ class Analyseur {
         // TODO on pourrait peut-être être plus précis et dire s'il manque des mots, par exemple, ou si tous les mots sont faux
         definit_message_modal("Il y a une erreur dans ton analyse !", "Reprendre l'analyse", () => {
             modal_message.classList.remove("modal-message-erreur");
-            this.analyse_suivante;});
+            });
     }
 
     soumettre_fonction(f: Fonction, nf: number) {
@@ -128,13 +128,15 @@ class Analyseur {
         }
     }
 
-    prepare_manipulation(f: Fonction) {
+    prepare_manipulation(f: Fonction, disparition_modal: boolean = true) {
         const analyseur = this; // pour éviter les problèmes liés à this
 
         return new Promise<void>( (valider, annuler) => {
             manipulation_fonction(f, analyseur._syntagme, analyseur._syntagme.fonctionPos(f));
             byID("modal-manipulations-OK").addEventListener("click", () => {
-                byID("modal-manipulations").style.display = "none";
+                if (disparition_modal) {
+                    anime_disparition_modal(byID("modal-manipulations-contenu"), byID("modal-manipulations"));
+                }
                 valider();
             }, {once: true});
             byID("modal-manipulations-annuler").addEventListener("click", () => {
@@ -166,23 +168,24 @@ class Analyseur {
         }
 
         else if (this._fonction_courante === "attribut_du_sujet") {
-            this.prepare_manipulation("sujet")
+            this.prepare_manipulation("sujet", false)
             .then( () => {
                 return analyseur.prepare_manipulation("attribut_du_sujet");
             },
             () => {
                 analyseur._consignes_etape = numero_d_etape("sujet");
                 analyseur.analyse_suivante();
-            }) /*
+            })
             .then ( () => {
-                console.log("soumission des fonctions");
                 // vérification des deux fonctions
                 if (!analyseur._syntagme.est_correct("sujet")) {
                     analyseur._consignes_etape = numero_d_etape("sujet");
                     analyseur.soumettre_fonction("sujet",-1);
+                    analyseur.analyse_fonction();
                 } else if (!analyseur._syntagme.est_correct("attribut_du_sujet")) {
                     analyseur._consignes_etape = numero_d_etape("attribut_du_sujet");
                     analyseur.soumettre_fonction("attribut_du_sujet",-1);
+                    analyseur.analyse_fonction();
                 } else {
                     analyseur.analyse_suivante();
                 }
@@ -191,7 +194,6 @@ class Analyseur {
                 analyseur._consignes_etape = numero_d_etape("attribut_du_sujet");
                 analyseur.analyse_suivante();
             });
-            */;
             return;
         }
         this.soumettre_fonction(this._fonction_courante, this._fonctions_multiples_index);
