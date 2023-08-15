@@ -1,6 +1,7 @@
 /* Ce module contient tout ce qui est nécessaire
  * à l'affichage de la phrase dans le navigateur.
  */
+// BUG FIXME le groupe verbal inclut l'indépendante au début de la phrase, et non l'inverse (tester avec la phrase "Prends tes papiers et sois prudent")
 import './affichage_phrase.css';
 
 import { Fonction, FonctionEnchassee, MotsPos, SyntagmeEleve } from "./phrase";
@@ -117,34 +118,34 @@ export function affiche_consigne(base: string, syntagme: SyntagmeEleve): string 
     }
 
     const fonctions_presentables: { [id: string]: string} = {
-      independante: 'Indépendante',
+      independante: "l'indépendante",
       verbes: 'Verbes',
       verbe_noyau: 'Verbe noyau',
-      sujet: 'Sujet',
-      cod: 'COD',
-      coi: 'COI',
-      attribut_du_sujet: 'Attribut du sujet',
-      attribut_du_cod: 'Attribut du COD',
-      complement_du_verbe_impersonnel: 'Complément du verbe impersonnel',
-      complement_d_agent: "Complément d'agent",
-      groupe_verbal: 'Groupe verbal',
-      complement_circonstanciel: 'Complément circonstanciel',
-      modalisateur: 'Modalisateur',
-      'auto-enonciative': 'Fonction auto-énonciative',
-      connecteur: 'Connecteur',
-      balise_textuelle: 'Balise textuelle',
+      sujet: 'le sujet',
+      cod: 'le COD',
+      coi: 'le COI',
+      attribut_du_sujet: "l'attribut du sujet",
+      attribut_du_cod: "l'attribut du COD",
+      complement_du_verbe_impersonnel: 'le complément du verbe impersonnel',
+      complement_d_agent: "le complément d'agent",
+      groupe_verbal: 'le groupe verbal',
+      complement_circonstanciel: 'le complément circonstanciel',
+      modalisateur: 'le modalisateur',
+      'auto-enonciative': 'la fonction auto-énonciative',
+      connecteur: 'le connecteur',
+      balise_textuelle: 'la balise textuelle',
       noyau: 'Noyau',
-      epithete: 'Épithète',
-      complement_du_nom: 'Complément du nom',
-      complement_du_pronom: 'Complément du pronom',
-      apposition: 'Apposition',
-      complement_de_l_adjectif: "Complément de l'adjectif"
+      epithete: "l'épithète",
+      complement_du_nom: 'le complément du nom',
+      complement_du_pronom: 'le complément du pronom',
+      apposition: "l'apposition",
+      complement_de_l_adjectif: "le complément de l'adjectif"
     };
 
     // on retire le premier membre : la phrase
     return arbre
         .slice(1)
-        .map(elt => "Dans le " + (elt[1] === -1 ? fonctions_presentables[elt[0]] : `${fonctions_presentables[elt[0]]}-${elt[1]}`))
+        .map(elt => "Dans " + (elt[1] === -1 ? fonctions_presentables[elt[0]] : `${fonctions_presentables[elt[0]]} numéro ${elt[1]+1}`))
         .join(" > ")
         + " : " + base;
 }

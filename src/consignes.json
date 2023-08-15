@@ -1,6 +1,6 @@
 [
     ["verbes" , "Sélectionne les verbes."],
-    ["independante", "Sélectionne une indépendante"],
+    ["independante", "Sélectionne une proposition indépendante"],
     ["verbe_noyau" , "Sélectionne le verbe noyau"],
     ["noyau", "Sélectionne le noyau"],
     ["sujet" , "Sélectionne le groupe sujet"],

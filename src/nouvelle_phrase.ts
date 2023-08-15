@@ -388,7 +388,7 @@ export class CreateurPhrase {
             byID("modal-ajout-manipulations").style.display = "block";
             const mots_selectionnes = Array.from(document.getElementsByClassName("phrase-selectionne"))
                 .map(elt => elt.innerHTML).join(" ");
-            const pronoms = (fonction_nom === "sujet" ?"je tu il elle nous vous ils elles" : "le la les").split(" ");
+            const pronoms = (fonction_nom === "sujet" ?"je tu il elle nous vous ils elles" : "le la l' les").split(" ");
             const pronoms_html = pronoms.includes(mots_selectionnes.toLowerCase()) ? 
                 `<input type="hidden" id="pronom-inutile" name="${fonction_nom}-pronoms" value="null" checked="true">`
                 : `<fieldset class="ajout-manipulations-cadre"><legend class="ajout-manipulations-cadre-titre">Par quoi le ${fonction_nom} peut-il être pronominalisé ?</legend>` +

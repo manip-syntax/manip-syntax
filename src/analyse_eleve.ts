@@ -92,6 +92,7 @@ class Analyseur {
         if (this._consignes_etape === consignes.length -1) {
             // on passe aux groupes enchâssés
             for (let [[f, n], groupe_enchasse] of this._groupes_enchasses_generateur) {
+                // TODO il serait bon de suivre l'ordre des groupes tels que déclarés par les élèves quand ce sont des fonctions multiples
                 const analyseur = new Analyseur( this._syntagme.cree_groupe_enchasse_eleve(groupe_enchasse, f, n));
                 const promesse_analyse = new Promise<void> ( (r, _) => {
                     analyseur.analyse_fonction();
@@ -105,7 +106,7 @@ class Analyseur {
         } else {
             const j = SyntagmeEleve.Fonctions_multiples.includes(this._fonction_courante) && !this._syntagme.est_complet(this._fonction_courante) ? 0 : 1;
             this._fonctions_multiples_index = j === 0 ? this._fonctions_multiples_index + 1 : -1;
-            this._consignes_etape++;
+            this._consignes_etape += j;
             return this.analyse_fonction();
         }
     }
@@ -133,16 +134,23 @@ class Analyseur {
 
         return new Promise<void>( (valider, annuler) => {
             manipulation_fonction(f, analyseur._syntagme, analyseur._syntagme.fonctionPos(f));
-            byID("modal-manipulations-OK").addEventListener("click", () => {
+            const options = {once: true};
+            const f_ok = () => {
                 if (disparition_modal) {
                     anime_disparition_modal(byID("modal-manipulations-contenu"), byID("modal-manipulations"));
                 }
+                byID("modal-manipulations-annuler").removeEventListener("click", f_annuler, options as any); // any, parce que ts râle et il ne semble pas qu'il y a un autre moyen...
                 valider();
-            }, {once: true});
-            byID("modal-manipulations-annuler").addEventListener("click", () => {
-                byID("modal-manipulations").style.display = "none";
+            } 
+            const f_annuler = () => {
+                anime_disparition_modal(byID("modal-manipulations-contenu"), byID("modal-manipulations"));
+                byID("modal-manipulations-OK").removeEventListener("click", f_ok, options as any);
                 annuler();
-            }, {once: true});
+            }
+
+
+            byID("modal-manipulations-OK").addEventListener("click", f_ok, options);
+            byID("modal-manipulations-annuler").addEventListener("click", f_annuler, options);
         });
     }
 
@@ -152,7 +160,7 @@ class Analyseur {
         const numero_d_etape = (f: Fonction) => consignes.map( (e, i) => [e[0], i]).filter( e => e[0] === f)[0][1] as number;
 
         if (this._fonction_courante === "sujet") {
-            if (!this._corrige.est_attributif) {
+            if (!this._corrige.aFonctions(["sujet","attribut_du_sujet"]) && !this._corrige.aFonctions(["sujet","cod"])) {
                 this.prepare_manipulation(this._fonction_courante)
                 .then( () => {
                     analyseur.soumettre_fonction(analyseur._fonction_courante, analyseur._fonctions_multiples_index);
@@ -167,23 +175,26 @@ class Analyseur {
             // si attribut, on attend l'attribut avant de manipuler et on ne vérifie pas
         }
 
-        else if (this._fonction_courante === "attribut_du_sujet") {
-            this.prepare_manipulation("sujet", false)
+        else if ("attribut_du_sujet cod".split(" ").includes(this._fonction_courante)) {
+            const f = this._fonction_courante;
+            (this._corrige.aFonction("sujet") ?
+                this.prepare_manipulation("sujet", false)
+                : new Promise<void>( (r) => {r()}))
             .then( () => {
-                return analyseur.prepare_manipulation("attribut_du_sujet");
+                return analyseur.prepare_manipulation(f);
             },
             () => {
                 throw "sujet";
             })
             .then ( () => {
                 // vérification des deux fonctions
-                if (!analyseur._syntagme.est_correct("sujet")) {
+                if (analyseur._corrige.aFonction("sujet") && !analyseur._syntagme.est_correct("sujet")) {
                     analyseur.affiche_erreur();
                     analyseur._consignes_etape = numero_d_etape("sujet");
                     analyseur.analyse_fonction();
-                } else if (!analyseur._syntagme.est_correct("attribut_du_sujet")) {
+                } else if (!analyseur._syntagme.est_correct(f)){
                     analyseur.affiche_erreur();
-                    analyseur._consignes_etape = numero_d_etape("attribut_du_sujet");
+                    analyseur._consignes_etape = numero_d_etape(f);
                     analyseur.analyse_fonction();
                 } else {
                     analyseur.analyse_suivante();
@@ -191,15 +202,15 @@ class Analyseur {
             },
             (e) => {
                 if (e !== "sujet") {
-                    throw "attribut_du_sujet";
+                    throw f;
                 }
                 throw e;
             })
             .catch ( (e) => {
                 if (e === "sujet") {
                     analyseur._consignes_etape = numero_d_etape("sujet");
-                } else if (e === "attribut_du_sujet") {
-                    analyseur._consignes_etape = numero_d_etape("attribut_du_sujet");
+                } else if (e === f) {
+                    analyseur._consignes_etape = numero_d_etape(f);
                 } else {
                     throw e;
                 }

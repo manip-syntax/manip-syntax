@@ -250,6 +250,17 @@ describe('Syntagme class tests', () => {
       expect(pe.declare("complement_circonstanciel",[0],0)).toBe(true);
       expect(pe.declare("complement_circonstanciel",[0],1)).toBe(false);
       expect(pe.declare("complement_circonstanciel",[3,4],1)).toBe(true);
+      expect(pc.estFonction("complement_circonstanciel",[0])).toBe(true);
+      expect(pc.estFonction("complement_circonstanciel",[3,4])).toBe(true);
+  });
+
+  test("Gestion correcte des indépendantes", () => {
+      let phrase = "Prends tes papiers et sois prudent sur la route ce soir.";
+      let pc = new SyntagmeCorrige(phrase);
+      pc.declareFonction("independante",[0,1,2]);
+      pc.declareFonction("independante",[4,5,6,7,8,9,10]);
+      expect(pc.estFonction("independante",[0,1,2])).toBe(true);
+      expect(pc.estFonction("independante",[4,5,6,7,8,9,10])).toBe(true);
   });
 
   test("cree_groupe_enchasse fonctionne correctement", () => {
@@ -338,7 +349,7 @@ describe('Syntagme class tests', () => {
     let s2 = new Syntagme("Vous êtes son rival ?");
     expect(s2.texte_pos([2])).toEqual("son");
     expect(s2.texte_pos([3])).toEqual("rival");
-    expect(s2.offset_pos([3])).toEqual([14, 19]);
+    expect(s2.offset_pos([3])).toEqual([[14, 19]]);
   });
 });
 

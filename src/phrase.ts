@@ -583,14 +583,14 @@ export class SyntagmeCorrige extends Syntagme {
     estFonction(f:Fonction, mots:MotsPos): boolean { // TEST 
         /*Vrai si mot a cette fonction d'après le corrigé
          */
-        mots = mots.sort();
+        mots = mots.sort( (a,b) => a -b);
         if (Syntagme.Fonctions_multiples.includes(f)) {
             if  (f in this._fonctions_multiples) {
                 return this._fonctions_multiples[f].filter(e => compare(e,mots)).length > 0;
             }
             return false;
         }
-        return compare(this.fonctionPos(f),mots.sort());
+        return compare(this.fonctionPos(f),mots);
     }
     
     * groupes_enchasses() {
