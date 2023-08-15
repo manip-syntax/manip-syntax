@@ -50,7 +50,7 @@ export class Syntagme {
     protected _fonctions_uniques: { [id: string] : MotsPos } = {};
     protected _fonctions_multiples: { [id: string] : MultiMotsPos } = {};
     protected _groupes_enchasses: Map<[Fonction, number], Syntagme> = new Map();
-    protected _manipulations: { [id: string] : ManipulationSujet|ManipulationCOD } = {};
+    protected _manipulations: { [id: string] : ManipulationSujet|ManipulationCOD|ManipulationGroupeVerbal } = {};
 
     public static Separateur = "[ ,;:?!.'-]";
     private static _separateur = new RegExp(Syntagme.Separateur);
@@ -233,7 +233,7 @@ export class Syntagme {
         return (Object.keys(this._fonctions_uniques).length === 0 && Object.keys(this._fonctions_multiples).length === 0);
     }
 
-    ajoute_infos_de_manipulation(f: Fonction, infos: ManipulationSujet|ManipulationCOD) {
+    ajoute_infos_de_manipulation(f: Fonction, infos: ManipulationSujet|ManipulationCOD|ManipulationGroupeVerbal) {
         this._manipulations[f] = infos;
     }
 
@@ -696,4 +696,7 @@ interface ManipulationSujet {
     pronominalisation: string | null;
 }
 
+interface ManipulationGroupeVerbal {
+    verbe: string;
+}
 export type ManipulationCOD = ManipulationSujet;

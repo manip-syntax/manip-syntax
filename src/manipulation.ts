@@ -15,7 +15,8 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
     const fonction_nom = 
     { sujet: "le sujet" ,
       attribut_du_sujet: "l'attribut du sujet",
-      cod: "le COD"
+      cod: "le COD",
+      groupe_verbal: "le groupe verbal"
     }[f as string];
 
     byID("modal-manipulations-titre").innerHTML = `Manipule ${fonction_nom} pour vérifier ta réponse.`;

@@ -39,8 +39,13 @@ byID("bouton-valider").addEventListener('click', () => {
 // raccourci : appuyer sur entrée fait la même chose que d'appuyer sur valider
 // TODO si un modal avec un bouton "ok" est en place, appuyer sur ce bouton à la place
 document.onkeyup = function (e) {
-    if (e.which === 13) {
-        fonctions_communes.ok();
+    switch (e.which) {
+        case 13:
+            fonctions_communes.ok();
+        break;
+        case 27:
+            fonctions_communes.annuler();
+        break;
     }
 };
 // bouton du modal de message: même chose

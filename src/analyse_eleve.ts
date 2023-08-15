@@ -151,6 +151,8 @@ class Analyseur {
 
             byID("modal-manipulations-OK").addEventListener("click", f_ok, options);
             byID("modal-manipulations-annuler").addEventListener("click", f_annuler, options);
+            fonctions_communes.ok = f_ok;
+            fonctions_communes.annuler = f_annuler;
         });
     }
 
@@ -158,21 +160,29 @@ class Analyseur {
         const analyseur = this; // pour éviter les problèmes liés à this
         // sale...
         const numero_d_etape = (f: Fonction) => consignes.map( (e, i) => [e[0], i]).filter( e => e[0] === f)[0][1] as number;
+        const une_seule_manipulation = () => {
+            this.prepare_manipulation(this._fonction_courante)
+            .then( () => {
+                analyseur.soumettre_fonction(analyseur._fonction_courante, analyseur._fonctions_multiples_index);
+            },
+                 () => {
+                     analyseur.analyse_fonction();
+            });
+        };
 
         if (this._fonction_courante === "sujet") {
             if (!this._corrige.aFonctions(["sujet","attribut_du_sujet"]) && !this._corrige.aFonctions(["sujet","cod"])) {
-                this.prepare_manipulation(this._fonction_courante)
-                .then( () => {
-                    analyseur.soumettre_fonction(analyseur._fonction_courante, analyseur._fonctions_multiples_index);
-                },
-                     () => {
-                         analyseur.analyse_fonction();
-                });
+                une_seule_manipulation();
                 return;
             }
             this.analyse_suivante();
             return;
             // si attribut, on attend l'attribut avant de manipuler et on ne vérifie pas
+        }
+
+        else if (this._fonction_courante === "groupe_verbal") {
+            une_seule_manipulation();
+            return;
         }
 
         else if ("attribut_du_sujet cod".split(" ").includes(this._fonction_courante)) {

@@ -5,6 +5,8 @@ export let fonctions_communes = {
     },
     ok : () => { console.log("Aucune fonction définie pour OK");
     },
+    annuler : () => {console.log("Aucune fonction définie pour Annuler");
+    },
     fonction_du_bouton_de_message : () => console.log("Fonction du bouton de message non mise en place")
 };
 

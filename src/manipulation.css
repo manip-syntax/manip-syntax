@@ -146,7 +146,8 @@
 }
 
 
-select[name="pronoms"] {
+select[name="pronoms"],
+.manipulation-select{
     font-size: 30px;
     background-color: white;
     border-style: solid;
