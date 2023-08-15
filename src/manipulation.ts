@@ -55,7 +55,7 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
         const sujet = syntagme.fonction_texte_pos("sujet");
         const infos_de_manipulation = {est_anime: false, pronominalisation: "le"};// TODO FIXME à mettre à la place -> -> syntagme.corrige.infos_de_manipulation("cod");
         const pronom_interrogatif = infos_de_manipulation.est_anime ? "Qui " : "Qu'";
-        const select_pronom = "le la l' les".split(" ").map( e => `<option value="${e.toLowerCase()}">${e}</option>`).join(" ");
+        const select_pronom = "le la l' les me m' te t' nous vous".split(" ").map( e => `<option value="${e.toLowerCase()}">${e}</option>`).join(" ");
         byID("manipulations-form-contenu").innerHTML = cree_champ("Question",`${pronom_interrogatif}est-ce que ${sujet} ${verbe} ? ${drop_zone}`) + 
             cree_champ("Extraction", `C'est ${drop_zone} que ${verbe} ${sujet}.`) +
             cree_champ("Pronominalisation",`${sujet} ${verbe} ${syntagme.texte_pos(mots_selectionnes)} ${fleche} ${sujet} <select name="pronoms">${select_pronom}</select> ${verbe}.`);

@@ -390,6 +390,9 @@ export class CreateurPhrase {
             case "groupe_verbal":
                 res = "Groupe Verbal";
             break;
+            case "coi":
+                res = "COI";
+            break;
             default:
                 throw this.fonction_courante.fonction;
         }
@@ -405,11 +408,33 @@ export class CreateurPhrase {
     }
 
     cree_select(titre: string, liste: string, name: string) : string {
-        const liste_options = liste.split(" ").map(e => `<option name=${name} value=${e.toLowerCase()}>${e}</option>`).join(" ");
+        /* Les différents éléments de liste doivent être séparés par des virgules
+         */
+        const liste_options = liste.split(",").map(e => `<option name=${name} value=${e.toLowerCase()}>${e}</option>`).join(" ");
         const contenu = `<select name="ajout-manipulations-contenu-${name}" class="manipulation-select">
         ${liste_options}</select>
         `;
         return this.cree_fieldset(titre, contenu);
+    }
+
+    cree_liste_preposions_coi(mots_selectionnes: string):string {
+        const mots = mots_selectionnes.split(" ");
+        let res = "à,de,";
+        if (mots.length >= 1) {
+            res += mots[0];
+        }
+        if (mots.length >= 2) {
+            res += `,${mots[0]} ${mots[1]}`;
+        }
+        if (mots.length >= 3) {
+            res += `,${mots[0]} ${mots[1]} ${mots[2]}`;
+        }
+        return res;
+
+    }
+
+    recupere_valeur_select (name: string) : string {
+        return Array.from(document.getElementsByName(name)).filter( elt => (elt as HTMLOptionElement).selected)[0].getAttribute("value") as string;
     }
 
     elements_de_manipulation(est_valide: boolean) {
@@ -417,15 +442,30 @@ export class CreateurPhrase {
         if (! est_valide) {
             return;
         }
-        if ("sujet cod groupe_verbal".split(" ").includes(this.fonction_courante.fonction)) {
+        if ("sujet cod coi groupe_verbal".split(" ").includes(this.fonction_courante.fonction)) {
             const mots_selectionnes = Array.from(document.getElementsByClassName("phrase-selectionne"))
                 .map(elt => elt.innerHTML).join(" ");
             const fonction_nom = this.manipulation_titre(mots_selectionnes);
             byID("modal-ajout-manipulations").style.display = "block";
             let fonction_courante = this.fonction_courante; // ce n'est pas inutile: au moment où on va appeler fonction_du_bouton_des_ajouts_de_manipulations, ce ne sera plus la fonction courante
 
-            if ("sujet cod".split(" ").includes(this.fonction_courante.fonction)) {
-                const pronoms = (fonction_nom === "sujet" ?"je tu il elle nous vous ils elles" : "le la l' les").split(" ");
+            if ("sujet cod coi".split(" ").includes(this.fonction_courante.fonction)) {
+                let pronoms;
+                switch (fonction_nom) {
+                    case "sujet":
+                        pronoms = "je tu il elle nous vous ils elles";
+                    break;
+                    case "COD":
+                        pronoms = "me m' te t' le la l' nous vous les";
+                    break;
+                    case "COI":
+                        pronoms = "me m' te t' elle lui nous vous leur en y";
+                    break;
+                    default:
+                        throw fonction_nom;
+                }
+                pronoms = pronoms.split(" ");
+
                 const pronoms_html = pronoms.includes(mots_selectionnes.toLowerCase()) ? 
                     `<input type="hidden" id="pronom-inutile" name="${fonction_nom}-pronoms" value="null" checked="true">`
                     : `<fieldset class="ajout-manipulations-cadre"><legend class="ajout-manipulations-cadre-titre">Par quoi le ${fonction_nom} peut-il être pronominalisé ?</legend>` +
@@ -434,12 +474,16 @@ export class CreateurPhrase {
                                    ).join(" ") +
                     '</fieldset>';
 
+                const prepositions = this.fonction_courante.fonction !== "coi" ? "" :
+                    this.cree_select("Par quelle préposition commence la question pour trouver le COI ?",this.cree_liste_preposions_coi(mots_selectionnes),"manipulation-preposition-coi");
+
                 byID("ajout-manipulations-form-contenu").innerHTML = '<fieldset class="ajout-manipulations-cadre"><legend class="ajout-manipulations-cadre-titre">Animé ou non-animé ?</legend>' +
                     `<label class="ajout-manipulations-label" for="est-anime">Le référent du ${fonction_nom} est animé.` +
                     `<input type="radio" id="est-anime" value="true" name="${fonction_nom}-anime" required><span class="ajout-manipulations-radio"></span></label class="ajout-manipulations-label">` +
                     `<label class="ajout-manipulations-label" for="est-non-anime">Le référent du ${fonction_nom} est non animé.` +
                     `<input type="radio" id="est-non-anime" value="false" name="${fonction_nom}-anime" required><span class="ajout-manipulations-radio"></span></label class="ajout-manipulations-label">` +
                     '</fieldset>' +
+                    prepositions +
                     pronoms_html;
                 fonction_du_bouton_des_ajouts_de_manipulations = () => {
                     const est_anime = (document.getElementsByName(`${fonction_nom}-anime`)[0] as HTMLInputElement).checked;
@@ -448,13 +492,19 @@ export class CreateurPhrase {
                         pronom = null;
                     }
 
-                    fonction_courante.syntagme.ajoute_infos_de_manipulation(this.fonction_courante.fonction,{est_anime: est_anime, pronominalisation: pronom});
+                    fonction_courante.syntagme.ajoute_infos_de_manipulation(this.fonction_courante.fonction,(() => {
+                        if (fonction_courante.fonction === "coi") {
+                            return {est_anime: est_anime, pronominalisation: pronom, preposition: this.recupere_valeur_select("manipulation-preposition-coi")};
+                        } else {
+                        return {est_anime: est_anime, pronominalisation: pronom};
+                        };
+                        })());
                     byID("modal-ajout-manipulations").style.display = "none";
                 };
             } else if (this.fonction_courante.fonction === "groupe_verbal") {
-                byID("ajout-manipulations-form-contenu").innerHTML = this.cree_select("Verbe pouvant remplacer le groupe verbal", "fais fait faisons faites font", "manipulation-verbe");
+                byID("ajout-manipulations-form-contenu").innerHTML = this.cree_select("Verbe pouvant remplacer le groupe verbal", "fais,fait,faisons,faites,font", "manipulation-verbe");
                 fonction_du_bouton_des_ajouts_de_manipulations = () => {
-                    const verbe = Array.from(document.getElementsByName("manipulation-verbe")).filter( elt => (elt as HTMLOptionElement).selected)[0].getAttribute("value") as string;
+                    const verbe = this.recupere_valeur_select("manipulation-verbe");
                     fonction_courante.syntagme.ajoute_infos_de_manipulation("groupe_verbal", {verbe: verbe});
                     byID("modal-ajout-manipulations").style.display = "none";
                 }
