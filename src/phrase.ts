@@ -50,7 +50,7 @@ export class Syntagme {
     protected _fonctions_uniques: { [id: string] : MotsPos } = {};
     protected _fonctions_multiples: { [id: string] : MultiMotsPos } = {};
     protected _groupes_enchasses: Map<[Fonction, number], Syntagme> = new Map();
-    protected _manipulations: { [id: string] : ManipulationSujet|ManipulationCOD|ManipulationGroupeVerbal } = {};
+    protected _manipulations: { [id: string] : ManipulationInfo} = {};
 
     public static Separateur = "[ ,;:?!.'-]";
     private static _separateur = new RegExp(Syntagme.Separateur);
@@ -233,7 +233,7 @@ export class Syntagme {
         return (Object.keys(this._fonctions_uniques).length === 0 && Object.keys(this._fonctions_multiples).length === 0);
     }
 
-    ajoute_infos_de_manipulation(f: Fonction, infos: ManipulationSujet|ManipulationCOD|ManipulationGroupeVerbal) {
+    ajoute_infos_de_manipulation(f: Fonction, infos: ManipulationInfo) {
         this._manipulations[f] = infos;
     }
 
@@ -687,16 +687,14 @@ interface SyntagmeJSON {
     _fonctions_uniques: { [id: string] : MotsPos|undefined};
     _fonctions_multiples?: { [id: string] : MultiMotsPos|undefined};
     _groupes_enchasses?: Map<[string, number], Syntagme>;
-    _manipulations?: { [id: string] : ManipulationSujet|ManipulationCOD };
+    _manipulations?: { [id: string] : ManipulationInfo};
 }
 
 // TODO probablement à déplacer
-interface ManipulationSujet {
-    est_anime: boolean;
-    pronominalisation: string | null;
+interface ManipulationInfo {
+    est_anime?: boolean;
+    pronominalisation?: string | null;
+    verbe?: string;
+    preposition?: string;
 }
 
-interface ManipulationGroupeVerbal {
-    verbe: string;
-}
-export type ManipulationCOD = ManipulationSujet;

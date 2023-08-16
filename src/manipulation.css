@@ -170,3 +170,22 @@ select[name="pronoms"],
     font-size: 0px;
     transition: 0.8s;
 }
+
+#manipulation-deplacable {
+    font-size: 40px;
+    font-style: italic;
+    cursor: grab;
+}
+
+.manipulation-deplacement-dropzone {
+    display: inline-block;
+    width: 10px;
+    height: 35px;
+}
+
+.manipulation-dropzone-hover {
+    background-color: salmon;
+    width: 40px;
+    height: 35px;
+    transition: 0.2s;
+}

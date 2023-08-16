@@ -492,7 +492,7 @@ export class CreateurPhrase {
                         pronom = null;
                     }
 
-                    fonction_courante.syntagme.ajoute_infos_de_manipulation(this.fonction_courante.fonction,(() => {
+                    fonction_courante.syntagme.ajoute_infos_de_manipulation(fonction_courante.fonction,(() => {
                         if (fonction_courante.fonction === "coi") {
                             return {est_anime: est_anime, pronominalisation: pronom, preposition: this.recupere_valeur_select("manipulation-preposition-coi")};
                         } else {
@@ -501,7 +501,7 @@ export class CreateurPhrase {
                         })());
                     byID("modal-ajout-manipulations").style.display = "none";
                 };
-            } else if (this.fonction_courante.fonction === "groupe_verbal") {
+            } else if (fonction_courante.fonction === "groupe_verbal") {
                 byID("ajout-manipulations-form-contenu").innerHTML = this.cree_select("Verbe pouvant remplacer le groupe verbal", "fais,fait,faisons,faites,font", "manipulation-verbe");
                 fonction_du_bouton_des_ajouts_de_manipulations = () => {
                     const verbe = this.recupere_valeur_select("manipulation-verbe");

@@ -100,7 +100,7 @@ class Analyseur {
                         r();
                     }, {once: true});
                 });
-                await promesse_analyse.then( () => console.log("promise ok"));
+                await promesse_analyse.then( () => console.debug("promise ok"));
             }
             return this.analyse_finie();
         } else {
@@ -133,7 +133,7 @@ class Analyseur {
         const analyseur = this; // pour éviter les problèmes liés à this
 
         return new Promise<void>( (valider, annuler) => {
-            manipulation_fonction(f, analyseur._syntagme, analyseur._syntagme.fonctionPos(f));
+            manipulation_fonction(f, analyseur._syntagme, analyseur._syntagme.fonctionPos(f, this._fonctions_multiples_index));
             const options = {once: true};
             const f_ok = () => {
                 if (disparition_modal) {
@@ -157,7 +157,7 @@ class Analyseur {
     }
 
     manipule_fonction() {
-        const analyseur = this; // pour éviter les problèmes liés à this
+        const analyseur = this; // pour éviter les problèmes liés à this dans les Promise
         // sale...
         const numero_d_etape = (f: Fonction) => consignes.map( (e, i) => [e[0], i]).filter( e => e[0] === f)[0][1] as number;
         const une_seule_manipulation = () => {
@@ -170,24 +170,8 @@ class Analyseur {
             });
         };
 
-        if (this._fonction_courante === "sujet") {
-            if (!this._corrige.aFonctions(["sujet","attribut_du_sujet"]) && !this._corrige.aFonctions(["sujet","cod"])) {
-                une_seule_manipulation();
-                return;
-            }
-            this.analyse_suivante();
-            return;
-            // si attribut, on attend l'attribut avant de manipuler et on ne vérifie pas
-        }
-
-        else if (this._fonction_courante === "groupe_verbal") {
-            une_seule_manipulation();
-            return;
-        }
-
-        else if ("attribut_du_sujet cod".split(" ").includes(this._fonction_courante)) {
-            const f = this._fonction_courante;
-            (this._corrige.aFonction("sujet") ?
+        const deux_manipulations = (f: Fonction) => {
+            return (this._corrige.aFonction("sujet") ?
                 this.prepare_manipulation("sujet", false)
                 : new Promise<void>( (r) => {r()}))
             .then( () => {
@@ -227,7 +211,36 @@ class Analyseur {
                 analyseur.analyse_fonction();
 
             });
+        };
+
+        if (this._fonction_courante === "sujet") {
+            if (!this._corrige.aFonctions(["sujet","attribut_du_sujet"]) && !this._corrige.aFonctions(["sujet","cod"])) {
+                une_seule_manipulation();
+                return;
+            }
+            this.analyse_suivante();
             return;
+            // si attribut, on attend l'attribut avant de manipuler et on ne vérifie pas
+        }
+
+        else if ("coi groupe_verbal complement_circonstanciel".includes(this._fonction_courante)) {
+            une_seule_manipulation();
+            return;
+        }
+
+        else if ("attribut_du_sujet cod".split(" ").includes(this._fonction_courante)) {
+            if (this._corrige.aFonction("attribut_du_cod")) {
+                return;
+            }
+            deux_manipulations(this._fonction_courante);
+            return;
+        }
+        else if (this._fonction_courante === "attribut_du_cod") {
+            deux_manipulations("cod")
+                .then( () => {
+                    this.soumettre_fonction("attribut_du_cod", -1);
+                });
+                return;
         }
         this.soumettre_fonction(this._fonction_courante, this._fonctions_multiples_index);
     }

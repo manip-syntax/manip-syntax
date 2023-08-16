@@ -1,6 +1,8 @@
 import { Fonction, MotsPos, SyntagmeEleve } from "./phrase";
 import { byID } from "./util";
 import './manipulation.css';
+// TODO FIXME attention au problème lié au sujet des verbes à l'impératif (notamment) : il faut mettre le sujet de substition partout ailleurs
+// C'est à Don Diègue que Il donne un soufflet -> à améliorer
 
 function cree_champ(titre: string, contenu: string) : string {
     return `<fieldset class="manipulation-element">
@@ -9,6 +11,102 @@ function cree_champ(titre: string, contenu: string) : string {
             </fieldset>`;
 }
 
+function cree_suppression(syntagme: SyntagmeEleve, mots_selectionnes: MotsPos): string {
+    const attr_offset = syntagme.offset_pos(mots_selectionnes);
+    let phrase_cassee = "";
+    for (let i=0, j=0; i <syntagme.contenu.length ; i++) {
+        if (i === attr_offset[j][0]) {
+            phrase_cassee += '<span class="manipulation-supprimable">';
+        }
+        else if (i === attr_offset[j][1]) {
+            phrase_cassee += '</span>';
+            if (j < attr_offset.length - 1) { 
+                j++;
+            }
+        }
+        phrase_cassee += syntagme.contenu[i];
+    }
+    return cree_champ("Suppression", phrase_cassee);
+}
+
+function cree_deplacement(syntagme: SyntagmeEleve, mots_selectionnes: MotsPos): string {
+    const attr_offset = syntagme.offset_pos(mots_selectionnes);
+    const dz = '<span class="manipulation-deplacement-dropzone"> </span>';
+    let phrase_cassee = dz;
+    for (let i=0, j=0; i <syntagme.contenu.length ; i++) {
+        if (i === attr_offset[j][0]) {
+            // on ajoute une espace au début et à la fin pour éviter que les mots ne collent
+            phrase_cassee += '<span draggable="true" class="manipulation-deplacable" id="manipulation-deplacable"><span> </span> ';
+        }
+        else if (i === attr_offset[j][1]) {
+            phrase_cassee += '<span> </span></span>';
+            if (j < attr_offset.length - 1) { 
+                j++;
+            }
+        } else if (syntagme.contenu[i] === " " && (i < attr_offset[j][0] || i >= attr_offset[j][1])) {
+            phrase_cassee += dz;
+            continue;
+        }
+        phrase_cassee += syntagme.contenu[i];
+    }
+    phrase_cassee += dz;
+
+    return cree_champ("Deplacement", phrase_cassee);
+}
+
+function cree_evenements_deplacements() {
+    const f_drag = () => {
+        byID("manipulation-deplacable").addEventListener("dragstart", (e) => {
+            if (e.dataTransfer !== null) {
+                e.dataTransfer.setData("text/plain",(e.target as HTMLElement).id);
+                e.dataTransfer.dropEffect = "move";
+            } else {
+                throw e;
+            }
+        });
+    }
+
+    const f_drop = (elt: HTMLElement) => {
+        elt.addEventListener("dragenter", () => {
+            elt.classList.add("manipulation-dropzone-hover");
+        });
+
+        elt.addEventListener("dragleave", () => {
+            elt.classList.remove("manipulation-dropzone-hover");
+        });
+
+        elt.addEventListener("dragover", (ev) => {
+            const e = ev as DragEvent;
+            if (e.dataTransfer === null) {
+                throw Error("Pas de données transférées");
+            }
+            e.preventDefault();
+            e.dataTransfer.dropEffect = "move";
+        });
+
+        elt.addEventListener("drop", (ev) => {
+            const e = ev as DragEvent;
+            if (e.dataTransfer === null) {
+                throw Error("Pas de données transférées");
+            }
+            e.preventDefault();
+            const element_deplace = byID(e.dataTransfer.getData("text/plain"));
+            let target = (e.target as HTMLElement)
+            target.classList.remove("manipulation-dropzone-hover");
+            const target_html = target.outerHTML;
+            target.outerHTML = element_deplace.outerHTML;
+            element_deplace.outerHTML = target_html;
+            f_drop(elt);
+            f_drag();
+        });
+    }
+    for (const elt of document.getElementsByClassName("manipulation-deplacement-dropzone")) {
+        f_drag();
+        f_drop(elt as HTMLElement);
+    }
+}
+
+
 export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots_selectionnes: MotsPos) {
     const modal = byID("modal-manipulations");
     modal.style.display = "block";
@@ -16,11 +114,13 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
     { sujet: "le sujet" ,
       attribut_du_sujet: "l'attribut du sujet",
       cod: "le COD",
-      groupe_verbal: "le groupe verbal"
+      groupe_verbal: "le groupe verbal",
+      complement_circonstanciel: "le complément circonstanciel"
     }[f as string];
 
     byID("modal-manipulations-titre").innerHTML = `Manipule ${fonction_nom} pour vérifier ta réponse.`;
     byID("manipulable").innerHTML = syntagme.texte_pos(mots_selectionnes);
+    byID("manipulable").style.visibility = "visible"; // au cas où un CC l'aurait caché
     const verbe = syntagme.fonction_texte_pos("verbe_noyau");
     const drop_zone = `<span class="manipulation-drop-zone">Glisse ${fonction_nom} ici</span>`;
     const fleche = `
@@ -32,6 +132,7 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
     </svg> </span>`
 
     if (f === "sujet") {
+        console.log("ok");
         const derriere_verbe = " " +
         function () { if (syntagme.corrige.aFonction("attribut_du_sujet")) {
             return syntagme.fonction_texte_pos("attribut_du_sujet");
@@ -53,12 +154,24 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
 
     } else if (f === "cod") {
         const sujet = syntagme.fonction_texte_pos("sujet");
+        const attr_cod = syntagme.corrige.aFonction("attribut_du_cod") ? " " + syntagme.fonction_texte_pos("attribut_du_cod") : "";
         const infos_de_manipulation = {est_anime: false, pronominalisation: "le"};// TODO FIXME à mettre à la place -> -> syntagme.corrige.infos_de_manipulation("cod");
         const pronom_interrogatif = infos_de_manipulation.est_anime ? "Qui " : "Qu'";
         const select_pronom = "le la l' les me m' te t' nous vous".split(" ").map( e => `<option value="${e.toLowerCase()}">${e}</option>`).join(" ");
-        byID("manipulations-form-contenu").innerHTML = cree_champ("Question",`${pronom_interrogatif}est-ce que ${sujet} ${verbe} ? ${drop_zone}`) + 
-            cree_champ("Extraction", `C'est ${drop_zone} que ${verbe} ${sujet}.`) +
-            cree_champ("Pronominalisation",`${sujet} ${verbe} ${syntagme.texte_pos(mots_selectionnes)} ${fleche} ${sujet} <select name="pronoms">${select_pronom}</select> ${verbe}.`);
+        byID("manipulations-form-contenu").innerHTML = cree_champ("Question",`${pronom_interrogatif}est-ce que ${sujet} ${verbe}${attr_cod} ? ${drop_zone}`) + 
+            cree_champ("Extraction", `C'est ${drop_zone} que ${sujet} ${verbe}${attr_cod}.`) +
+            cree_champ("Pronominalisation",`${sujet} ${verbe} ${syntagme.texte_pos(mots_selectionnes)}${attr_cod} ${fleche} ${sujet} <select name="pronoms">${select_pronom}</select> ${verbe}${attr_cod}.`);
+
+    } else if (f === "coi") {
+        const sujet = syntagme.fonction_texte_pos("sujet");
+        const cod = syntagme.corrige.aFonction("cod") ? " " + syntagme.fonction_texte_pos("cod") : "";
+        const infos_de_manipulation = {est_anime: false, pronominalisation: "lui", preposition: "à"};// TODO FIXME à mettre à la place -> -> syntagme.corrige.infos_de_manipulation("coi");
+        const preposition = infos_de_manipulation.preposition;
+        const pronom_interrogatif = preposition + " " +infos_de_manipulation.est_anime ? "qui " : "quoi";
+        const select_pronom = "lui leur me m' te t'".split(" ").map( e => `<option value="${e.toLowerCase()}">${e}</option>`).join(" ");
+        byID("manipulations-form-contenu").innerHTML = cree_champ("Question", `${sujet} ${verbe}${cod} ${preposition} ${pronom_interrogatif} ? ${drop_zone}`) +
+            cree_champ("Extraction", `C'est ${drop_zone} que ${sujet} ${verbe}${cod}.`) +
+            cree_champ("Pronominalisation",`${sujet} ${verbe}${cod} ${syntagme.texte_pos(mots_selectionnes)} ${fleche} ${sujet} <select name="pronoms">${select_pronom}</select> ${verbe}${cod}.`);
 
     } else if (f === "groupe_verbal") {
         const sujet = syntagme.fonction_texte_pos("sujet");
@@ -68,29 +181,21 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
 
     } else if (f === "attribut_du_sujet") {
         const sujet = syntagme.fonction_texte_pos("sujet");
-        const attr_offset = syntagme.offset_pos(mots_selectionnes);
-        let phrase_cassee = "";
-        for (let i=0, j=0; i <syntagme.contenu.length ; i++) {
-            if (i === attr_offset[j][0]) {
-                phrase_cassee += '<span class="manipulation-supprimable">';
-            }
-            else if (i === attr_offset[j][1]) {
-                phrase_cassee += '</span>';
-                if (j < attr_offset.length - 1) { 
-                    j++;
-                }
-            }
-            phrase_cassee += syntagme.contenu[i];
-        }
         byID("manipulations-form-contenu").innerHTML = cree_champ("Question",`${sujet} ${verbe} quoi ? ${drop_zone}`) + 
-        cree_champ("Suppression",phrase_cassee);
+            cree_suppression(syntagme, mots_selectionnes);
 
-        for (let supprimable of document.getElementsByClassName("manipulation-supprimable")) {
-            supprimable.addEventListener('click', () => {
-                supprimable.classList.remove("manipulation-supprimable");
-                supprimable.classList.add("manipulation-supprime");
-            });
-        }
+    } else if (f === "complement_circonstanciel") {
+        byID("manipulations-form-contenu").innerHTML = cree_suppression(syntagme, mots_selectionnes) +
+            cree_deplacement(syntagme, mots_selectionnes);
+        cree_evenements_deplacements();
+        byID("manipulable").style.visibility = "collapse";
+    }
+
+    for (let supprimable of document.getElementsByClassName("manipulation-supprimable")) {
+        supprimable.addEventListener('click', () => {
+            supprimable.classList.remove("manipulation-supprimable");
+            supprimable.classList.add("manipulation-supprime");
+        });
     }
 
     for (const elt of document.getElementsByClassName("manipulation-drop-zone")) {
