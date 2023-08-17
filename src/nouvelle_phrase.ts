@@ -312,7 +312,8 @@ export class CreateurPhrase {
             if (fonction in compatibilite) {
                 return compatibilite[fonction].map(elt => syntagme.fonctionPos(elt as Fonction)).flat().concat(syntagme.mots_sans_fonction);
             } else {
-                return syntagme.mots_sans_fonction;
+                // il faut inclure la fonction courante si l'utilisateur veut la corriger
+                return syntagme.mots_sans_fonction.concat(syntagme.fonctionPos(fonction, this.fonction_courante.numero));
             }
         };
         byID("phrase-analyse-paragraphe").innerHTML = affiche_phrase(this._phrase, a_inclure());
@@ -322,6 +323,7 @@ export class CreateurPhrase {
 
         // selection des mots précédemment sélectionnés
         const mots_selectionnes = syntagme.fonctionPos(fonction, this.fonction_courante.numero);
+        // préselection ne fonctionne pas ocrrectement TODO FIXME
         Array.from(document.getElementsByClassName("phrase-cliquable"))
             .forEach( elt => {
                 if (mots_selectionnes.includes(Number(elt.id.split('-')[2]))) {
@@ -350,8 +352,11 @@ export class CreateurPhrase {
             return this;
         }
 
-        fonction_de_validation_de_la_phrase = () => {
-            const filename = "phrase.{{numéro_de_version}}.json";
+        fonction_de_validation_de_la_phrase = async () => {
+            const base_filename = this._phrase.contenu.replaceAll(" ","_").replace(Syntagme.separateur,'').toLowerCase();
+            const filename = `${base_filename}.{{numéro_de_version}}.json`;
+
+            await this.verification_verbes_sans_sujet(this._phrase); 
 
             // TODO ajout de la version dans le fichier json?
             const blob = new Blob([JSON.stringify(enregistre_fonction()._phrase)], { type: "text/json" });
@@ -437,6 +442,37 @@ export class CreateurPhrase {
         return Array.from(document.getElementsByName(name)).filter( elt => (elt as HTMLOptionElement).selected)[0].getAttribute("value") as string;
     }
 
+    elements_de_manipulation_verbes (s: Syntagme, mots: string) {
+            byID("modal-ajout-manipulations").style.display = "block";
+            byID("modal-ajout-manipulations-titre").innerHTML = `Rentrer les informations nécessaires à la validation d'un verbe sans sujet: ${mots}`;
+            byID("ajout-manipulations-form-contenu").innerHTML = this.cree_select("Sujet", "tu,nous,vous,je,j',il,elle,ils,elles", "manipulation-verbe-sans-sujet");
+            fonction_du_bouton_des_ajouts_de_manipulations = () => {
+                const sujet = this.recupere_valeur_select("manipulation-verbe-sans-sujet");
+                s.ajoute_infos_de_manipulation("verbe_noyau",{"pronominalisation":sujet});
+                console.log("manip inside",s.infos_de_manipulation("verbe_noyau"));
+                byID("modal-ajout-manipulations").style.display = "none";
+            }
+            fonctions_communes.ok = fonction_du_bouton_des_ajouts_de_manipulations;
+    }
+
+    async verification_verbes_sans_sujet(s:Syntagme) {
+        if (s.fonctionPos("verbe_noyau").length > 0 && s.fonctionPos("sujet").length === 0) {
+            this.elements_de_manipulation_verbes(s, s.fonctionMots("verbe_noyau"));
+            let p = new Promise<void>( (r, _) => {
+                const f_definie = fonction_du_bouton_des_ajouts_de_manipulations;
+                fonction_du_bouton_des_ajouts_de_manipulations = () => {
+                    f_definie();
+                    r();
+                };
+                });
+            await p.then( () => console.debug("Promise fulfilled"));
+        }
+        for (let [_, gp] of s.groupes_enchasses()) {
+            await this.verification_verbes_sans_sujet(gp);
+        }
+
+    }
+
     elements_de_manipulation(est_valide: boolean) {
         // TODO pour l'attribut, ajouter la possibilité de rentrer si c'est un adjectif, afin de pouvoir suivre les directives du guide et poser soit la question comment, soit quoi
         if (! est_valide) {
@@ -453,7 +489,7 @@ export class CreateurPhrase {
                 let pronoms;
                 switch (fonction_nom) {
                     case "sujet":
-                        pronoms = "je tu il elle nous vous ils elles";
+                        pronoms = "je j' tu il elle nous vous ils elles";
                     break;
                     case "COD":
                         pronoms = "me m' te t' le la l' nous vous les";
@@ -527,7 +563,7 @@ export function nouvelle_phrase() : void {
     modal_nouvelle_phrase.style.display = "block";
     byID("nouvelle_phrase-texterea").focus();
     // Divers éléments à afficher
-    byID("conseil").innerHTML = "Sélectionnez chaque fonction comme si vous étiez vous-même l'élève. Cliquez sur valider quand vous avez terminé votre sélection. Valider dans rien sélectionner indique que cette fonction est absente de la phrase. Vous pouvez toujours corriger une éventuelle erreur en sélectionnant une fonction dans la liste déroulante.";
+    //byID("conseil").innerHTML = "Sélectionnez chaque fonction comme si vous étiez vous-même l'élève. Cliquez sur valider quand vous avez terminé votre sélection. Valider dans rien sélectionner indique que cette fonction est absente de la phrase. Vous pouvez toujours corriger une éventuelle erreur en sélectionnant une fonction dans la liste déroulante.";
     const bouton_valider = byID("bouton-valider");
     bouton_valider.style.width = "50%";
     bouton_valider.innerHTML = "Valider la fonction";

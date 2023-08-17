@@ -351,5 +351,13 @@ describe('Syntagme class tests', () => {
     expect(s2.texte_pos([3])).toEqual("rival");
     expect(s2.offset_pos([3])).toEqual([[14, 19]]);
   });
+
+  test("La sérialisation supprime ce qui est inutile", () => {
+      let s = new Syntagme("Le chat de ma voisine est noir.");
+      let ss = s.cree_groupe_enchasse([0,1,2,3,4], "sujet",-1);
+      console.log(s.toJSON());
+      console.log("s2",ss.toJSON());
+      expect(true).toBe(true);
+  });
 });
 

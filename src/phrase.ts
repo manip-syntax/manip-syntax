@@ -322,9 +322,18 @@ export class Syntagme {
     // http://choly.ca/post/typescript-json/#comment-2579491209
     toJSON(): SyntagmeJSON {  // TODO TEST À FAIRE -> ne fonctionne pas, tout est copié
         // une copie pour garder le strict nécessaire: les données
-        const copie = this.copie;
-        let copie_obj = Object.assign(copie);
-        copie_obj._groupes_enchasses = Array.from(copie_obj._groupes_enchasses.entries());
+        let copie_obj= Object.assign(this.copie);
+        copie_obj._groupes_enchasses = Array.from(this._groupes_enchasses.entries());//.map( elt => {console.log(elt); return [elt[0],elt[1].toJSON()]});
+        return copie_obj; // TODO pour le moment uniquement
+        // copie de ce qui est nécessaire uniquement
+        for (let elt in copie_obj) {
+            if (!"phrase _mots_pos verbes _fonctions_uniques _fonctions_multiples _groupes_enchasses _manipulations".includes(elt)) {
+                delete(copie_obj[elt]);
+            }
+            else if ("verbes _fonctions_uniques _fonctions_multiples _groupes_enchasses _manipulations".includes(elt) && elt.length === 0) {
+                delete(copie_obj[elt]);
+            }
+        }
         return copie_obj;
     }
 
@@ -510,6 +519,12 @@ export class Syntagme {
             .filter(n=>n); // retire chaines vides
     }
 
+    * groupes_enchasses() {
+        for (let elt of this._groupes_enchasses) {
+            yield elt;
+        }
+    }
+
 }
 
 export class SyntagmeCorrige extends Syntagme {
@@ -526,6 +541,7 @@ export class SyntagmeCorrige extends Syntagme {
     }
 
     static fromJSON(json: SyntagmeJSON|string): SyntagmeCorrige { // TEST
+        // Il faut tenir compte du problème du parent TODO 
         if (typeof json === 'string') {
             return JSON.parse(json, SyntagmeCorrige.reviver);
         } else {
@@ -541,6 +557,7 @@ export class SyntagmeCorrige extends Syntagme {
             return o;
         }
     }
+
     cree_groupe_enchasse(mots_pos: MotsPos, f: Fonction, numero:number): SyntagmeCorrige { // TEST
         const n = new SyntagmeCorrige(this.contenu, mots_pos);
         this._groupes_enchasses.set([f,numero], n);
@@ -548,7 +565,6 @@ export class SyntagmeCorrige extends Syntagme {
         n._parent = this;
         return n;
     }
-
 
     groupe_enchasse(f: Fonction, n:number): SyntagmeCorrige {
         // on sait que les groupes enchassés de cette classe sont corrigés

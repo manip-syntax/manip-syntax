@@ -1,7 +1,7 @@
 import { Fonction, MotsPos, SyntagmeEleve } from "./phrase";
 import { byID } from "./util";
 import './manipulation.css';
-// TODO FIXME attention au problème lié au sujet des verbes à l'impératif (notamment) : il faut mettre le sujet de substition partout ailleurs
+// TODO FIXME attention au problème lié au sujet des verbes à l'impératif (notamment) : revoir le fonctionnement: c'est plus compliqué que ce qui se trouve dans cette page
 // C'est à Don Diègue que Il donne un soufflet -> à améliorer
 
 function cree_champ(titre: string, contenu: string) : string {
@@ -106,6 +106,21 @@ function cree_evenements_deplacements() {
     }
 }
 
+function recupere_sujet(syntagme: SyntagmeEleve) : string {
+    if (syntagme.corrige.aFonction("sujet")) {
+        return syntagme.fonction_texte_pos("sujet");
+    }
+    if (syntagme.corrige.aFonction("verbe_noyau")) {
+        const p = syntagme.corrige.infos_de_manipulation("verbe_noyau").pronominalisation;
+        if (typeof p !== "string") {
+            throw new Error("Impossible de trouver le sujet");
+        }
+        return p;
+    }
+
+    return "";
+}
+
 
 export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots_selectionnes: MotsPos) {
     const modal = byID("modal-manipulations");
@@ -132,7 +147,6 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
     </svg> </span>`
 
     if (f === "sujet") {
-        console.log("ok");
         const derriere_verbe = " " +
         function () { if (syntagme.corrige.aFonction("attribut_du_sujet")) {
             return syntagme.fonction_texte_pos("attribut_du_sujet");
@@ -153,9 +167,9 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
         <select name="pronoms">${select_pronom}</select> ${verbe}${derriere_verbe}.</span></fieldset>`);
 
     } else if (f === "cod") {
-        const sujet = syntagme.fonction_texte_pos("sujet");
+        const sujet = recupere_sujet(syntagme);
         const attr_cod = syntagme.corrige.aFonction("attribut_du_cod") ? " " + syntagme.fonction_texte_pos("attribut_du_cod") : "";
-        const infos_de_manipulation = {est_anime: false, pronominalisation: "le"};// TODO FIXME à mettre à la place -> -> syntagme.corrige.infos_de_manipulation("cod");
+        const infos_de_manipulation = syntagme.corrige.infos_de_manipulation("cod");
         const pronom_interrogatif = infos_de_manipulation.est_anime ? "Qui " : "Qu'";
         const select_pronom = "le la l' les me m' te t' nous vous".split(" ").map( e => `<option value="${e.toLowerCase()}">${e}</option>`).join(" ");
         byID("manipulations-form-contenu").innerHTML = cree_champ("Question",`${pronom_interrogatif}est-ce que ${sujet} ${verbe}${attr_cod} ? ${drop_zone}`) + 
@@ -163,9 +177,9 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
             cree_champ("Pronominalisation",`${sujet} ${verbe} ${syntagme.texte_pos(mots_selectionnes)}${attr_cod} ${fleche} ${sujet} <select name="pronoms">${select_pronom}</select> ${verbe}${attr_cod}.`);
 
     } else if (f === "coi") {
-        const sujet = syntagme.fonction_texte_pos("sujet");
+        const sujet = recupere_sujet(syntagme);
         const cod = syntagme.corrige.aFonction("cod") ? " " + syntagme.fonction_texte_pos("cod") : "";
-        const infos_de_manipulation = {est_anime: false, pronominalisation: "lui", preposition: "à"};// TODO FIXME à mettre à la place -> -> syntagme.corrige.infos_de_manipulation("coi");
+        const infos_de_manipulation = syntagme.corrige.infos_de_manipulation("coi");
         const preposition = infos_de_manipulation.preposition;
         const pronom_interrogatif = preposition + " " +infos_de_manipulation.est_anime ? "qui " : "quoi";
         const select_pronom = "lui leur me m' te t'".split(" ").map( e => `<option value="${e.toLowerCase()}">${e}</option>`).join(" ");
@@ -174,13 +188,13 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
             cree_champ("Pronominalisation",`${sujet} ${verbe}${cod} ${syntagme.texte_pos(mots_selectionnes)} ${fleche} ${sujet} <select name="pronoms">${select_pronom}</select> ${verbe}${cod}.`);
 
     } else if (f === "groupe_verbal") {
-        const sujet = syntagme.fonction_texte_pos("sujet");
-        const infos_de_manipulation = {verbe: "fait"}; // TODO FIXME -> syntagme.corrige.infos_de_manipulation("groupe_verbal");
+        const sujet = recupere_sujet(syntagme);
+        const infos_de_manipulation = syntagme.corrige.infos_de_manipulation("groupe_verbal");
         const verbe = infos_de_manipulation.verbe;
         byID("manipulations-form-contenu").innerHTML = cree_champ("Question", `Que ${verbe} ${sujet} ? ${sujet} ${drop_zone}`);
 
     } else if (f === "attribut_du_sujet") {
-        const sujet = syntagme.fonction_texte_pos("sujet");
+        const sujet = recupere_sujet(syntagme);
         byID("manipulations-form-contenu").innerHTML = cree_champ("Question",`${sujet} ${verbe} quoi ? ${drop_zone}`) + 
             cree_suppression(syntagme, mots_selectionnes);
 
