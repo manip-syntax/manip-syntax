@@ -29,9 +29,9 @@
 .groupe-de-mots::before {
     font-size: 13px;
     position: absolute;
-    bottom: -5px;
+    bottom: -5px; /* BUG: si le groupe est sur deux lignes, le nom s'affichera mal */
     left: 0;
-    width: 200%; /* Pour éviter les retours à la ligne intempestifs */
+    width: 150px; /* Pour éviter les retours à la ligne intempestifs */
     text-align: left;
 }
 
@@ -133,9 +133,14 @@
     color: black;
 }
 
-.phrase-complement_du_nom {
+.phrase-complement_du_nom,
+.phrase-complement_du_pronom {
     border-style: dotted;
     border-color: green;
+}
+
+.phrase-complement_du_pronom::before {
+    content: "Complément du pronom";
 }
 
 .phrase-complement_du_nom::before {
