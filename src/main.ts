@@ -6,6 +6,17 @@ import { add_events_listener, nouvelle_phrase, retirer_elements_nouvelle_phrase 
 import { SyntagmeCorrige} from './phrase';
 import { definit_message_modal, fonctions_communes } from './fonctions_partagees';
 import {analyse_phrase, selectionne_phrase} from './analyse_eleve';
+/* TODO FIXME
+ * - affichage et correction des infos de manipulation (nouvelle phrase)
+ * - limiter davantage les choix selon les choix précédents dans la nouvelle phrase
+ * - si chevauchement du nom de deux fonctions, faire disparaître avec des points de suspension et avec un :hover, montrer ce qui manque
+ * - afficher les numéros de sfonctions multiples ?
+ * - c'est il qui donner un soufflet -> c'est lui... (manipulation)
+ * - attention au que il... (manipulation)
+ * - proposer aux élèves de déterminer eux-mêmes quelles fonctions sont présentes dans la phrase.
+ * - par rapport aux groupes enchassés, une méthode plus efficace pourrait consister à leur faire trouver tout le groupe après avoir trouvé ses éléments
+ *   Auquel cas, il faudrait changer complètement d'approche (actuellement, on trouve l'ensemble du groupe et ensuite ses éléments)
+ */
 
 
 // sélection des mots
