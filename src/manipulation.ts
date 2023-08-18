@@ -182,10 +182,10 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
         const infos_de_manipulation = syntagme.corrige.infos_de_manipulation("coi");
         const preposition = infos_de_manipulation.preposition;
         const pronom_interrogatif = preposition + " " +infos_de_manipulation.est_anime ? "qui " : "quoi";
-        const select_pronom = "lui leur me m' te t'".split(" ").map( e => `<option value="${e.toLowerCase()}">${e}</option>`).join(" ");
+        const select_pronom = "lui leur me m' te t' en y".split(" ").map( e => `<option value="${e.toLowerCase()}">${e}</option>`).join(" ");
         byID("manipulations-form-contenu").innerHTML = cree_champ("Question", `${sujet} ${verbe}${cod} ${preposition} ${pronom_interrogatif} ? ${drop_zone}`) +
             cree_champ("Extraction", `C'est ${drop_zone} que ${sujet} ${verbe}${cod}.`) +
-            cree_champ("Pronominalisation",`${sujet} ${verbe}${cod} ${syntagme.texte_pos(mots_selectionnes)} ${fleche} ${sujet} <select name="pronoms">${select_pronom}</select> ${verbe}${cod}.`);
+            cree_champ("Pronominalisation",`${sujet} ${verbe}${cod} ${preposition} ${syntagme.texte_pos(mots_selectionnes)} ${fleche} ${sujet} <select name="pronoms">${select_pronom}</select> ${verbe}${cod}.`);
 
     } else if (f === "groupe_verbal") {
         const sujet = recupere_sujet(syntagme);

@@ -31,7 +31,7 @@
     position: absolute;
     bottom: -5px; /* BUG: si le groupe est sur deux lignes, le nom s'affichera mal */
     left: 0;
-    width: 150px; /* Pour éviter les retours à la ligne intempestifs */
+    width: 170px; /* Pour éviter les retours à la ligne intempestifs */
     text-align: left;
 }
 

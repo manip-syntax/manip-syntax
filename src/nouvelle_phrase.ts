@@ -315,10 +315,15 @@ export class CreateurPhrase {
                 complement_du_verbe_impersonnel: ["groupe_verbal", "verbes"]
             };
             if (fonction in compatibilite) {
-                return compatibilite[fonction].map(elt => syntagme.fonctionPos(elt as Fonction)).flat().concat(syntagme.mots_sans_fonction);
+                return compatibilite[fonction].map(elt => syntagme.fonctionPos(elt as Fonction)).flat()
+                    .concat(syntagme.mots_sans_fonction)                                    // mots qui n'ont jamais été choisis
+                    .concat(syntagme.fonctionPos(fonction, this.fonction_courante.numero)); // mots qui ont été précédemment choisis pour cette fonction
             } else {
                 // il faut inclure la fonction courante si l'utilisateur veut la corriger
-                return syntagme.mots_sans_fonction.concat(syntagme.fonctionPos(fonction, this.fonction_courante.numero));
+                console.debug("Intégration des mots sans fonction et de la fonction courante dans les mots qu'on peut sélectionner", fonction);
+                return syntagme.mots_sans_fonction
+                    .concat(syntagme.fonctionPos(fonction, this.fonction_courante.numero)) // mots présélectionnés
+                    .concat(syntagme.fonctionPos("verbes"));                                // tous les verbes peuvent être intégrés dans un autre syntagme
             }
         };
         byID("phrase-analyse-paragraphe").innerHTML = affiche_phrase(this._phrase, a_inclure());
@@ -328,7 +333,6 @@ export class CreateurPhrase {
 
         // selection des mots précédemment sélectionnés
         const mots_selectionnes = syntagme.fonctionPos(fonction, this.fonction_courante.numero);
-        // préselection ne fonctionne pas ocrrectement TODO FIXME
         Array.from(document.getElementsByClassName("phrase-cliquable"))
             .forEach( elt => {
                 if (mots_selectionnes.includes(Number(elt.id.split('-')[2]))) {
@@ -358,8 +362,10 @@ export class CreateurPhrase {
         }
 
         fonction_de_validation_de_la_phrase = async () => {
-            const base_filename = this._phrase.contenu.replaceAll(" ","_").replace(Syntagme.separateur,'').toLowerCase();
+            let base_filename = this._phrase.contenu.replaceAll(" ","_").replace(Syntagme.separateur,'').toLowerCase();
+            base_filename = base_filename.length > 40 ? base_filename.slice(0,37) + "..." : base_filename;
             const filename = `${base_filename}.{{numéro_de_version}}.json`;
+            // limiter le nombre de caractères TODO
 
             await this.verification_verbes_sans_sujet(this._phrase); 
 
