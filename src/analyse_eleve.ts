@@ -48,6 +48,7 @@ class Analyseur {
 
     analyse_fonction(): void {
         this._fonction_courante = consignes[this._consignes_etape][0] as Fonction;
+        console.log(`Nouvelle analyse: ${this._fonction_courante}`);
         if (!this._corrige.aFonction(this._fonction_courante)) {
             this.analyse_suivante();
             return;
@@ -90,9 +91,15 @@ class Analyseur {
 
     async analyse_suivante () {
         if (this._consignes_etape === consignes.length -1) {
+            console.debug("Fin de l'analyse du syntagme");
             // on passe aux groupes enchâssés
             for (let [[f, n], groupe_enchasse] of this._groupes_enchasses_generateur) {
                 // TODO il serait bon de suivre l'ordre des groupes tels que déclarés par les élèves quand ce sont des fonctions multiples
+                console.debug(`Analyse d'un groupe enchâssé: ${f}`);
+                if (groupe_enchasse.vide) {
+                    console.debug("Groupe enchâssé vide",f);
+                    continue;
+                }
                 const analyseur = new Analyseur( this._syntagme.cree_groupe_enchasse_eleve(groupe_enchasse, f, n));
                 const promesse_analyse = new Promise<void> ( (r, _) => {
                     analyseur.analyse_fonction();

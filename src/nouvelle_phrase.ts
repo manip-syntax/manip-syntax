@@ -270,9 +270,14 @@ export class CreateurPhrase {
             selecteur_courant.style.display = 'none';
         });
 
+        /*
         sous_menu.addEventListener("click", () => {
+            // il semble qu'il y a un problème de temps en temps sur Chromium,
+            // et que le selecteur soit fermé lorsqu'on clique avant que la fonction cliquée
+            // soit passée à l'analyse
             selecteur_courant.style.display = 'none';
         });
+        */
     }
 
     valide_fonction(b: boolean): boolean {
@@ -597,6 +602,9 @@ export function nouvelle_phrase() : void {
                 return -1;
             };
             nouvelle_phrase.analyse_de_fonction(val());
+            // disparition du sous-menu si nécessaire
+            Array.from(document.getElementsByClassName("sous_menu_contenu")).
+                map(elt => (elt as HTMLElement).style.display = "none");
         };
     };
     fonctions_communes.ok = fonction_du_bouton_de_nouvelle_phrase;
