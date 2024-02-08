@@ -8,6 +8,10 @@ import consignes from './consignes.json';
 
 
 export function analyse_phrase(phrase_corrigee: SyntagmeCorrige): void {
+    const b_valider = byID("bouton-valider");
+    b_valider.classList.replace("boutons-analyse-desactive","bouton-actif");
+    b_valider.classList.add("boutons-analyse-valider");
+
     let phrase_eleve = new SyntagmeEleve(phrase_corrigee.contenu, phrase_corrigee);
 
     let analyseur = new Analyseur(phrase_eleve);
@@ -39,7 +43,7 @@ class Analyseur {
     analyse_finie(): void {
         if (this._syntagme.arbre_genealogique.length === 1) {
             // on est à la fin de la phrase: on peut donc commencer une autre analyse
-            definit_message_modal("Bravo !", "Commencer une autre analyse", selectionne_phrase);
+            definit_message_modal("Bravo !", "Commencer une autre analyse", selectionne_phrase, true);
         }
 
         const e = new Event(`AnalyseFinie-${this._id}`);
@@ -109,6 +113,7 @@ class Analyseur {
                 });
                 await promesse_analyse.then( () => console.debug("promise ok"));
             }
+            byID("phrase-analyse-paragraphe").innerHTML = affiche_phrase(this._syntagme, this._syntagme.mots_pos);
             return this.analyse_finie();
         } else {
             const j = SyntagmeEleve.Fonctions_multiples.includes(this._fonction_courante) && !this._syntagme.est_complet(this._fonction_courante) ? 0 : 1;

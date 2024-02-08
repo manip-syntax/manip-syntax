@@ -28,8 +28,8 @@
                 </p>
             </div>
             <div class="boutons" id="boutons-analyse">
-                <button id="bouton-valider" class="bouton boutons-analyse-valider" type="button">Valider</button>
-                <button id="bouton-valider-phrase" class="bouton boutons-valider-phrase" type="button" style="display: none;">Valider la phrase</button>
+                <button id="bouton-valider" class="bouton bouton-actif boutons-analyse-valider" type="button">Valider</button>
+                <button id="bouton-valider-phrase" class="bouton bouton-actif boutons-valider-phrase" type="button" style="display: none;">Valider la phrase</button>
             </div>
             <div class=" modal modal-choix-phrase" id="modal-choix-phrase">
                 <div class="modal-contenu modal-choix-phrase-contenu" id="modal-choix-phrase-contenu">
@@ -40,8 +40,9 @@
             </div>
             <div class="modal modal-message" id="modal-message">
                 <div class="modal-contenu modal-message-contenu" id="modal-message-contenu">
+                    <span id="modal-croix" class="modal-croix" hidden >&times;</span>
                     <p class="modal-message-contenu-texte" id="modal-message-contenu-texte"></p>
-                    <button id="modal-message-bouton" type="button" class="bouton modal-message-bouton">OK</button>
+                    <button id="modal-message-bouton" type="button" class="bouton bouton-actif modal-message-bouton">OK</button>
                 </div>
             </div>
             <div class="modal modal-nouvelle-phrase" id="modal-nouvelle-phrase">
@@ -53,7 +54,7 @@
                             <textarea name="nouvelle_phrase" id="nouvelle_phrase-texterea"></textarea>
                         </div>
                     </form>
-                    <button id="modal-nouvelle_phrase-bouton" type="button" class="bouton modal-message-bouton">OK</button>
+                    <button id="modal-nouvelle_phrase-bouton" type="button" class="bouton bouton-actif modal-message-bouton">OK</button>
                 </div>
             </div>
             <div class="modal modal-analyse-fichier" id="modal-analyse-fichier">
@@ -74,7 +75,7 @@
                     <form id="ajout-manipulations-form">
                         <div id="ajout-manipulations-form-contenu">
                         </div>
-                    <button id="modal-ajout-manipulations-OK" type="submit" class="bouton modal-message-bouton">OK</button>
+                    <button id="modal-ajout-manipulations-OK" type="submit" class="bouton bouton-actif modal-message-bouton">OK</button>
                     </form>
                 </div>
             </div>
@@ -85,8 +86,8 @@
                     <div id="manipulations-form">
                         <div id="manipulations-form-contenu">
                     </div>
-                    <button id="modal-manipulations-OK" class="bouton boutons-analyse-valider">Valider</button>
-                    <button id="modal-manipulations-annuler" class="bouton boutons-analyse-annuler">Corriger</button>
+                    <button id="modal-manipulations-OK" class="bouton bouton-actif boutons-analyse-valider">Valider</button>
+                    <button id="modal-manipulations-annuler" class="bouton bouton-actif boutons-analyse-annuler">Corriger</button>
                     </div>
                 </div>
             </div>

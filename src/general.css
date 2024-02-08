@@ -95,13 +95,24 @@ body {
   border: none; /* Remove borders */
   color: white; /* Add a text color */
   padding: 14px 28px; /* Add some padding */
-  cursor: pointer; /* Add a pointer cursor on mouse-over */
   border-radius: 5px;
   font-size: 30px;
   display: block;
   margin: -1px;
     transition: 0.5s;
 }
+
+.bouton-actif {
+  cursor: pointer; /* Add a pointer cursor on mouse-over */
+}
+.boutons-analyse-desactive{
+    background-color: #E7E9EB;
+}
+
+.boutons-analyse-desactive:hover {
+    background-color: #E7E9EB;
+}
+
 
 .boutons-analyse-valider {
     background-color: #04AA6D;

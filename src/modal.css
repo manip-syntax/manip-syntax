@@ -74,3 +74,17 @@
     background-color: #BBD1E8;
 }
 
+.modal-croix {
+    color: #aaaaaa;
+    float: right;
+    font-size: 48px;
+    font-weight: bold;
+}
+
+.modal-croix:hover,
+.modal-croix:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+

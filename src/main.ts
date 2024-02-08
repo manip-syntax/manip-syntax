@@ -160,6 +160,18 @@ byID("analyse_fichier_input_form").addEventListener("drop", e => {
     charge_fichier(e.dataTransfer?.files as FileList);
 });
 
+byID("modal-croix").addEventListener("click", _ => {
+    anime_disparition_modal(
+        byID("modal-message-contenu"),
+        byID("modal-message")
+    );
+    byID("modal-croix").style.display = "none";
+    fonctions_communes.fonction_de_validation = () => {};
+    const b_valider = byID("bouton-valider");
+    b_valider.classList.replace("boutons-analyse-valider","boutons-analyse-desactive");
+    b_valider.classList.remove("bouton-actif");
+});
+
 add_events_listener();
 
 selectionne_phrase();
