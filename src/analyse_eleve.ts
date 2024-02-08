@@ -114,6 +114,7 @@ class Analyseur {
                 await promesse_analyse.then( () => console.debug("promise ok"));
             }
             byID("phrase-analyse-paragraphe").innerHTML = affiche_phrase(this._syntagme, this._syntagme.mots_pos);
+            dispose(byID("phrase-analyse-paragraphe"));
             return this.analyse_finie();
         } else {
             const j = SyntagmeEleve.Fonctions_multiples.includes(this._fonction_courante) && !this._syntagme.est_complet(this._fonction_courante) ? 0 : 1;
