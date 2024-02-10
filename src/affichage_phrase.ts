@@ -5,6 +5,8 @@
 import './affichage_phrase.css';
 
 import { Fonction, FonctionEnchassee, MotsPos, SyntagmeEleve } from "./phrase";
+import { displayTextWidth, non_null} from "./util";
+import { liste_des_fonctions_inverse } from "./fonctions_partagees";
 
 function renvoie_crochet(f: Fonction, est_crochet_ouvrant: boolean): string {
     /*
@@ -30,7 +32,8 @@ function debut_balise(fe: FonctionEnchassee, pos: number): string {
     // ne sont pas forcément les uns à côté des autres
     if (pos == fe[1] || fe[0] === "verbes") {
         const crochet = renvoie_crochet(fe[0], true);
-        return `${crochet}<span groupe class="groupe-de-mots phrase-${fe[0]}">`;
+        const f_name = liste_des_fonctions_inverse[fe[0]];
+        return `${crochet}<span groupe class="groupe-de-mots phrase-${fe[0]}"><span class="affichage-nom-fonction affichage-${fe[0]}">${f_name}</span>`;
     }
     return "";
 }
@@ -83,6 +86,29 @@ export function dispose(base: HTMLElement) {
     const profondeur_max = profondeur(base);
     base.style.lineHeight = `${1.8 + profondeur_max /10}`;
     installe_profondeur(base, profondeur_max);
+    affiche_noms_fonctions(base);
+}
+
+function affiche_noms_fonctions(racine: HTMLElement) {
+    for (let i = 0; i < racine.children.length; i++) {
+        let elt = racine.children[i] as HTMLElement;
+        if (elt.hasAttribute("groupe")) {
+            const f_node = non_null(elt.querySelector(".affichage-nom-fonction")) as HTMLElement;
+            const font = window.getComputedStyle(f_node).font;
+            const longueur_f = displayTextWidth(f_node.innerText, font);
+            let border_width = parseInt(window.getComputedStyle(elt).borderWidth);
+            if (border_width === 0) {
+                // problème de l'affichage de certains groupes comme les indépendantes
+                border_width = parseInt(window.getComputedStyle(elt).borderLeftWidth);
+            }
+
+            const padding = longueur_f + border_width *2  - elt.offsetWidth; // *2 pour donner un peu plus d'espace
+            elt.style.paddingRight = `${padding}px`;
+            if (f_node.innerText === "Indépendante") {
+                console.log("affiche_noms_fonctions", border_width, longueur_f, elt.offsetWidth);
+            }
+        }
+    }
 }
 
 function profondeur(racine: HTMLElement) : number {

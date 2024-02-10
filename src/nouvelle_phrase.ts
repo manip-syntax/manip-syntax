@@ -1,7 +1,7 @@
 import { affiche_phrase, dispose } from './affichage_phrase';
 import { Syntagme, Fonction, MotsPos, SyntagmeCorrige, SyntagmeEleve } from './phrase';
 import { assert, byID, non_null } from './util';
-import { fonctions_communes } from './fonctions_partagees';
+import { fonctions_communes, liste_des_fonctions } from './fonctions_partagees';
 import './nouvelle_phrase.css';
 import contenus_possibles from "./contenus_possibles.json";
 
@@ -76,30 +76,6 @@ export class CreateurPhrase {
     private _traceur: FonctionTracee[] = [];
     private _pos: number = 0;
     private _selecteur: HTMLElement = byID("nouvelle_phrase-fonctions-selection") as HTMLElement;
-    static liste_des_fonctions: { [nom: string] : Fonction } = {
-        "Indépendante" : "independante",
-        "Verbes" : "verbes",
-        "Verbe noyau" : "verbe_noyau",
-        "Sujet" : "sujet",
-        "COD" : "cod",
-        "COI" : "coi",
-        "Attribut du sujet" : "attribut_du_sujet",
-        "Attribut du COD" : "attribut_du_cod",
-        "Complément du verbe impersonnel" : "complement_du_verbe_impersonnel",
-        "Complément d'agent" : "complement_d_agent",
-        "Groupe verbal" : "groupe_verbal",
-        "Complément circonstanciel" : "complement_circonstanciel",
-        "Modalisateur" : "modalisateur",
-        "Fonction auto-énonciative" : "auto-enonciative",
-        "Connecteur" : "connecteur",
-        "Balise textuelle" : "balise_textuelle",
-        "Noyau" : "noyau",
-        "Épithète" : "epithete",
-        "Complément du nom" : "complement_du_nom",
-        "Complément du pronom": "complement_du_pronom",
-        "Apposition" : "apposition",
-        "Complément de l'adjectif": "complement_de_l_adjectif"
-    };
 
     static contenus_possibles(f: Fonction): { [nom: string] : Fonction} {
         /* Renvoie un objet de fonctions qui peuvent être contenues directement
@@ -111,7 +87,7 @@ export class CreateurPhrase {
     constructor(texte: string) {
         this._phrase = new SyntagmeEleve(texte, new SyntagmeCorrige(texte));
         this._selecteur.innerHTML = ''; // réinitialisation du sélecteur
-        Object.entries(CreateurPhrase.liste_des_fonctions).forEach(
+        Object.entries(liste_des_fonctions).forEach(
             elt => this.ajouter_fonction_tracee(this._traceur.length, elt[0], elt[1])
         );
         this._selecteur.style.display = 'block';

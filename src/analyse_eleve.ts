@@ -113,6 +113,7 @@ class Analyseur {
                 });
                 await promesse_analyse.then( () => console.debug("promise ok"));
             }
+            byID("consigne-container").innerHTML = affiche_consigne("L'analyse est terminée.", this._syntagme);
             byID("phrase-analyse-paragraphe").innerHTML = affiche_phrase(this._syntagme, this._syntagme.mots_pos);
             dispose(byID("phrase-analyse-paragraphe"));
             return this.analyse_finie();

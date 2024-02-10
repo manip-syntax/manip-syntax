@@ -1,3 +1,5 @@
+const canvas = document.createElement("canvas");
+
 export function compare<T>(a: T[], b: T[]): boolean { // TEST
     /* Vrai si a et b sont égaux
      */
@@ -64,5 +66,12 @@ export function assert(val: boolean, msg: string): void {
     if (val === false) {
         throw Error(msg);
     }
+}
+
+export function displayTextWidth(text: string, font: string): number {
+  let context = non_null(canvas.getContext("2d"));
+  context.font = font;
+  let metrics = context.measureText(text);
+  return Math.ceil(metrics.width);
 }
     

@@ -51,7 +51,7 @@ function cree_deplacement(syntagme: SyntagmeEleve, mots_selectionnes: MotsPos): 
     }
     phrase_cassee += dz;
 
-    return cree_champ("Deplacement", phrase_cassee);
+    return cree_champ("Déplacement", phrase_cassee);
 }
 
 function cree_evenements_deplacements() {

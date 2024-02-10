@@ -26,13 +26,14 @@
     position: relative;
 }
 
-.groupe-de-mots::before {
-    font-size: 13px;
+.affichage-nom-fonction {
     position: absolute;
-    bottom: -5px; /* BUG: si le groupe est sur deux lignes, le nom s'affichera mal */
+    white-space: nowrap;
+    font-size: 13px;
+    bottom: -5px;
     left: 0;
-    width: 170px; /* Pour éviter les retours à la ligne intempestifs */
     text-align: left;
+    width: 100%;
 }
 
 .phrase-sujet {
@@ -40,16 +41,8 @@
     border-style: solid;
 }
 
-.phrase-sujet::before {
-    content: "Sujet";
-}
-
 .phrase-verbe_noyau {
     text-decoration: wavy underline green;
-}
-
-.phrase-verbe_noyau::before {
-    content: "Verbe noyau";
 }
 
 .phrase-cod {
@@ -57,17 +50,9 @@
     border-color: blue;
 }
 
-.phrase-cod::before {
-    content: "COD";
-}
-
 .phrase-coi {
     border-style: dashed solid;
     border-color: pink;
-}
-
-.phrase-coi::before {
-    content: "COI";
 }
 
 .phrase-attribut_du_sujet {
@@ -75,26 +60,14 @@
     border-color: green;
 }
 
-.phrase-attribut_du_sujet::before {
-    content: "Attribut du sujet";
-}
-
 .phrase-attribut_du_cod {
     border-style: dashed solid;
     border-color: cyan;
 }
 
-.phrase-attribut_du_cod::before {
-    content: "Attribut du COD";
-}
-
 .phrase-complement_d_agent {
     border-style: solid;
     border-color: pink;
-}
-
-.phrase-complement_d_agent::before {
-    content: "CA";
 }
 
 .phrase-complement_du_verbe_impersonnel {
@@ -103,35 +76,19 @@
 
 }
 
-.phrase-complement_du_verbe_impersonnel::before {
-    content: "Complément du verbe impersonnel";
-}
-
 .phrase-complement_circonstanciel {
     border-style: dashed;
     border-color: red;
-}
-
-.phrase-complement_circonstanciel::before {
-    content: "Complément circonstanciel";
 }
 
 .phrase-verbes {
     font-style: italic;
 }
 
-.phrase-verbes::before {
-    content: "Verbe";
-}
-
 .phrase-noyau {
     color: orange;
 }
 
-.phrase-noyau::before {
-    content: "Noyau";
-    color: black;
-}
 
 .phrase-complement_du_nom,
 .phrase-complement_du_pronom {
@@ -139,21 +96,9 @@
     border-color: green;
 }
 
-.phrase-complement_du_pronom::before {
-    content: "Complément du pronom";
-}
-
-.phrase-complement_du_nom::before {
-    content: "Complément du nom";
-}
-
 .phrase-epithete {
     border-style: double;
     border-color: green;
-}
-
-.phrase-epithete::before {
-    content: "Épithète";
 }
 
 .phrase-apposition {
@@ -161,17 +106,9 @@
     border-color: green;
 }
 
-.phrase-apposition::before {
-    content: "Apposition";
-}
-
 .phrase-complement_de_l_adjectif {
     border-style: dotted;
     border-color: Tomato;
-}
-
-.phrase-complement_de_l_adjectif::before {
-    content: "Complément de l'adjectif";
 }
 
 .phrase-modalisateur {
@@ -179,17 +116,9 @@
     border-color: green;
 }
 
-.phrase-modalisateur::before {
-    content: "Modalisateur";
-}
-
 .phrase-auto-enonciative {
     border-style: dashed;
     border-color: blue;
-}
-
-.phrase-auto-enonciative::before {
-    content: "Auto-énonciative";
 }
 
 .phrase-connecteur {
@@ -197,17 +126,9 @@
     border-color: Tomato;
 }
 
-.phrase-connecteur::before {
-    content: "Connecteur";
-}
-
 .phrase-balise_textuelle {
     border-style: dashed;
     border-color: black ;
-}
-
-.phrase-balise_textuelle::before {
-    content: "Balise textuelle";
 }
 
 .phrase-independante {
@@ -215,13 +136,5 @@
     border-color: rgb(60, 179, 113);
     border-width: 8px;
     background-color: rgb(60, 179, 113, 0.5);
-}
-
-.phrase-independante::before {
-    content: "Indépendante";
-}
-
-.phrase-groupe_verbal::before {
-    content: "Groupe verbal";
 }
 

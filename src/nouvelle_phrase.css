@@ -75,6 +75,7 @@
 
 .selecteur {
     position: relative;
+    z-index: 1;
      /*background-color: #E7E9EB;*/
 
 }
