@@ -104,9 +104,7 @@ function affiche_noms_fonctions(racine: HTMLElement) {
 
             const padding = longueur_f + border_width *2  - elt.offsetWidth; // *2 pour donner un peu plus d'espace
             elt.style.paddingRight = `${padding}px`;
-            if (f_node.innerText === "Indépendante") {
-                console.log("affiche_noms_fonctions", border_width, longueur_f, elt.offsetWidth);
-            }
+            affiche_noms_fonctions(elt);
         }
     }
 }
