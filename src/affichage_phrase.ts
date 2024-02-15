@@ -94,6 +94,7 @@ function affiche_noms_fonctions(racine: HTMLElement) {
         let elt = racine.children[i] as HTMLElement;
         if (elt.hasAttribute("groupe")) {
             const f_node = non_null(elt.querySelector(".affichage-nom-fonction")) as HTMLElement;
+            // ajout d'une petite marge si le nom de la fonction est plus long que la fonction elle-même
             const font = window.getComputedStyle(f_node).font;
             const longueur_f = displayTextWidth(f_node.innerText, font);
             let border_width = parseInt(window.getComputedStyle(elt).borderWidth);
@@ -104,6 +105,13 @@ function affiche_noms_fonctions(racine: HTMLElement) {
 
             const padding = longueur_f + border_width *2  - elt.offsetWidth; // *2 pour donner un peu plus d'espace
             elt.style.paddingRight = `${padding}px`;
+            // calcul de la position du nom de la fonction. Cette solution tarabiscotée est due à une incohérence entre FF et Chromium
+            const hauteur_basique = f_node.innerText === "Indépendante" ? 68 : 74; // ces nombres dépendent bien sûr de la police
+            const padding_elt = parseInt(elt.style.paddingBottom);
+            const retrait = f_node.innerText === "Indépendante" ? 23 : 28;
+            f_node.style.top = `${hauteur_basique + padding_elt - retrait}px`;
+
+
             affiche_noms_fonctions(elt);
         }
     }

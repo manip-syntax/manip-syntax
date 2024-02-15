@@ -37,6 +37,10 @@ body {
     padding-top: 13px;
 }
 
+.header h1 span {
+    font-size: 10px;
+}
+
 .header h1:hover, .header h2:hover {
     background-color: #ddd;
     color: black;

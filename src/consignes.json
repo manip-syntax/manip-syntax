@@ -1,9 +1,9 @@
 [
-    ["verbes" , "Sélectionne les verbes."],
+    ["verbes" , "Sélectionne le ou les verbes."],
     ["independante", "Sélectionne une proposition indépendante"],
     ["verbe_noyau" , "Sélectionne le verbe noyau"],
     ["noyau", "Sélectionne le noyau"],
-    ["sujet" , "Sélectionne le groupe sujet"],
+    ["sujet" , "Sélectionne le sujet"],
     ["attribut_du_sujet","Sélectionne l'attribut du sujet."],
     ["cod","Sélectionne le Complément d'objet direct (COD)."],
     ["coi" , "Sélectionne le Complément d'objet indirect (COI)."],
