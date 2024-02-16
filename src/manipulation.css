@@ -180,7 +180,7 @@ select[name="pronoms"],
 .manipulation-deplacement-dropzone {
     display: inline-block;
     width: 10px;
-    height: 35px;
+    height: 95px;
 }
 
 .manipulation-dropzone-hover {

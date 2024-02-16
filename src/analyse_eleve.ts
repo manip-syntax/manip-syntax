@@ -3,7 +3,7 @@ import { charge_phrases } from './charge_phrases';
 import { affiche_phrase, affiche_consigne, dispose } from './affichage_phrase';
 import { anime_disparition_modal, byID, cree_html_element } from "./util";
 import { definit_message_modal, fonctions_communes } from "./fonctions_partagees";
-import { manipulation_fonction} from './manipulation';
+import { manipulation_faite, manipulation_fonction} from './manipulation';
 import consignes from './consignes.json';
 
 
@@ -150,6 +150,11 @@ class Analyseur {
             manipulation_fonction(f, analyseur._syntagme, analyseur._syntagme.fonctionPos(f, this._fonctions_multiples_index));
             const options = {once: true};
             const f_ok = () => {
+                if (! manipulation_faite()) {
+                    // il faut le redéfinir puisque les options spécifient qu'il doit disparaître après le premier click
+                    byID("modal-manipulations-OK").addEventListener("click", f_ok, options); 
+                    return;
+                }
                 if (disparition_modal) {
                     anime_disparition_modal(byID("modal-manipulations-contenu"), byID("modal-manipulations"));
                 }
@@ -163,7 +168,7 @@ class Analyseur {
             }
 
 
-            byID("modal-manipulations-OK").addEventListener("click", f_ok, options);
+            byID("modal-manipulations-OK").addEventListener("click", f_ok, options); 
             byID("modal-manipulations-annuler").addEventListener("click", f_annuler, options);
             fonctions_communes.ok = f_ok;
             fonctions_communes.annuler = f_annuler;

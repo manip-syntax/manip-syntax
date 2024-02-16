@@ -1,5 +1,5 @@
 import { Fonction, MotsPos, SyntagmeEleve } from "./phrase";
-import { byID } from "./util";
+import { byID, non_null} from "./util";
 import './manipulation.css';
 // TODO FIXME attention au problème lié au sujet des verbes à l'impératif (notamment) : revoir le fonctionnement: c'est plus compliqué que ce qui se trouve dans cette page
 // C'est à Don Diègue que Il donne un soufflet -> à améliorer
@@ -93,10 +93,14 @@ function cree_evenements_deplacements() {
             const element_deplace = byID(e.dataTransfer.getData("text/plain"));
             let target = (e.target as HTMLElement)
             target.classList.remove("manipulation-dropzone-hover");
+            target.classList.add("manipulation-dropzone-dropped");
             const target_html = target.outerHTML;
             target.outerHTML = element_deplace.outerHTML;
             element_deplace.outerHTML = target_html;
-            f_drop(elt);
+            byID("manipulation-deplacable").classList.add("manipulation-deplace");
+            const dropped = non_null(document.querySelector(".manipulation-dropzone-dropped"));
+            f_drop(dropped as HTMLElement);
+            dropped.classList.remove("manipulation-dropzone-dropped");
             f_drag();
         });
     }
@@ -129,6 +133,7 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
     { sujet: "le sujet" ,
       attribut_du_sujet: "l'attribut du sujet",
       cod: "le COD",
+      coi: "le COI",
       groupe_verbal: "le groupe verbal",
       complement_circonstanciel: "le complément circonstanciel"
     }[f as string];
@@ -158,13 +163,13 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
 
         const infos_de_manipulation = syntagme.corrige.infos_de_manipulation("sujet");
         const pronom_interrogatif = infos_de_manipulation.est_anime ? "Qui " : "Qu'";
-        const select_pronom = "Je Tu Il Elle Nous Vous Ils Elles C'".split(" ").map( e => `<option value="${e.toLowerCase()}">${e}</option>`).join(" ");
+        const select_pronom = "Je Tu Il Elle Nous Vous Ils Elles C' Ce".split(" ").map( e => `<option value="${e.toLowerCase()}">${e}</option>`).join(" ");
         byID("manipulations-form-contenu").innerHTML = `<fieldset class="manipulation-element"><legend class="manipulation-element-titre">Question</legend><span class="manipulation-element-contenu">${pronom_interrogatif}est-ce qui ${verbe}${derriere_verbe} ? ${drop_zone}</span></fieldset>` +
             `<fieldset class="manipulation-element"><legend class="manipulation-element-titre">Extraction</legend><span class="manipulation-element-contenu">C'est ${drop_zone} qui ${verbe}${derriere_verbe}. </span></fieldset>` +
             (infos_de_manipulation.pronominalisation === null ? "" : 
             '<fieldset class="manipulation-element"><legend class="manipulation-element-titre">Pronominalisation</legend>' +
             `<span class="manipulation-element-contenu">${syntagme.texte_pos(mots_selectionnes)} ${verbe}${derriere_verbe}. ${fleche}
-        <select name="pronoms">${select_pronom}</select> ${verbe}${derriere_verbe}.</span></fieldset>`);
+        <select name="pronoms"><option disabled selected value>--</option>${select_pronom}</select> ${verbe}${derriere_verbe}.</span></fieldset>`);
 
     } else if (f === "cod") {
         const sujet = recupere_sujet(syntagme);
@@ -174,7 +179,7 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
         const select_pronom = "le la l' les me m' te t' nous vous".split(" ").map( e => `<option value="${e.toLowerCase()}">${e}</option>`).join(" ");
         byID("manipulations-form-contenu").innerHTML = cree_champ("Question",`${pronom_interrogatif}est-ce que ${sujet} ${verbe}${attr_cod} ? ${drop_zone}`) + 
             cree_champ("Extraction", `C'est ${drop_zone} que ${sujet} ${verbe}${attr_cod}.`) +
-            cree_champ("Pronominalisation",`${sujet} ${verbe} ${syntagme.texte_pos(mots_selectionnes)}${attr_cod} ${fleche} ${sujet} <select name="pronoms">${select_pronom}</select> ${verbe}${attr_cod}.`);
+            cree_champ("Pronominalisation",`${sujet} ${verbe} ${syntagme.texte_pos(mots_selectionnes)}${attr_cod} ${fleche} ${sujet} <select name="pronoms"><option disabled selected value>--</option>${select_pronom}</select> ${verbe}${attr_cod}.`);
 
     } else if (f === "coi") {
         const sujet = recupere_sujet(syntagme);
@@ -185,7 +190,7 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
         const select_pronom = "lui leur me m' te t' en y".split(" ").map( e => `<option value="${e.toLowerCase()}">${e}</option>`).join(" ");
         byID("manipulations-form-contenu").innerHTML = cree_champ("Question", `${sujet} ${verbe}${cod} ${preposition} ${pronom_interrogatif} ? ${drop_zone}`) +
             cree_champ("Extraction", `C'est ${drop_zone} que ${sujet} ${verbe}${cod}.`) +
-            cree_champ("Pronominalisation",`${sujet} ${verbe}${cod} ${preposition} ${syntagme.texte_pos(mots_selectionnes)} ${fleche} ${sujet} <select name="pronoms">${select_pronom}</select> ${verbe}${cod}.`);
+            cree_champ("Pronominalisation",`${sujet} ${verbe}${cod} ${preposition} ${syntagme.texte_pos(mots_selectionnes)} ${fleche} ${sujet} <select name="pronoms"><option disabled selected value>--</option>${select_pronom}</select> ${verbe}${cod}.`);
 
     } else if (f === "groupe_verbal") {
         const sujet = recupere_sujet(syntagme);
@@ -236,6 +241,34 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
     }
     // TODO interdire de valider tant que chaque manipulation n'aura pas été faite.
     // TODO vérifier la pronominalisation
+}
+
+export function manipulation_faite(): boolean {
+    /* true si toutes les manipulations présentes ont été faites par l'élève
+     */
+    const length = (s: string) => document.querySelectorAll(s).length;
+    // y a-t-il une pronominalisation ?
+    const pronoms = document.getElementsByName("pronoms");
+    for (const elt of pronoms) {
+        if ((elt as HTMLSelectElement).value === "") {
+            return false;
+        }
+    }
+    // y a-t-il des déplaçables ?
+    console.log(length(".manipulation-element-contenu"),length(".manipulable-deplace"));
+    if (length(".manipulation-drop-zone") > 0) {
+        return false;
+    }
+
+    if (document.querySelectorAll(".manipulation-deplacable").length !== document.querySelectorAll(".manipulation-deplace").length) {
+        return false;
+    }
+
+    // y a-t-il des supprimables ?
+    if (length(".manipulation-supprimable") > 0) {
+        return false;
+    }
+    return true;
 }
 
 byID("manipulable").addEventListener("dragstart", (e) => {

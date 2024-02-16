@@ -476,7 +476,7 @@ export class CreateurPhrase {
                 let pronoms;
                 switch (fonction_nom) {
                     case "sujet":
-                        pronoms = "je j' tu il elle nous vous ils elles";
+                        pronoms = "je j' tu il elle nous vous ils elles ce c'";
                     break;
                     case "COD":
                         pronoms = "me m' te t' le la l' nous vous les en";
