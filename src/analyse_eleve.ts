@@ -4,6 +4,7 @@ import { affiche_phrase, affiche_consigne, dispose } from './affichage_phrase';
 import { anime_disparition_modal, byID, cree_html_element } from "./util";
 import { definit_message_modal, fonctions_communes } from "./fonctions_partagees";
 import { manipulation_faite, manipulation_fonction} from './manipulation';
+import { Fireworks } from 'fireworks-js';
 import consignes from './consignes.json';
 
 
@@ -43,7 +44,19 @@ class Analyseur {
     analyse_finie(): void {
         if (this._syntagme.arbre_genealogique.length === 1) {
             // on est à la fin de la phrase: on peut donc commencer une autre analyse
-            definit_message_modal("Bravo !", "Commencer une autre analyse", selectionne_phrase, true);
+            definit_message_modal('<div class="victoire" id="victoire"><h1>Bravo !</h1><div id="feu-d-artifice"></div></div>',
+                                  //<img src="/trophy-cup-svgrepo-com.svg" alt="Une coupe de victoire" height="200" width="200">
+                                  "Commencer une autre analyse", selectionne_phrase, true);
+            const container = byID("feu-d-artifice");
+            const fw = new Fireworks(container, {
+                autoresize: false,
+                mouse: {
+                    click: true,
+                    move: false,
+                    max: 1
+                }
+            });
+            fw.start();
         }
 
         const e = new Event(`AnalyseFinie-${this._id}`);

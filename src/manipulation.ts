@@ -176,7 +176,7 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
         const attr_cod = syntagme.corrige.aFonction("attribut_du_cod") ? " " + syntagme.fonction_texte_pos("attribut_du_cod") : "";
         const infos_de_manipulation = syntagme.corrige.infos_de_manipulation("cod");
         const pronom_interrogatif = infos_de_manipulation.est_anime ? "Qui " : "Qu'";
-        const select_pronom = "le la l' les me m' te t' nous vous".split(" ").map( e => `<option value="${e.toLowerCase()}">${e}</option>`).join(" ");
+        const select_pronom = "le la l' les me m' te t' nous vous en".split(" ").map( e => `<option value="${e.toLowerCase()}">${e}</option>`).join(" ");
         byID("manipulations-form-contenu").innerHTML = cree_champ("Question",`${pronom_interrogatif}est-ce que ${sujet} ${verbe}${attr_cod} ? ${drop_zone}`) + 
             cree_champ("Extraction", `C'est ${drop_zone} que ${sujet} ${verbe}${attr_cod}.`) +
             cree_champ("Pronominalisation",`${sujet} ${verbe} ${syntagme.texte_pos(mots_selectionnes)}${attr_cod} ${fleche} ${sujet} <select name="pronoms"><option disabled selected value>--</option>${select_pronom}</select> ${verbe}${attr_cod}.`);
@@ -239,7 +239,6 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
             target.classList.remove("manipulation-drop-zone");
         });
     }
-    // TODO interdire de valider tant que chaque manipulation n'aura pas été faite.
     // TODO vérifier la pronominalisation
 }
 

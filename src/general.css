@@ -185,3 +185,28 @@ body {
       'footer footer footer footer footer footer';
   }
 }
+
+.victoire {
+  font-family: "Oswald", sans-serif;
+  text-align: center;
+  font-size: 50px;
+  }
+
+#feu-d-artifice {
+    display: flex;
+    align-items: center;
+  justify-content: center;
+}
+#feu-d-artifice::after{
+  content: "";
+  background-image: url("/trophy-cup-svgrepo-com.svg");
+  background-position: center;
+  position: absolute;
+  opacity: 0.1;
+  width: 100%;
+  top: 39%;
+  bottom: 30%;
+  left: 0%;
+  background-repeat: no-repeat;
+  }
+
