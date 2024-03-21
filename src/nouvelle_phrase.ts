@@ -482,7 +482,7 @@ export class CreateurPhrase {
                         pronoms = "me m' te t' le la l' nous vous les en";
                     break;
                     case "COI":
-                        pronoms = "me m' te t' elle lui nous vous leur en y";
+                        pronoms = "me m' moi te t' toi elle lui nous vous leur en y";
                     break;
                     default:
                         throw fonction_nom;
