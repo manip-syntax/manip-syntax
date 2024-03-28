@@ -28,6 +28,7 @@ class Analyseur {
     private _id: number;
     private _fonction_courante: Fonction = "sujet";
     private _mots_selectionnes: MotsPos = [];
+    private _score: number = 0;
     static current_id: number = 0;
 
     constructor(private _syntagme: SyntagmeEleve) {
@@ -44,7 +45,20 @@ class Analyseur {
     analyse_finie(): void {
         if (this._syntagme.arbre_genealogique.length === 1) {
             // on est à la fin de la phrase: on peut donc commencer une autre analyse
-            definit_message_modal('<div class="victoire" id="victoire"><h1>Bravo !</h1><div id="feu-d-artifice"></div></div>',
+            const score_maker = () => {
+                console.log("Nombre d'erreurs à la fin de l'analyse: ",this._score);
+                switch (this._score) {
+                    case 0:
+                        return "<h1>Bravo ! Tu n'as aucune faute.</h1>";
+                    case 1:
+                        return "<h2>C'est très bien ! Tu as fait une seule erreur.</h2>";
+                    default:
+                        return `<h2>C'est bien, mais tu as fait ${this._score} erreurs.</h2>`;
+                }
+                return "Il y a une erreur dans le code.";
+            }
+
+            definit_message_modal(`<div class="victoire" id="victoire">${score_maker()}<div id="feu-d-artifice"></div></div>`,
                                   //<img src="/trophy-cup-svgrepo-com.svg" alt="Une coupe de victoire" height="200" width="200">
                                   "Commencer une autre analyse", selectionne_phrase, true);
             const container = byID("feu-d-artifice");
@@ -150,6 +164,8 @@ class Analyseur {
     soumettre_fonction(f: Fonction, nf: number) {
         let reponse_correcte = this._syntagme.est_correct(f, nf);
         if (!reponse_correcte) {
+            this._score++;
+            console.log("score",this._score);
             this.affiche_erreur();
         } else {
             this.analyse_suivante();
