@@ -1,8 +1,11 @@
 import { Fonction, MotsPos, SyntagmeEleve } from "./phrase";
-import { byID, non_null} from "./util";
+import { byID } from "./util";
 import './manipulation.css';
+import dragula from 'dragula';
+import 'dragula/dist/dragula.min.css';
 // TODO FIXME attention au problème lié au sujet des verbes à l'impératif (notamment) : revoir le fonctionnement: c'est plus compliqué que ce qui se trouve dans cette page
 // C'est à Don Diègue que Il donne un soufflet -> à améliorer
+// Aussi : As-tu trouvé le livre ? C'est Tu qui as trouvé le livre.
 
 function cree_champ(titre: string, contenu: string) : string {
     return `<fieldset class="manipulation-element">
@@ -30,84 +33,21 @@ function cree_suppression(syntagme: SyntagmeEleve, mots_selectionnes: MotsPos): 
 }
 
 function cree_deplacement(syntagme: SyntagmeEleve, mots_selectionnes: MotsPos): string {
-    const attr_offset = syntagme.offset_pos(mots_selectionnes);
-    const dz = '<span class="manipulation-deplacement-dropzone"> </span>';
-    let phrase_cassee = dz;
-    for (let i=0, j=0; i <syntagme.contenu.length ; i++) {
-        if (i === attr_offset[j][0]) {
-            // on ajoute une espace au début et à la fin pour éviter que les mots ne collent
-            phrase_cassee += '<span draggable="true" class="manipulation-deplacable" id="manipulation-deplacable"><span> </span> ';
+    let phrase_cassee = '<span id="dragula-container">';
+    for (let p=0; p < syntagme.longueur; p++) {
+        console.log("p",p, mots_selectionnes);
+        if (mots_selectionnes.indexOf(p) > -1) {
+            phrase_cassee += `<span class="dragula-draggable">${syntagme.texte_pos(mots_selectionnes)} </span> `;
+            p = mots_selectionnes.length -1;
         }
-        else if (i === attr_offset[j][1]) {
-            phrase_cassee += '<span> </span></span>';
-            if (j < attr_offset.length - 1) { 
-                j++;
-            }
-        } else if (syntagme.contenu[i] === " " && (i < attr_offset[j][0] || i >= attr_offset[j][1])) {
-            phrase_cassee += dz;
-            continue;
+        else {
+            phrase_cassee += `<span class="dragula-dz" >${syntagme.texte_pos([p])}</span> `;
         }
-        phrase_cassee += syntagme.contenu[i];
     }
-    phrase_cassee += dz;
+
+    phrase_cassee += '<span class="dragula-dz"> </span> </span>';
 
     return cree_champ("Déplacement", phrase_cassee);
-}
-
-function cree_evenements_deplacements() {
-    const f_drag = () => {
-        byID("manipulation-deplacable").addEventListener("dragstart", (e) => {
-            if (e.dataTransfer !== null) {
-                e.dataTransfer.setData("text/plain",(e.target as HTMLElement).id);
-                e.dataTransfer.dropEffect = "move";
-            } else {
-                throw e;
-            }
-        });
-    }
-
-    const f_drop = (elt: HTMLElement) => {
-        elt.addEventListener("dragenter", () => {
-            elt.classList.add("manipulation-dropzone-hover");
-        });
-
-        elt.addEventListener("dragleave", () => {
-            elt.classList.remove("manipulation-dropzone-hover");
-        });
-
-        elt.addEventListener("dragover", (ev) => {
-            const e = ev as DragEvent;
-            if (e.dataTransfer === null) {
-                throw Error("Pas de données transférées");
-            }
-            e.preventDefault();
-            e.dataTransfer.dropEffect = "move";
-        });
-
-        elt.addEventListener("drop", (ev) => {
-            const e = ev as DragEvent;
-            if (e.dataTransfer === null) {
-                throw Error("Pas de données transférées");
-            }
-            e.preventDefault();
-            const element_deplace = byID(e.dataTransfer.getData("text/plain"));
-            let target = (e.target as HTMLElement)
-            target.classList.remove("manipulation-dropzone-hover");
-            target.classList.add("manipulation-dropzone-dropped");
-            const target_html = target.outerHTML;
-            target.outerHTML = element_deplace.outerHTML;
-            element_deplace.outerHTML = target_html;
-            byID("manipulation-deplacable").classList.add("manipulation-deplace");
-            const dropped = non_null(document.querySelector(".manipulation-dropzone-dropped"));
-            f_drop(dropped as HTMLElement);
-            dropped.classList.remove("manipulation-dropzone-dropped");
-            f_drag();
-        });
-    }
-    for (const elt of document.getElementsByClassName("manipulation-deplacement-dropzone")) {
-        f_drag();
-        f_drop(elt as HTMLElement);
-    }
 }
 
 function recupere_sujet(syntagme: SyntagmeEleve) : string {
@@ -139,6 +79,8 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
     }[f as string];
 
     byID("modal-manipulations-titre").innerHTML = `Manipule ${fonction_nom} pour vérifier ta réponse.`;
+    // réinitialisation du contenu du modal
+    byID("manipulations-form-contenu").innerHTML = "";
     byID("manipulable").innerHTML = syntagme.texte_pos(mots_selectionnes);
     byID("manipulable").style.visibility = "visible"; // au cas où un CC l'aurait caché
     const verbe = syntagme.fonction_texte_pos("verbe_noyau");
@@ -206,8 +148,23 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
     } else if (f === "complement_circonstanciel") {
         byID("manipulations-form-contenu").innerHTML = cree_suppression(syntagme, mots_selectionnes) +
             cree_deplacement(syntagme, mots_selectionnes);
-        cree_evenements_deplacements();
+        //cree_evenements_deplacements();
         byID("manipulable").style.visibility = "collapse";
+        dragula([byID("dragula-container") ],
+                {
+                    moves: function (el, _source, _handle) {
+                        if (el === undefined) {
+                            throw Error("el is undefined");
+                        }
+                        return el.className !== 'dragula-dz';
+                      },
+              accepts: function (_el, _target, _source, sibling) {
+                        if (sibling === undefined) {
+                            throw Error("sibling is undefined");
+                        }
+                        return sibling === null || sibling.className === "dragula-dz";
+                      }
+                });
     }
 
     for (let supprimable of document.getElementsByClassName("manipulation-supprimable")) {

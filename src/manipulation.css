@@ -29,6 +29,10 @@
     display: table;
 }
 
+.dragula-draggable:hover {
+    cursor: grab;
+}
+
 .ajout-manipulations-cadre, 
 .manipulation-element {
     font-size: 30px;
