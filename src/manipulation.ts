@@ -14,6 +14,26 @@ function cree_champ(titre: string, contenu: string) : string {
             </fieldset>`;
 }
 
+function gere_element_deplace(elt: string): string {
+    /* Gère l'élément déplacé par l'élève et le change si nécessaire.
+     */
+    elt = elt.toLowerCase();
+
+    const remplacements = new Map( [
+        ["je" , "moi"],
+        ["tu" , "toi"],
+        ["il" , "lui"],
+        ["ils", "eux"],
+        ["me", "moi"],
+        ["te", "toi"],
+        ["le", "lui"],
+        ["la", "elle"],
+        ["les", "eux"]
+    ]);
+
+    return remplacements.get(elt) ?? elt;
+}
+
 function cree_suppression(syntagme: SyntagmeEleve, mots_selectionnes: MotsPos): string {
     const attr_offset = syntagme.offset_pos(mots_selectionnes);
     let phrase_cassee = "";
@@ -189,7 +209,7 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
                 throw Error("Pas de données transférées");
             }
             e.preventDefault();
-            const element_deplace = byID(e.dataTransfer.getData("text/plain")).innerHTML;
+            const element_deplace = gere_element_deplace(byID(e.dataTransfer.getData("text/plain")).innerHTML);
             let target = (e.target as HTMLElement)
             target.innerHTML = element_deplace;
             target.classList.add("manipulable-deplace");
