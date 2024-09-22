@@ -712,5 +712,6 @@ interface ManipulationInfo {
     pronominalisation?: string | null;
     verbe?: string;
     preposition?: string;
+    manipulations_enregistrees?: string;
 }
 
