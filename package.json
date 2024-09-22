@@ -25,6 +25,8 @@
     "vite-plugin-checker": "^0.5.6"
   },
   "dependencies": {
+    "@types/dragula": "^3.7.5",
+    "dragula": "^3.7.3",
     "fireworks-canvas": "^2.6.2",
     "fireworks-js": "^2.10.7"
   }
