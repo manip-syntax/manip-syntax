@@ -5,5 +5,8 @@ export default {
       typescript: true,
     }),
   ],
-    base: "./"
+    base: "./",
+    define: {
+        "global": "window"
+    }
 }
