@@ -4,6 +4,7 @@ import './manipulation.css';
 import dragula from 'dragula';
 import 'dragula/dist/dragula.min.css';
 // TODO FIXME attention au problème lié au sujet des verbes à l'impératif (notamment) : revoir le fonctionnement: c'est plus compliqué que ce qui se trouve dans cette page
+// Il le cherche -> Qui est-ce qui cherche le ? C'est ... qui cherche le
 
 function cree_champ(titre: string, contenu: string) : string {
     return `<fieldset class="manipulation-element">

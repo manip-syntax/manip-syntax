@@ -30,6 +30,7 @@ describe("Fonctionnement de elision", () => {
         expect(elision("que","il")).toBe("qu'il");
         expect(elision("que","à")).toBe("qu'à");
         expect(elision("le","animal")).toBe("l'animal");
+        expect(elision("que","Elle")).toBe("qu'Elle");
     });
     test("Fonctionnement correct de elision: première lettre consonne",() => {
         expect(elision("que","Jean")).toBe("que Jean");

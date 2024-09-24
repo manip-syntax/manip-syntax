@@ -88,7 +88,7 @@ export function elision (a_elider: string, mot_suivant: string): string {
         throw Error(`${a_elider} ne finit pas par un e`);
     }
     const voyelles = "aeiouy";
-    const premiere_lettre = strNoAccent(mot_suivant).slice(0,1);
+    const premiere_lettre = strNoAccent(mot_suivant).slice(0,1).toLowerCase();
     if (voyelles.indexOf( premiere_lettre) === -1) {
         return a_elider + " " + mot_suivant;
     } else {
