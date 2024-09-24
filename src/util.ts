@@ -74,4 +74,25 @@ export function displayTextWidth(text: string, font: string): number {
   let metrics = context.measureText(text);
   return Math.ceil(metrics.width);
 }
+
+export function strNoAccent(a:string) {
+    /* https://www.equinode.com/fonctions-javascript/retirer-les-accents-avec-javascript
+     */
+  return a.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+export function elision (a_elider: string, mot_suivant: string): string {
+    /* Gère l'élision d'un mot
+     * */
+    if (a_elider.slice(-1) !== 'e') {
+        throw Error(`${a_elider} ne finit pas par un e`);
+    }
+    const voyelles = "aeiouy";
+    const premiere_lettre = strNoAccent(mot_suivant).slice(0,1);
+    if (voyelles.indexOf( premiere_lettre) === -1) {
+        return a_elider + " " + mot_suivant;
+    } else {
+        return a_elider.slice(0,-1) + "'" + mot_suivant;
+    }
+}
     
