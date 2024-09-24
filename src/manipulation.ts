@@ -1,11 +1,9 @@
 import { Fonction, MotsPos, SyntagmeEleve } from "./phrase";
-import { byID } from "./util";
+import { byID, elision } from "./util";
 import './manipulation.css';
 import dragula from 'dragula';
 import 'dragula/dist/dragula.min.css';
 // TODO FIXME attention au problème lié au sujet des verbes à l'impératif (notamment) : revoir le fonctionnement: c'est plus compliqué que ce qui se trouve dans cette page
-// C'est à Don Diègue que Il donne un soufflet -> à améliorer
-// Aussi : As-tu trouvé le livre ? C'est Tu qui as trouvé le livre.
 
 function cree_champ(titre: string, contenu: string) : string {
     return `<fieldset class="manipulation-element">
@@ -33,6 +31,8 @@ function gere_element_deplace(elt: string): string {
 
     return remplacements.get(elt) ?? elt;
 }
+
+
 
 function cree_suppression(syntagme: SyntagmeEleve, mots_selectionnes: MotsPos): string {
     const attr_offset = syntagme.offset_pos(mots_selectionnes);
@@ -139,8 +139,8 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
         const infos_de_manipulation = syntagme.corrige.infos_de_manipulation("cod");
         const pronom_interrogatif = infos_de_manipulation.est_anime ? "Qui " : "Qu'";
         const select_pronom = "le la l' les me m' te t' nous vous en".split(" ").map( e => `<option value="${e.toLowerCase()}">${e}</option>`).join(" ");
-        byID("manipulations-form-contenu").innerHTML = cree_champ("Question",`${pronom_interrogatif}est-ce que ${sujet} ${verbe}${attr_cod} ? ${drop_zone}`) + 
-            cree_champ("Extraction", `C'est ${drop_zone} que ${sujet} ${verbe}${attr_cod}.`) +
+        byID("manipulations-form-contenu").innerHTML = cree_champ("Question",`${pronom_interrogatif}est-ce ${elision("que",sujet)} ${verbe}${attr_cod} ? ${drop_zone}`) + 
+            cree_champ("Extraction", `C'est ${drop_zone} ${elision("que",sujet)} ${verbe}${attr_cod}.`) +
             cree_champ("Pronominalisation",`${sujet} ${verbe} ${syntagme.texte_pos(mots_selectionnes)}${attr_cod} ${fleche} ${sujet} <select name="pronoms"><option disabled selected value>--</option>${select_pronom}</select> ${verbe}${attr_cod}.`);
 
     } else if (f === "coi") {
@@ -151,7 +151,7 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
         const pronom_interrogatif = preposition + " " +infos_de_manipulation.est_anime ? "qui " : "quoi";
         const select_pronom = "lui leur me moi m' te t' toi en y".split(" ").map( e => `<option value="${e.toLowerCase()}">${e}</option>`).join(" ");
         byID("manipulations-form-contenu").innerHTML = cree_champ("Question", `${sujet} ${verbe}${cod} ${preposition} ${pronom_interrogatif} ? ${drop_zone}`) +
-            cree_champ("Extraction", `C'est ${drop_zone} que ${sujet} ${verbe}${cod}.`) +
+            cree_champ("Extraction", `C'est ${drop_zone} ${elision("que", sujet)} ${verbe}${cod}.`) +
             cree_champ("Pronominalisation",`${sujet} ${verbe}${cod} ${preposition} ${syntagme.texte_pos(mots_selectionnes)} ${fleche} ${sujet} <select name="pronoms"><option disabled selected value>--</option>${select_pronom}</select> ${verbe}${cod}.`);
 
     } else if (f === "groupe_verbal") {
