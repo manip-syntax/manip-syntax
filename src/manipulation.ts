@@ -4,7 +4,7 @@ import './manipulation.css';
 import dragula from 'dragula';
 import 'dragula/dist/dragula.min.css';
 // TODO FIXME attention au problème lié au sujet des verbes à l'impératif (notamment) : revoir le fonctionnement: c'est plus compliqué que ce qui se trouve dans cette page
-// Il le cherche -> Qui est-ce qui cherche le ? C'est ... qui cherche le
+// Elle le donne à son voisin -> elle [lui] le donne
 
 function cree_champ(titre: string, contenu: string) : string {
     return `<fieldset class="manipulation-element">
@@ -86,6 +86,28 @@ function recupere_sujet(syntagme: SyntagmeEleve) : string {
     return "";
 }
 
+function gere_groupe_verbal(syntagme: SyntagmeEleve, verbe: string): string {
+    /* Gère le groupe verbal (verbe + COD, COI, attribut_du_sujet)
+     * pour mettre les compléments avant ou après le verbe
+     */
+    const complement = function () {
+            if (syntagme.corrige.aFonction("attribut_du_sujet")) {
+                return syntagme.fonction_texte_pos("attribut_du_sujet");
+            } else if (syntagme.corrige.aFonction("cod")) {
+                return syntagme.fonction_texte_pos("cod");
+            }
+            return "";
+        }();
+    if ("me moi te toi se soi lui la nous vous les leur en y".indexOf(complement) > -1) {
+        return complement + " " + verbe;
+    }
+    else if ("m' t' s' l'".indexOf(complement) > -1) {
+        return complement + verbe;
+    } else {
+        return verbe + " " + complement;
+    }
+}
+
 
 export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots_selectionnes: MotsPos) {
     const modal = byID("modal-manipulations");
@@ -115,24 +137,16 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
     </svg> </span>`
 
     if (f === "sujet") {
-        const derriere_verbe = " " +
-        function () { if (syntagme.corrige.aFonction("attribut_du_sujet")) {
-            return syntagme.fonction_texte_pos("attribut_du_sujet");
-        } else if (syntagme.corrige.aFonction("cod")) {
-            return syntagme.fonction_texte_pos("cod");
-        }
-        return "";
-        }();
 
         const infos_de_manipulation = syntagme.corrige.infos_de_manipulation("sujet");
         const pronom_interrogatif = infos_de_manipulation.est_anime ? "Qui " : "Qu'";
         const select_pronom = "Je Tu Il Elle Nous Vous Ils Elles C' Ce Cela".split(" ").map( e => `<option value="${e.toLowerCase()}">${e}</option>`).join(" ");
-        byID("manipulations-form-contenu").innerHTML = `<fieldset class="manipulation-element"><legend class="manipulation-element-titre">Question</legend><span class="manipulation-element-contenu">${pronom_interrogatif}est-ce qui ${verbe}${derriere_verbe} ? ${drop_zone}</span></fieldset>` +
-            `<fieldset class="manipulation-element"><legend class="manipulation-element-titre">Extraction</legend><span class="manipulation-element-contenu">C'est ${drop_zone} qui ${verbe}${derriere_verbe}. </span></fieldset>` +
+        byID("manipulations-form-contenu").innerHTML = `<fieldset class="manipulation-element"><legend class="manipulation-element-titre">Question</legend><span class="manipulation-element-contenu">${pronom_interrogatif}est-ce qui ${gere_groupe_verbal(syntagme, verbe)} ? ${drop_zone}</span></fieldset>` +
+            `<fieldset class="manipulation-element"><legend class="manipulation-element-titre">Extraction</legend><span class="manipulation-element-contenu">C'est ${drop_zone} qui ${gere_groupe_verbal(syntagme, verbe)}. </span></fieldset>` +
             (infos_de_manipulation.pronominalisation === null ? "" : 
             '<fieldset class="manipulation-element"><legend class="manipulation-element-titre">Pronominalisation</legend>' +
-            `<span class="manipulation-element-contenu">${syntagme.texte_pos(mots_selectionnes)} ${verbe}${derriere_verbe}. ${fleche}
-        <select name="pronoms"><option disabled selected value>--</option>${select_pronom}</select> ${verbe}${derriere_verbe}.</span></fieldset>`);
+            `<span class="manipulation-element-contenu">${syntagme.texte_pos(mots_selectionnes)} ${gere_groupe_verbal(syntagme, verbe)}. ${fleche}
+        <select name="pronoms"><option disabled selected value>--</option>${select_pronom}</select> ${gere_groupe_verbal(syntagme, verbe)}.</span></fieldset>`);
 
     } else if (f === "cod") {
         const sujet = recupere_sujet(syntagme);
@@ -146,14 +160,13 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
 
     } else if (f === "coi") {
         const sujet = recupere_sujet(syntagme);
-        const cod = syntagme.corrige.aFonction("cod") ? " " + syntagme.fonction_texte_pos("cod") : "";
         const infos_de_manipulation = syntagme.corrige.infos_de_manipulation("coi");
         const preposition = infos_de_manipulation.preposition;
         const pronom_interrogatif = preposition + " " +infos_de_manipulation.est_anime ? "qui " : "quoi";
         const select_pronom = "lui leur me moi m' te t' toi en y".split(" ").map( e => `<option value="${e.toLowerCase()}">${e}</option>`).join(" ");
-        byID("manipulations-form-contenu").innerHTML = cree_champ("Question", `${sujet} ${verbe}${cod} ${preposition} ${pronom_interrogatif} ? ${drop_zone}`) +
-            cree_champ("Extraction", `C'est ${drop_zone} ${elision("que", sujet)} ${verbe}${cod}.`) +
-            cree_champ("Pronominalisation",`${sujet} ${verbe}${cod} ${preposition} ${syntagme.texte_pos(mots_selectionnes)} ${fleche} ${sujet} <select name="pronoms"><option disabled selected value>--</option>${select_pronom}</select> ${verbe}${cod}.`);
+        byID("manipulations-form-contenu").innerHTML = cree_champ("Question", `${sujet} ${gere_groupe_verbal(syntagme, verbe)} ${preposition} ${pronom_interrogatif} ? ${drop_zone}`) +
+            cree_champ("Extraction", `C'est ${drop_zone} ${elision("que", sujet)} ${gere_groupe_verbal(syntagme, verbe)}.`) +
+            cree_champ("Pronominalisation",`${sujet} ${gere_groupe_verbal(syntagme, verbe)} ${preposition} ${syntagme.texte_pos(mots_selectionnes)} ${fleche} ${sujet} <select name="pronoms"><option disabled selected value>--</option>${select_pronom}</select> ${gere_groupe_verbal(syntagme, verbe)}.`);
 
     } else if (f === "groupe_verbal") {
         const sujet = recupere_sujet(syntagme);
