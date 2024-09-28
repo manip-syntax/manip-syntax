@@ -56,7 +56,6 @@ function cree_suppression(syntagme: SyntagmeEleve, mots_selectionnes: MotsPos): 
 function cree_deplacement(syntagme: SyntagmeEleve, mots_selectionnes: MotsPos): string {
     let phrase_cassee = '<span id="dragula-container">';
     for (let p=0; p < syntagme.longueur; p++) {
-        console.log("p",p, mots_selectionnes);
         if (mots_selectionnes.indexOf(p) > -1) {
             phrase_cassee += `<span class="dragula-draggable">${syntagme.texte_pos(mots_selectionnes)} </span> `;
             p = mots_selectionnes.length -1;
@@ -182,7 +181,6 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
     } else if (f === "complement_circonstanciel") {
         byID("manipulations-form-contenu").innerHTML = cree_suppression(syntagme, mots_selectionnes) +
             cree_deplacement(syntagme, mots_selectionnes);
-        //cree_evenements_deplacements();
         byID("manipulable").style.visibility = "collapse";
         dragula([byID("dragula-container") ],
                 {
@@ -190,9 +188,12 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
                         if (el === undefined) {
                             throw Error("el is undefined");
                         }
+                        if (el.className === "dragula-draggable") {
+                            el.className += " dragged";
+                        }
                         return el.className !== 'dragula-dz';
                       },
-              accepts: function (_el, _target, _source, sibling) {
+                  accepts: function (_el, _target, _source, sibling) {
                         if (sibling === undefined) {
                             throw Error("sibling is undefined");
                         }
@@ -250,7 +251,7 @@ export function manipulation_faite(): boolean {
         return false;
     }
 
-    if (document.querySelectorAll(".manipulation-deplacable").length !== document.querySelectorAll(".manipulation-deplace").length) {
+    if (document.querySelectorAll(".dragula-draggable").length !== document.querySelectorAll(".dragged").length) {
         return false;
     }
 
