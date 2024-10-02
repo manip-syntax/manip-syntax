@@ -479,7 +479,7 @@ export class CreateurPhrase {
                         pronoms = "je j' tu il elle nous vous ils elles ce cela c'";
                     break;
                     case "COD":
-                        pronoms = "me m' te t' le la l' nous vous les en";
+                        pronoms = "me m' te t' le la l' nous vous les en cela";
                     break;
                     case "COI":
                         pronoms = "me m' moi te t' toi elle lui nous vous leur en y";
