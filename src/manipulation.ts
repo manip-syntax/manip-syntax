@@ -58,7 +58,7 @@ function cree_deplacement(syntagme: SyntagmeEleve, mots_selectionnes: MotsPos): 
     for (let p=0; p < syntagme.longueur; p++) {
         if (mots_selectionnes.indexOf(p) > -1) {
             phrase_cassee += `<span class="dragula-draggable">${syntagme.texte_pos(mots_selectionnes)} </span> `;
-            p = mots_selectionnes.length -1;
+            p += mots_selectionnes.length -1;
         }
         else {
             phrase_cassee += `<span class="dragula-dz" >${syntagme.texte_pos([p])}</span> `;
@@ -152,7 +152,7 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
         const attr_cod = syntagme.corrige.aFonction("attribut_du_cod") ? " " + syntagme.fonction_texte_pos("attribut_du_cod") : "";
         const infos_de_manipulation = syntagme.corrige.infos_de_manipulation("cod");
         const pronom_interrogatif = infos_de_manipulation.est_anime ? "Qui " : "Qu'";
-        const select_pronom = "le la l' les me m' te t' nous vous en".split(" ").map( e => `<option value="${e.toLowerCase()}">${e}</option>`).join(" ");
+        const select_pronom = "le la l' les me m' te t' nous vous en cela".split(" ").map( e => `<option value="${e.toLowerCase()}">${e}</option>`).join(" ");
         byID("manipulations-form-contenu").innerHTML = cree_champ("Question",`${pronom_interrogatif}est-ce ${elision("que",sujet)} ${verbe}${attr_cod} ? ${drop_zone}`) + 
             cree_champ("Extraction", `C'est ${drop_zone} ${elision("que",sujet)} ${verbe}${attr_cod}.`) +
             cree_champ("Pronominalisation",`${sujet} ${verbe} ${syntagme.texte_pos(mots_selectionnes)}${attr_cod} ${fleche} ${sujet} <select name="pronoms"><option disabled selected value>--</option>${select_pronom}</select> ${verbe}${attr_cod}.`);
