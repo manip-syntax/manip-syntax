@@ -278,6 +278,7 @@ class Analyseur {
 
         else if ("attribut_du_sujet cod".split(" ").includes(this._fonction_courante)) {
             if (this._corrige.aFonction("attribut_du_cod")) {
+                this.analyse_suivante();
                 return;
             }
             deux_manipulations(this._fonction_courante);
