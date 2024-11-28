@@ -155,7 +155,8 @@ export function manipulation_fonction(f: Fonction, syntagme: SyntagmeEleve, mots
         const select_pronom = "le la l' les me m' te t' nous vous en cela".split(" ").map( e => `<option value="${e.toLowerCase()}">${e}</option>`).join(" ");
         byID("manipulations-form-contenu").innerHTML = cree_champ("Question",`${pronom_interrogatif}est-ce ${elision("que",sujet)} ${verbe}${attr_cod} ? ${drop_zone}`) + 
             cree_champ("Extraction", `C'est ${drop_zone} ${elision("que",sujet)} ${verbe}${attr_cod}.`) +
-            cree_champ("Pronominalisation",`${sujet} ${verbe} ${syntagme.texte_pos(mots_selectionnes)}${attr_cod} ${fleche} ${sujet} <select name="pronoms"><option disabled selected value>--</option>${select_pronom}</select> ${verbe}${attr_cod}.`);
+            (infos_de_manipulation.pronominalisation === null ? "" : 
+            cree_champ("Pronominalisation",`${sujet} ${verbe} ${syntagme.texte_pos(mots_selectionnes)}${attr_cod} ${fleche} ${sujet} <select name="pronoms"><option disabled selected value>--</option>${select_pronom}</select> ${verbe}${attr_cod}.`));
 
     } else if (f === "coi") {
         const sujet = recupere_sujet(syntagme);
