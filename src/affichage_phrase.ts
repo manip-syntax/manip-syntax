@@ -171,7 +171,8 @@ export function affiche_consigne(base: string, syntagme: SyntagmeEleve): string 
       complement_du_nom: 'le complément du nom',
       complement_du_pronom: 'le complément du pronom',
       apposition: "l'apposition",
-      complement_de_l_adjectif: "le complément de l'adjectif"
+      complement_de_l_adjectif: "le complément de l'adjectif",
+      determinant : "le déterminant"
     };
 
     // on retire le premier membre : la phrase

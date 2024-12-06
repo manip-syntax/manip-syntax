@@ -29,6 +29,7 @@ export const liste_des_fonctions: { [nom: string] : Fonction } = {
     "Connecteur" : "connecteur",
     "Balise textuelle" : "balise_textuelle",
     "Noyau" : "noyau",
+    "Déterminant": "determinant",
     "Épithète" : "epithete",
     "Complément du nom" : "complement_du_nom",
     "Complément du pronom": "complement_du_pronom",

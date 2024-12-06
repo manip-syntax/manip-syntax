@@ -18,6 +18,7 @@ export type Fonction =
     "epithete" |
     "apposition" |
     "complement_de_l_adjectif" |
+    "determinant" |
 // énonciatives et textuelles
     "modalisateur" |
     "auto-enonciative" |

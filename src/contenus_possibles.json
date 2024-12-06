@@ -35,7 +35,8 @@
         "Modalisateur" : "modalisateur",
         "Fonction auto-énonciative" : "auto-enonciative",
         "Connecteur" : "connecteur",
-        "Balise textuelle" : "balise_textuelle"
+        "Balise textuelle" : "balise_textuelle",
+        "Déterminant" : "determinant"
 	},
 
 	"cod" : {
@@ -57,7 +58,8 @@
         "Modalisateur" : "modalisateur",
         "Fonction auto-énonciative" : "auto-enonciative",
         "Connecteur" : "connecteur",
-        "Balise textuelle" : "balise_textuelle"
+        "Balise textuelle" : "balise_textuelle",
+        "Déterminant" : "determinant"
 	},
 
 	"coi" : {
@@ -79,7 +81,8 @@
         "Modalisateur" : "modalisateur",
         "Fonction auto-énonciative" : "auto-enonciative",
         "Connecteur" : "connecteur",
-        "Balise textuelle" : "balise_textuelle"
+        "Balise textuelle" : "balise_textuelle",
+        "Déterminant" : "determinant"
 	},
 
 	"attribut_du_sujet" : {
@@ -102,7 +105,8 @@
         "Modalisateur" : "modalisateur",
         "Fonction auto-énonciative" : "auto-enonciative",
         "Connecteur" : "connecteur",
-        "Balise textuelle" : "balise_textuelle"
+        "Balise textuelle" : "balise_textuelle",
+        "Déterminant" : "determinant"
 	},
 
 	"attribut_du_cod" : {
@@ -125,7 +129,8 @@
         "Modalisateur" : "modalisateur",
         "Fonction auto-énonciative" : "auto-enonciative",
         "Connecteur" : "connecteur",
-        "Balise textuelle" : "balise_textuelle"
+        "Balise textuelle" : "balise_textuelle",
+        "Déterminant" : "determinant"
 	},
 
 	"complement_d_agent" : {
@@ -147,7 +152,8 @@
         "Modalisateur" : "modalisateur",
         "Fonction auto-énonciative" : "auto-enonciative",
         "Connecteur" : "connecteur",
-        "Balise textuelle" : "balise_textuelle"
+        "Balise textuelle" : "balise_textuelle",
+        "Déterminant" : "determinant"
 	},
 
 	"complement_circonstanciel" : {
@@ -169,7 +175,8 @@
         "Modalisateur" : "modalisateur",
         "Fonction auto-énonciative" : "auto-enonciative",
         "Connecteur" : "connecteur",
-        "Balise textuelle" : "balise_textuelle"
+        "Balise textuelle" : "balise_textuelle",
+        "Déterminant" : "determinant"
 	},
 
 	"complement_du_verbe_impersonnel" : {
@@ -191,7 +198,8 @@
         "Épithète" : "epithete",
         "Complément du nom" : "complement_du_nom",
         "Complément du pronom": "complement_du_pronom",
-        "Apposition" : "apposition"
+        "Apposition" : "apposition",
+        "Déterminant" : "determinant"
 	},
 	
 	"epithete" : {	
@@ -218,7 +226,8 @@
         "Épithète" : "epithete",
         "Complément du nom" : "complement_du_nom",
         "Complément du pronom": "complement_du_pronom",
-        "Apposition" : "apposition"
+        "Apposition" : "apposition",
+        "Déterminant" : "determinant"
 	},
 
 	"complement_du_pronom" : {
@@ -240,7 +249,8 @@
         "Épithète" : "epithete",
         "Complément du nom" : "complement_du_nom",
         "Complément du pronom": "complement_du_pronom",
-        "Apposition" : "apposition"
+        "Apposition" : "apposition",
+        "Déterminant" : "determinant"
 	},
 
 	"apposition" : {
@@ -263,7 +273,8 @@
         "Épithète" : "epithete",
         "Complément du nom" : "complement_du_nom",
         "Complément du pronom": "complement_du_pronom",
-        "Apposition" : "apposition"	
+        "Apposition" : "apposition",
+        "Déterminant" : "determinant"
 	},
 
         "complement_de_l_adjectif" : {
@@ -271,7 +282,8 @@
         "Épithète" : "epithete",
         "Complément du nom" : "complement_du_nom",
         "Complément du pronom": "complement_du_pronom",
-        "Apposition" : "apposition"
+        "Apposition" : "apposition",
+        "Déterminant" : "determinant"
 	}
 
 
